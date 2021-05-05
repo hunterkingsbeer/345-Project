@@ -27,7 +27,7 @@ struct ContentView: View {
             VStack {
                 HStack {
                     Text("Receipt App.")
-                        .font(.system(.largeTitle, design: .rounded)).bold()
+                        .font(.system(.body, design: .rounded)).bold()
                     Spacer()
                 }
                 

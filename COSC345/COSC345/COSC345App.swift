@@ -7,6 +7,9 @@
 
 import SwiftUI
 
+/**
+ just testing some doc code that updates as built
+ */
 @main
 struct COSC345App: App {
     let persistenceController = PersistenceController.shared

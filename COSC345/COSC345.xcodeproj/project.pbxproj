@@ -85,6 +85,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5A1CFB73262BDA7F00C33F55 /* Build configuration list for PBXNativeTarget "COSC345" */;
 			buildPhases = (
+				250AB7B226416C40006D9AD5 /* Run Script */,
 				5A1CFB5B262BDA7B00C33F55 /* Sources */,
 				5A1CFB5C262BDA7B00C33F55 /* Frameworks */,
 				5A1CFB5D262BDA7B00C33F55 /* Resources */,
@@ -141,6 +142,29 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		250AB7B226416C40006D9AD5 /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/newInputFile",
+			);
+			name = "Run Script";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "chmod +x init_script\n\nif [[ $(ps ax | grep -c \"init_script\") == 1 ]]; then\n        echo \"Script already running\"\n        killall Terminal    \nsleep 2\nopen -a Terminal\nosascript -e 'tell application \"Terminal\" to set miniaturized of every window to true'\nsleep 2\nosascript -e 'tell application \"Terminal\" to activate' -e 'tell application \"Terminal\" to do script \"cd $SRCROOT\" in window 1' \nosascript -e 'tell application \"Terminal\" to do script \"./init_script\" in window 1'\nosascript -e 'tell application \"Terminal\" to do script \"killall Terminal\" in window 1'\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		5A1CFB5B262BDA7B00C33F55 /* Sources */ = {
@@ -279,9 +303,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"COSC345/Preview Content\"";
-				DEVELOPMENT_TEAM = TJ3X96WH43;
+				DEVELOPMENT_TEAM = 532Z8N5QBN;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = COSC345/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -289,8 +314,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.kingsbeer.COSC345;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tane.COSC345;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -301,9 +327,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"COSC345/Preview Content\"";
-				DEVELOPMENT_TEAM = TJ3X96WH43;
+				DEVELOPMENT_TEAM = 532Z8N5QBN;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = COSC345/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -311,8 +338,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.kingsbeer.COSC345;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tane.COSC345;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
