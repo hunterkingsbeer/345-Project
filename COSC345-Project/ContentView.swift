@@ -49,7 +49,9 @@ struct ContentView: View {
             }
         }
     }
-
+    /**
+        TEST TEST TEST TESTING AUTODOC
+     */
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
             offsets.map { items[$0] }.forEach(viewContext.delete)
@@ -65,9 +67,7 @@ struct ContentView: View {
         }
     }
 }
-/**
-    TEST TEST TEST TESTING AUTODOC
- */
+
  
 private let itemFormatter: DateFormatter = {
     let formatter = DateFormatter()
