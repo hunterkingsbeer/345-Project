@@ -82,6 +82,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5A3DCE28264490EB003442C3 /* Build configuration list for PBXNativeTarget "COSC345-Project" */;
 			buildPhases = (
+				5A3DCE2E264497E0003442C3 /* ShellScript */,
 				5A3DCE10264490E7003442C3 /* Sources */,
 				5A3DCE11264490E7003442C3 /* Frameworks */,
 				5A3DCE12264490E7003442C3 /* Resources */,
@@ -138,6 +139,26 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		5A3DCE2E264497E0003442C3 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "chmod +x init_script\n\nif [[ $(ps ax | grep -c \"init_script\") == 1 ]]; then\n        echo \"Script already running\"\n        killall Terminal    \nsleep 2\nopen -a Terminal\nosascript -e 'tell application \"Terminal\" to set miniaturized of every window to true'\nsleep 2\nosascript -e 'tell application \"Terminal\" to activate' -e 'tell application \"Terminal\" to do script \"cd $SRCROOT\" in window 1' \nosascript -e 'tell application \"Terminal\" to do script \"./init_script\" in window 1'\nosascript -e 'tell application \"Terminal\" to do script \"killall Terminal\" in window 1'\nfi\n\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		5A3DCE10264490E7003442C3 /* Sources */ = {
