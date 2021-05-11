@@ -1,0 +1,131 @@
+{
+  "warnings": [
+    {
+      "file": "/Users/hunter/University/APP/COSC345-Project/COSC345-Project/COSC345_ProjectApp.swift",
+      "line": 11,
+      "symbol": "COSC345_ProjectApp",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/hunter/University/APP/COSC345-Project/COSC345-Project/COSC345_ProjectApp.swift",
+      "line": 12,
+      "symbol": "COSC345_ProjectApp.persistenceController",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/hunter/University/APP/COSC345-Project/COSC345-Project/ContentView.swift",
+      "line": 11,
+      "symbol": "ContentView",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/hunter/University/APP/COSC345-Project/COSC345-Project/ContentView.swift",
+      "line": 12,
+      "symbol": "ContentView.viewContext",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/hunter/University/APP/COSC345-Project/COSC345-Project/ContentView.swift",
+      "line": 17,
+      "symbol": "ContentView.items",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/hunter/University/APP/COSC345-Project/COSC345-Project/ContentView.swift",
+      "line": 37,
+      "symbol": "ContentView.addItem()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/hunter/University/APP/COSC345-Project/COSC345-Project/ContentView.swift",
+      "line": 72,
+      "symbol": "itemFormatter",
+      "symbol_kind": "source.lang.swift.decl.var.global",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/hunter/University/APP/COSC345-Project/COSC345-Project/ContentView.swift",
+      "line": 79,
+      "symbol": "ContentView_Previews",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/hunter/University/APP/COSC345-Project/COSC345-Project/Persistence.swift",
+      "line": 10,
+      "symbol": "PersistenceController",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/hunter/University/APP/COSC345-Project/COSC345-Project/Persistence.swift",
+      "line": 11,
+      "symbol": "PersistenceController.shared",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/hunter/University/APP/COSC345-Project/COSC345-Project/Persistence.swift",
+      "line": 13,
+      "symbol": "PersistenceController.preview",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/hunter/University/APP/COSC345-Project/COSC345-Project/Persistence.swift",
+      "line": 31,
+      "symbol": "PersistenceController.container",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/hunter/University/APP/COSC345-Project/COSC345-Project/Persistence.swift",
+      "line": 33,
+      "symbol": "PersistenceController.init(inMemory:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/hunter/University/APP/COSC345-Project/build/COSC345-Project.build/Release-iphoneos/COSC345-Project.build/DerivedSources/CoreDataGenerated/COSC345_Project/Item+CoreDataClass.swift",
+      "line": 14,
+      "symbol": "Item",
+      "symbol_kind": "source.lang.swift.decl.class",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/hunter/University/APP/COSC345-Project/build/COSC345-Project.build/Release-iphoneos/COSC345-Project.build/DerivedSources/CoreDataGenerated/COSC345_Project/Item+CoreDataClass.swift",
+      "line": 14,
+      "symbol": "Item",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/hunter/University/APP/COSC345-Project/build/COSC345-Project.build/Release-iphoneos/COSC345-Project.build/DerivedSources/CoreDataGenerated/COSC345_Project/Item+CoreDataClass.swift",
+      "line": 24,
+      "symbol": "Item",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/hunter/University/APP/COSC345-Project/build/COSC345-Project.build/Release-iphoneos/COSC345-Project.build/DerivedSources/CoreDataGenerated/COSC345_Project/Item+CoreDataProperties.swift",
+      "line": 16,
+      "symbol": "Item.fetchRequest()",
+      "symbol_kind": "source.lang.swift.decl.function.method.class",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/hunter/University/APP/COSC345-Project/build/COSC345-Project.build/Release-iphoneos/COSC345-Project.build/DerivedSources/CoreDataGenerated/COSC345_Project/Item+CoreDataProperties.swift",
+      "line": 20,
+      "symbol": "Item.timestamp",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    }
+  ],
+  "source_directory": "/Users/hunter/University/APP/COSC345-Project"
+}
