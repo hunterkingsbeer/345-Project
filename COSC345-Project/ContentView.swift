@@ -42,22 +42,7 @@ struct ContentView: View {
         NavigationView {
             ZStack(alignment: .top) {
                 // BACKGROUND BLOBS ------------------
-                VStack {
-                    Circle()
-                        .fill(LinearGradient(gradient: Gradient(colors: [Color("orange"), Color("purple")]),
-                                             startPoint: .top, endPoint: .bottom))
-                        .scaleEffect(x: 1.5) // gives it that clean stretched out look
-                        .padding(.top, -UIScreen.screenHeight * (addPanelState == .homepage ? 0.5 : 0.38))
-                        .animation(.spring())
-                    Spacer()
-                    Circle()
-                        .fill(LinearGradient(gradient: Gradient(colors: [Color("purple"), Color("cyan")]),
-                                             startPoint: .top, endPoint: .bottom))
-                        .scaleEffect(x: 1.5)
-                        .padding(.bottom, -UIScreen.screenHeight * (addPanelState == .homepage ? 0.5 : 0.38))
-                        .animation(.spring())
-                }
-                
+                BackgroundView(addPanelState: addPanelState, dashPanelState: dashPanelState)
                 
                 // COMPANY TITLE ------------------
                 VStack{
@@ -624,3 +609,28 @@ struct CustomTextField: View {
     }
 }
 
+
+struct BackgroundView: View {
+    var addPanelState : AddPanelType
+    var dashPanelState : DashPanelType
+    
+    var body: some View {
+        VStack {
+            Circle()
+                .fill(LinearGradient(gradient: Gradient(colors: [Color("orange"), Color("purple")]),
+                                     startPoint: .top, endPoint: .bottom))
+                .scaleEffect(x: 1.5) // gives it that clean stretched out look
+                .padding(.top, -UIScreen.screenHeight * (dashPanelState == .homepage ? 0.5 : 0.38))
+                .animation(.spring())
+            
+            Spacer()
+            
+            Circle()
+                .fill(LinearGradient(gradient: Gradient(colors: [Color("purple"), Color("cyan")]),
+                                     startPoint: .top, endPoint: .bottom))
+                .scaleEffect(x: 1.5)
+                .padding(.bottom, -UIScreen.screenHeight * (addPanelState == .homepage ? 0.5 : 0.38))
+                .animation(.spring())
+        }
+    }
+}
