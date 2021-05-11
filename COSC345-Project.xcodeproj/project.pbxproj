@@ -156,7 +156,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#chmod +x init_script\n\n#if [[ $(ps ax | grep -c \"init_script\") == 1 ]]; then\n #       echo \"Script already running\"\n  #      killall Terminal    \n#sleep 2\n#open -a Terminal\n#osascript -e 'tell application \"Terminal\" to set miniaturized of every window to true'\n#sleep 2\n#osascript -e 'tell application \"Terminal\" to activate' -e 'tell application \"Terminal\" to do script \"cd $SRCROOT\" in window 1' \n#osascript -e 'tell application \"Terminal\" to do script \"./init_script\" in window 1'\n#osascript -e 'tell application \"Terminal\" to do script \"killall Terminal\" in window 1'\n#fi\n\n";
+			shellScript = "#chmod +x init_script\n\n#if [[ $(ps ax | grep -c \"init_script\") == 1 ]]; then\n #       echo \"Script already running\"\n  #      killall Terminal    \n#sleep 2\n#open -a Terminal\n#osascript -e 'tell application \"Terminal\" to set miniaturized of every window to true'\n#sleep 2\n#osascript -e 'tell application \"Terminal\" to activate' -e 'tell application \"Terminal\" to do script \"cd $SRCROOT\" in window 1' \n#osascript -e 'tell application \"Terminal\" to do script \"./init_script\" in window 1'\n#osascript -e 'tell application \"Terminal\" to do script \"killall Terminal\" in window 1'\n#fi\n\n# another test\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
