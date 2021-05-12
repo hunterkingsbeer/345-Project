@@ -12,7 +12,10 @@ import CoreData
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+        Group {
+            ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+            ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+        }
     }
 }
 
@@ -33,7 +36,9 @@ enum DashPanelType {
     case settings
     case notifications
 }
-
+/**
+ Content View stuff
+ */
 struct ContentView: View {
     @State var addPanelState : AddPanelType = .homepage
     @State var dashPanelState : DashPanelType = .homepage

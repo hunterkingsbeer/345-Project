@@ -1,9 +1,9 @@
-//
-//  COSC345_ProjectApp.swift
-//  COSC345-Project
-//
-//  Created by Hunter Kingsbeer on 7/05/21.
-//
+///
+///  COSC345_ProjectApp.swift
+///  COSC345-Project
+///
+/// Created by Hunter Kingsbeer on 7/05/21.
+///
 
 import SwiftUI
 
