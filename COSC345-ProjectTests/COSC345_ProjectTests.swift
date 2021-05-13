@@ -18,15 +18,16 @@ class COSC345_ProjectTests: XCTestCase {
     }
 
     func testExample() throws {
+        XCTAssert(1==1)
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
     }
 
     func testPerformanceExample() throws {
         // This is an example of a performance test case.
-        measure {
+        /*measure {
             // Put the code you want to measure the time of here.
-        }
+        }*/
     }
 
 }
