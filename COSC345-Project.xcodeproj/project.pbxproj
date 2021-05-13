@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -13,8 +13,8 @@
 		5A3DCE1F264490EB003442C3 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5A3DCE1E264490EB003442C3 /* Preview Assets.xcassets */; };
 		5A3DCE21264490EB003442C3 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A3DCE20264490EB003442C3 /* Persistence.swift */; };
 		5A3DCE24264490EB003442C3 /* COSC345_Project.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5A3DCE22264490EB003442C3 /* COSC345_Project.xcdatamodeld */; };
-		5AEDB898264DCD8D003A3CDD /* COSC345_ProjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AEDB897264DCD8D003A3CDD /* COSC345_ProjectTests.swift */; };
-		5AEDB8A6264DD6AB003A3CDD /* COSC345_ProjectUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AEDB8A5264DD6AB003A3CDD /* COSC345_ProjectUITests.swift */; };
+		5AEDB898264DCD8D003A3CDD /* COSC345_ProjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AEDB897264DCD8D003A3CDD /* COSC345_ProjectTests.swift */; platformFilter = ios; };
+		5AEDB8A6264DD6AB003A3CDD /* COSC345_ProjectUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AEDB8A5264DD6AB003A3CDD /* COSC345_ProjectUITests.swift */; platformFilter = ios; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -302,6 +302,7 @@
 		};
 		5AEDB8A9264DD6AB003A3CDD /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
+			platformFilter = ios;
 			target = 5A3DCE13264490E7003442C3 /* COSC345-Project */;
 			targetProxy = 5AEDB8A8264DD6AB003A3CDD /* PBXContainerItemProxy */;
 		};
@@ -453,7 +454,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"COSC345-Project/Preview Content\"";
-				DEVELOPMENT_TEAM = TJ3X96WH43;
+				DEVELOPMENT_TEAM = 532Z8N5QBN;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "COSC345-Project/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
@@ -493,8 +494,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = TJ3X96WH43;
+				DEVELOPMENT_TEAM = 532Z8N5QBN;
 				INFOPLIST_FILE = "COSC345-ProjectTests/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -522,6 +524,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 11.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.kingsbeer.COSC345-ProjectUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -533,8 +536,9 @@
 		5AEDB8AB264DD6AB003A3CDD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = TJ3X96WH43;
+				DEVELOPMENT_TEAM = 532Z8N5QBN;
 				INFOPLIST_FILE = "COSC345-ProjectUITests/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -542,6 +546,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 11.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.kingsbeer.COSC345-ProjectUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
