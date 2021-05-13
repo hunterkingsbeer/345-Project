@@ -58,14 +58,13 @@ struct ContentView: View {
                     if addPanelState == .homepage {
                         DashboardPanel(size: UIScreen.screenHeight * 0.55, dashPanelState: $dashPanelState)
                             .padding(.bottom, dashPanelState == .homepage ? 15 : 0)
-                            .transition(.opacity.combined(with: .scale(scale: 0.75)))
-                            //.transition(.scale(scale: 0.75))
+                            //.transition(.opacity.combined(with: .scale(scale: 0.75)))
                     }
                     
                     // ADD RECEIPT (LOWER) ------------------
                     if dashPanelState == .homepage {
                         AddPanel(addPanelState: $addPanelState)
-                            .transition(.opacity.combined(with: .scale(scale: 0.75)))
+                            //.transition(.opacity.combined(with: .scale(scale: 0.75)))
                     }
                 }.padding(.horizontal, addPanelState == .homepage ? 15 : 0)
             }.navigationBarTitle("").navigationBarHidden(true)
@@ -84,10 +83,10 @@ struct AddPanel: View {
                 VStack{
                     if addPanelState == .homepage {
                         AddPanelHomepageView(addPanelState: $addPanelState)
-                            .transition(.move(edge: .bottom).combined(with: .opacity)).animation(.spring())
+                            //.transition(.move(edge: .bottom).combined(with: .opacity)).animation(.spring())
                     } else {
                         AddPanelDetailView(addPanelState: $addPanelState)
-                            .transition(.move(edge: .bottom).combined(with: .opacity)).animation(.spring())
+                            //.transition(.move(edge: .bottom).combined(with: .opacity)).animation(.spring())
                     }
                 }
             ).foregroundColor(.black)
@@ -211,15 +210,15 @@ struct DashboardPanel: View{
                 VStack {
                     if dashPanelState == .homepage {
                         DashboardHomePageView(size: size, dashPanelState: $dashPanelState)
-                            .transition(.move(edge: .bottom).combined(with: .opacity)).animation(.spring())
+                            //.transition(.move(edge: .bottom).combined(with: .opacity)).animation(.spring())
                     } else {
                         if dashPanelState == .receipts { // receipts
                             ReceiptCollectionView(dashPanelState: $dashPanelState)
-                                .transition(.move(edge: .top).combined(with: .opacity)).animation(.spring()) // usually bottom
+                                //.transition(.move(edge: .top).combined(with: .opacity)).animation(.spring()) // usually bottom
                                 .frame(width: UIScreen.screenWidth*0.9)
                         } else if dashPanelState == .folders { // folders
                             FolderCollectionView(dashPanelState: $dashPanelState)
-                                .transition(.move(edge: .top).combined(with: .opacity)).animation(.spring())
+                                //.transition(.move(edge: .top).combined(with: .opacity)).animation(.spring())
                         }
                     }
                 }
@@ -249,13 +248,13 @@ struct DashboardHomePageView: View {
             
             if toolbarFocus == .homepage {
                 ReceiptsFoldersButtons(dashPanelState: $dashPanelState)
-                    .transition(.scale(scale: 0.8).combined(with: .opacity))
+                    //.transition(.scale(scale: 0.8).combined(with: .opacity))
             } else if toolbarFocus == .settings {
                 SettingsView()
-                    .transition(.move(edge: .leading).combined(with: .opacity))
+                    //.transition(.move(edge: .leading).combined(with: .opacity))
             } else if toolbarFocus == .notifications {
                 NotificationsView()
-                    .transition(.move(edge: .trailing).combined(with: .opacity))
+                    //.transition(.move(edge: .trailing).combined(with: .opacity))
             }
         }.foregroundColor(.black).padding(.horizontal)
     }
@@ -280,14 +279,14 @@ struct DashboardToolbar: View {
                         .scaleEffect((toolbarFocus == .settings ? 1.4 : 1))
                         .frame(minWidth: 0, maxWidth: .infinity)
                         .frame(minHeight: 0, maxHeight: .infinity)
-                        .transition(.move(edge: .leading).combined(with: .opacity))
+                        //.transition(.move(edge: .leading).combined(with: .opacity))
                 }.buttonStyle(ShrinkingButton()).contentShape(Rectangle())
             }
             
             Spacer()
             if toolbarFocus == .homepage {
                 Divider().padding(.vertical, 35)
-                    .transition(.scale(scale: 0.6).combined(with: .opacity))
+                    //.transition(.scale(scale: 0.6).combined(with: .opacity))
                 Spacer()
             }
             
@@ -302,7 +301,7 @@ struct DashboardToolbar: View {
                         .scaleEffect((toolbarFocus == .notifications ? 1.4 : 1))
                         .frame(minWidth: 0, maxWidth: .infinity)
                         .frame(minHeight: 0, maxHeight: .infinity)
-                        .transition(.move(edge: .trailing).combined(with: .opacity))
+                        //.transition(.move(edge: .trailing).combined(with: .opacity))
                 }.buttonStyle(ShrinkingButton()).contentShape(Rectangle())
             }
             Spacer()
