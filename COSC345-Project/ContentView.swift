@@ -45,6 +45,7 @@ struct ContentView: View {
 
     var body: some View {
         NavigationView {
+            
             ZStack(alignment: .top) {
                 // BACKGROUND BLOBS ------------------
                 BackgroundView(addPanelState: addPanelState, dashPanelState: dashPanelState)
@@ -594,7 +595,7 @@ extension UIScreen{
 struct ShrinkingButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.96 : 1)
+            .scaleEffect(configuration.isPressed ? 0.925 : 1)
             .animation(.spring())
     }
 }

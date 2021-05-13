@@ -13,7 +13,18 @@
 		5A3DCE1F264490EB003442C3 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5A3DCE1E264490EB003442C3 /* Preview Assets.xcassets */; };
 		5A3DCE21264490EB003442C3 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A3DCE20264490EB003442C3 /* Persistence.swift */; };
 		5A3DCE24264490EB003442C3 /* COSC345_Project.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5A3DCE22264490EB003442C3 /* COSC345_Project.xcdatamodeld */; };
+		5AEDB898264DCD8D003A3CDD /* COSC345_ProjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AEDB897264DCD8D003A3CDD /* COSC345_ProjectTests.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		5AEDB89A264DCD8D003A3CDD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5A3DCE0C264490E7003442C3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5A3DCE13264490E7003442C3;
+			remoteInfo = "COSC345-Project";
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		5A3DCE14264490E7003442C3 /* COSC345-Project.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "COSC345-Project.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -24,10 +35,20 @@
 		5A3DCE20264490EB003442C3 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		5A3DCE23264490EB003442C3 /* COSC345_Project.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = COSC345_Project.xcdatamodel; sourceTree = "<group>"; };
 		5A3DCE25264490EB003442C3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5AEDB895264DCD8C003A3CDD /* COSC345-ProjectTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "COSC345-ProjectTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5AEDB897264DCD8D003A3CDD /* COSC345_ProjectTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = COSC345_ProjectTests.swift; sourceTree = "<group>"; };
+		5AEDB899264DCD8D003A3CDD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		5A3DCE11264490E7003442C3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5AEDB892264DCD8C003A3CDD /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -41,6 +62,7 @@
 			isa = PBXGroup;
 			children = (
 				5A3DCE16264490E7003442C3 /* COSC345-Project */,
+				5AEDB896264DCD8D003A3CDD /* COSC345-ProjectTests */,
 				5A3DCE15264490E7003442C3 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -49,6 +71,7 @@
 			isa = PBXGroup;
 			children = (
 				5A3DCE14264490E7003442C3 /* COSC345-Project.app */,
+				5AEDB895264DCD8C003A3CDD /* COSC345-ProjectTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -75,6 +98,15 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		5AEDB896264DCD8D003A3CDD /* COSC345-ProjectTests */ = {
+			isa = PBXGroup;
+			children = (
+				5AEDB897264DCD8D003A3CDD /* COSC345_ProjectTests.swift */,
+				5AEDB899264DCD8D003A3CDD /* Info.plist */,
+			);
+			path = "COSC345-ProjectTests";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -97,17 +129,39 @@
 			productReference = 5A3DCE14264490E7003442C3 /* COSC345-Project.app */;
 			productType = "com.apple.product-type.application";
 		};
+		5AEDB894264DCD8C003A3CDD /* COSC345-ProjectTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5AEDB89E264DCD8D003A3CDD /* Build configuration list for PBXNativeTarget "COSC345-ProjectTests" */;
+			buildPhases = (
+				5AEDB891264DCD8C003A3CDD /* Sources */,
+				5AEDB892264DCD8C003A3CDD /* Frameworks */,
+				5AEDB893264DCD8C003A3CDD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5AEDB89B264DCD8D003A3CDD /* PBXTargetDependency */,
+			);
+			name = "COSC345-ProjectTests";
+			productName = "COSC345-ProjectTests";
+			productReference = 5AEDB895264DCD8C003A3CDD /* COSC345-ProjectTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		5A3DCE0C264490E7003442C3 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1240;
+				LastSwiftUpdateCheck = 1250;
 				LastUpgradeCheck = 1240;
 				TargetAttributes = {
 					5A3DCE13264490E7003442C3 = {
 						CreatedOnToolsVersion = 12.4;
+					};
+					5AEDB894264DCD8C003A3CDD = {
+						CreatedOnToolsVersion = 12.5;
+						TestTargetID = 5A3DCE13264490E7003442C3;
 					};
 				};
 			};
@@ -127,6 +181,7 @@
 			projectRoot = "";
 			targets = (
 				5A3DCE13264490E7003442C3 /* COSC345-Project */,
+				5AEDB894264DCD8C003A3CDD /* COSC345-ProjectTests */,
 			);
 		};
 /* End PBXProject section */
@@ -141,27 +196,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-/* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		5A3DCE2E264497E0003442C3 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
+		5AEDB893264DCD8C003A3CDD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "#chmod +x init_script\n\n#if [[ $(ps ax | grep -c \"init_script\") == 1 ]]; then\n #       echo \"Script already running\"\n  #      killall Terminal    \n#sleep 2\n#open -a Terminal\n#osascript -e 'tell application \"Terminal\" to set miniaturized of every window to true'\n#sleep 2\n#osascript -e 'tell application \"Terminal\" to activate' -e 'tell application \"Terminal\" to do script \"cd $SRCROOT\" in window 1' \n#osascript -e 'tell application \"Terminal\" to do script \"./init_script\" in window 1'\n#osascript -e 'tell application \"Terminal\" to do script \"killall Terminal\" in window 1'\n#fi\n\n# another tes\n";
 		};
-/* End PBXShellScriptBuildPhase section */
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		5A3DCE10264490E7003442C3 /* Sources */ = {
@@ -175,7 +217,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5AEDB891264DCD8C003A3CDD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5AEDB898264DCD8D003A3CDD /* COSC345_ProjectTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		5AEDB89B264DCD8D003A3CDD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5A3DCE13264490E7003442C3 /* COSC345-Project */;
+			targetProxy = 5AEDB89A264DCD8D003A3CDD /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		5A3DCE26264490EB003442C3 /* Debug */ = {
@@ -229,7 +287,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -284,7 +342,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -304,7 +362,7 @@
 				DEVELOPMENT_TEAM = TJ3X96WH43;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "COSC345-Project/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -326,7 +384,7 @@
 				DEVELOPMENT_TEAM = TJ3X96WH43;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "COSC345-Project/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -335,6 +393,48 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		5AEDB89C264DCD8D003A3CDD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = TJ3X96WH43;
+				INFOPLIST_FILE = "COSC345-ProjectTests/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.kingsbeer.COSC345-ProjectTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/COSC345-Project.app/COSC345-Project";
+			};
+			name = Debug;
+		};
+		5AEDB89D264DCD8D003A3CDD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = TJ3X96WH43;
+				INFOPLIST_FILE = "COSC345-ProjectTests/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.kingsbeer.COSC345-ProjectTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/COSC345-Project.app/COSC345-Project";
 			};
 			name = Release;
 		};
@@ -355,6 +455,15 @@
 			buildConfigurations = (
 				5A3DCE29264490EB003442C3 /* Debug */,
 				5A3DCE2A264490EB003442C3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5AEDB89E264DCD8D003A3CDD /* Build configuration list for PBXNativeTarget "COSC345-ProjectTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5AEDB89C264DCD8D003A3CDD /* Debug */,
+				5AEDB89D264DCD8D003A3CDD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
