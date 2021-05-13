@@ -14,10 +14,18 @@
 		5A3DCE21264490EB003442C3 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A3DCE20264490EB003442C3 /* Persistence.swift */; };
 		5A3DCE24264490EB003442C3 /* COSC345_Project.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5A3DCE22264490EB003442C3 /* COSC345_Project.xcdatamodeld */; };
 		5AEDB898264DCD8D003A3CDD /* COSC345_ProjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AEDB897264DCD8D003A3CDD /* COSC345_ProjectTests.swift */; };
+		5AEDB8A6264DD6AB003A3CDD /* COSC345_ProjectUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AEDB8A5264DD6AB003A3CDD /* COSC345_ProjectUITests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
 		5AEDB89A264DCD8D003A3CDD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5A3DCE0C264490E7003442C3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5A3DCE13264490E7003442C3;
+			remoteInfo = "COSC345-Project";
+		};
+		5AEDB8A8264DD6AB003A3CDD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 5A3DCE0C264490E7003442C3 /* Project object */;
 			proxyType = 1;
@@ -38,6 +46,9 @@
 		5AEDB895264DCD8C003A3CDD /* COSC345-ProjectTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "COSC345-ProjectTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5AEDB897264DCD8D003A3CDD /* COSC345_ProjectTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = COSC345_ProjectTests.swift; sourceTree = "<group>"; };
 		5AEDB899264DCD8D003A3CDD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5AEDB8A3264DD6AB003A3CDD /* COSC345-ProjectUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "COSC345-ProjectUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5AEDB8A5264DD6AB003A3CDD /* COSC345_ProjectUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = COSC345_ProjectUITests.swift; sourceTree = "<group>"; };
+		5AEDB8A7264DD6AB003A3CDD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +66,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5AEDB8A0264DD6AB003A3CDD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -63,6 +81,7 @@
 			children = (
 				5A3DCE16264490E7003442C3 /* COSC345-Project */,
 				5AEDB896264DCD8D003A3CDD /* COSC345-ProjectTests */,
+				5AEDB8A4264DD6AB003A3CDD /* COSC345-ProjectUITests */,
 				5A3DCE15264490E7003442C3 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -72,6 +91,7 @@
 			children = (
 				5A3DCE14264490E7003442C3 /* COSC345-Project.app */,
 				5AEDB895264DCD8C003A3CDD /* COSC345-ProjectTests.xctest */,
+				5AEDB8A3264DD6AB003A3CDD /* COSC345-ProjectUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -105,6 +125,15 @@
 				5AEDB899264DCD8D003A3CDD /* Info.plist */,
 			);
 			path = "COSC345-ProjectTests";
+			sourceTree = "<group>";
+		};
+		5AEDB8A4264DD6AB003A3CDD /* COSC345-ProjectUITests */ = {
+			isa = PBXGroup;
+			children = (
+				5AEDB8A5264DD6AB003A3CDD /* COSC345_ProjectUITests.swift */,
+				5AEDB8A7264DD6AB003A3CDD /* Info.plist */,
+			);
+			path = "COSC345-ProjectUITests";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -147,6 +176,24 @@
 			productReference = 5AEDB895264DCD8C003A3CDD /* COSC345-ProjectTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		5AEDB8A2264DD6AB003A3CDD /* COSC345-ProjectUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5AEDB8AC264DD6AB003A3CDD /* Build configuration list for PBXNativeTarget "COSC345-ProjectUITests" */;
+			buildPhases = (
+				5AEDB89F264DD6AB003A3CDD /* Sources */,
+				5AEDB8A0264DD6AB003A3CDD /* Frameworks */,
+				5AEDB8A1264DD6AB003A3CDD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5AEDB8A9264DD6AB003A3CDD /* PBXTargetDependency */,
+			);
+			name = "COSC345-ProjectUITests";
+			productName = "COSC345-ProjectUITests";
+			productReference = 5AEDB8A3264DD6AB003A3CDD /* COSC345-ProjectUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -160,6 +207,10 @@
 						CreatedOnToolsVersion = 12.4;
 					};
 					5AEDB894264DCD8C003A3CDD = {
+						CreatedOnToolsVersion = 12.5;
+						TestTargetID = 5A3DCE13264490E7003442C3;
+					};
+					5AEDB8A2264DD6AB003A3CDD = {
 						CreatedOnToolsVersion = 12.5;
 						TestTargetID = 5A3DCE13264490E7003442C3;
 					};
@@ -182,6 +233,7 @@
 			targets = (
 				5A3DCE13264490E7003442C3 /* COSC345-Project */,
 				5AEDB894264DCD8C003A3CDD /* COSC345-ProjectTests */,
+				5AEDB8A2264DD6AB003A3CDD /* COSC345-ProjectUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -197,6 +249,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		5AEDB893264DCD8C003A3CDD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5AEDB8A1264DD6AB003A3CDD /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -225,6 +284,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5AEDB89F264DD6AB003A3CDD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5AEDB8A6264DD6AB003A3CDD /* COSC345_ProjectUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -232,6 +299,11 @@
 			isa = PBXTargetDependency;
 			target = 5A3DCE13264490E7003442C3 /* COSC345-Project */;
 			targetProxy = 5AEDB89A264DCD8D003A3CDD /* PBXContainerItemProxy */;
+		};
+		5AEDB8A9264DD6AB003A3CDD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5A3DCE13264490E7003442C3 /* COSC345-Project */;
+			targetProxy = 5AEDB8A8264DD6AB003A3CDD /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -438,6 +510,46 @@
 			};
 			name = Release;
 		};
+		5AEDB8AA264DD6AB003A3CDD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = TJ3X96WH43;
+				INFOPLIST_FILE = "COSC345-ProjectUITests/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.kingsbeer.COSC345-ProjectUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "COSC345-Project";
+			};
+			name = Debug;
+		};
+		5AEDB8AB264DD6AB003A3CDD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = TJ3X96WH43;
+				INFOPLIST_FILE = "COSC345-ProjectUITests/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.kingsbeer.COSC345-ProjectUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "COSC345-Project";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -464,6 +576,15 @@
 			buildConfigurations = (
 				5AEDB89C264DCD8D003A3CDD /* Debug */,
 				5AEDB89D264DCD8D003A3CDD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5AEDB8AC264DD6AB003A3CDD /* Build configuration list for PBXNativeTarget "COSC345-ProjectUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5AEDB8AA264DD6AB003A3CDD /* Debug */,
+				5AEDB8AB264DD6AB003A3CDD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
