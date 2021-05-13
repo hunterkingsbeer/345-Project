@@ -8,6 +8,7 @@
 import SwiftUI
 import CoreData
 
+
 // -------------------------------------------------------------------------- PREVIEW
 
 struct ContentView_Previews: PreviewProvider {
@@ -320,7 +321,7 @@ struct ReceiptsFoldersButtons: View {
     var body: some View {
         VStack {
             Button(action: {
-                withAnimation(.spring()) {
+                withAnimation(.spring() ) {
                     dashPanelState = dashPanelState != .homepage ? .homepage : .receipts
                 }
             }){
