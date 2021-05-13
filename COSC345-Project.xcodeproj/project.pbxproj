@@ -370,7 +370,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.kingsbeer.COSC345-Project";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -392,7 +392,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.kingsbeer.COSC345-Project";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -412,7 +412,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.kingsbeer.COSC345-ProjectTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/COSC345-Project.app/COSC345-Project";
 			};
 			name = Debug;
@@ -433,7 +433,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.kingsbeer.COSC345-ProjectTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/COSC345-Project.app/COSC345-Project";
 			};
 			name = Release;
