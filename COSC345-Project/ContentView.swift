@@ -38,7 +38,7 @@ enum DashPanelType {
  Content View stuff
  */
 struct ContentView: View {
-    @State var addPanelState : AddPanelType = .homepage
+    @State var addPanelState : AddPanelType = .homepage // need to make these global vars
     @State var dashPanelState : DashPanelType = .homepage
 
     var body: some View {
@@ -236,6 +236,15 @@ enum ToolbarFocusType {
 // THIS DEFINITELY could be stream lined. Look into this!!!!
 // Work settings/notifications into DashboardToolbar view
 struct DashboardHomePageView: View {
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)],
+        animation: .spring())
+    var receipts: FetchedResults<Receipt>
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \Folder.title, ascending: false)],
+        animation: .spring())
+    var folders: FetchedResults<Folder>
+ 
     let size : CGFloat
     @Binding var dashPanelState : DashPanelType
     @State var toolbarFocus : ToolbarFocusType = .homepage //0 = none, 1 = settings, 2 = notifications
@@ -247,8 +256,12 @@ struct DashboardHomePageView: View {
             Divider()
             
             if toolbarFocus == .homepage {
-                ReceiptsFoldersButtons(dashPanelState: $dashPanelState)
-                    .transition(AnyTransition.scale(scale: 0.8).combined(with: .opacity))
+                if receipts.count != 0 || folders.count != 0 {
+                    ReceiptsFoldersButtons(dashPanelState: $dashPanelState)
+                        .transition(AnyTransition.scale(scale: 0.8).combined(with: .opacity))
+                } else {
+                    Text("Add a receipt!")
+                }
             } else if toolbarFocus == .settings {
                 SettingsView()
                     .transition(AnyTransition.move(edge: .leading).combined(with: .opacity))
@@ -312,6 +325,15 @@ struct DashboardToolbar: View {
 
 /// ReceiptsFoldersButtons - The view that holds the buttons that change the dashPanelState to display receipts/folders
 struct ReceiptsFoldersButtons: View {
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)],
+        animation: .spring())
+    var receipts: FetchedResults<Receipt>
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \Folder.title, ascending: false)],
+        animation: .spring())
+    var folders: FetchedResults<Folder>
+    
     @Binding var dashPanelState : DashPanelType
     
     var body: some View {
@@ -323,7 +345,7 @@ struct ReceiptsFoldersButtons: View {
             }){
                 VStack{
                     Spacer()
-                    Text("146").font(.system(.title, design: .rounded))
+                    Text("\(receipts.count)").font(.system(.title, design: .rounded))
                     Text("Receipts").font(.system(.largeTitle, design: .rounded)).bold()
                     Spacer()
                 }.frame(minWidth: 0, maxWidth: .infinity)
@@ -339,7 +361,8 @@ struct ReceiptsFoldersButtons: View {
             }){
                 VStack{
                     Spacer()
-                    Text("13").font(.system(.title, design: .rounded))
+                    //Text("\(folders.count)").font(.system(.title, design: .rounded))
+                    Text("\(folders.count)").font(.system(.title, design: .rounded))
                     Text("Folders").font(.system(.largeTitle, design: .rounded)).bold()
                     Spacer()
                 }.frame(minWidth: 0, maxWidth: .infinity)
@@ -390,6 +413,10 @@ struct NotificationsView: View {
 /// Receipt Collection View - View that displays all the receipts (interactive), along with a search/filter bar
 struct ReceiptCollectionView: View {
     @Environment(\.colorScheme) var colorScheme
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)],
+        animation: .spring())
+    var receipts: FetchedResults<Receipt>
     
     @Binding var dashPanelState : DashPanelType
     @State var showingFilters : Bool = false
@@ -448,8 +475,8 @@ struct ReceiptCollectionView: View {
             
             // receipts
             ScrollView(showsIndicators: false) {
-                ForEach(0..<12){ index in
-                    ReceiptView(index: index)
+                ForEach(receipts){ receipt in
+                    ReceiptView(receipt: receipt)
                 }
             }.cornerRadius(18)
             
@@ -474,7 +501,7 @@ struct ReceiptCollectionView: View {
 
 /// Receipt view - The receipt that is displayed, starts minimized then after interaction expands to full size
 struct ReceiptView: View{
-    let index : Int
+    @State var receipt : Receipt
     @State var selected : Bool = false
     
     var body: some View {
@@ -486,27 +513,29 @@ struct ReceiptView: View{
                 .overlay(
                     VStack {
                         HStack {
-                            Text("Receipt \(index+1)")
+                            Text(receipt.store ?? "")
                                 .font(.system(size: selected ? 30 : 22,
                                               weight: selected ? .bold : .regular,
                                               design: .rounded))
                             Spacer()
                         }
                         if selected {
-                            ForEach(0..<7){ index in
+                            Text(receipt.body ?? "")
+                                .padding(.vertical, 5)
+                            /*ForEach(0..<7){ index in
                                 HStack {
                                     Text("Item \(index)")
                                     Spacer()
                                     Text("$0.00")
                                 }.padding(.vertical, 5)
-                            }
+                            }*/
                         }
                         Spacer()
                         HStack {
                             Spacer()
                             VStack (alignment: .trailing){
                                 Text("Total")
-                                Text("$\(Double.random(in: 20.00..<350.00), specifier: "%.2f")").font(.system(.title, design: .rounded)).bold()
+                                Text("$\(receipt.total , specifier: "%.2f")").font(.system(.title, design: .rounded)).bold()
                             }
                         }
                     }.padding().foregroundColor(.black)
@@ -517,6 +546,11 @@ struct ReceiptView: View{
 
 /// Folder Collection View - View that displays all the folders
 struct FolderCollectionView: View {
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \Folder.title, ascending: false)],
+        animation: .spring())
+    var folders: FetchedResults<Folder>
+    
     @Binding var dashPanelState : DashPanelType
     let columns = [
             GridItem(.flexible()),
@@ -530,8 +564,8 @@ struct FolderCollectionView: View {
                 .foregroundColor(.black)
             ScrollView(showsIndicators: false) {
                 LazyVGrid(columns: columns) {
-                    ForEach(0..<12){ index in
-                        FolderView(index: index)
+                    ForEach(folders){ folder in
+                        FolderView(folder: folder)
                     }
                 }
             }.cornerRadius(18).padding(.horizontal)
@@ -557,21 +591,21 @@ struct FolderCollectionView: View {
 
 /// Folder view - Extremely basic folder
 struct FolderView: View{
-    let index : Int
+    @State var folder : Folder
     
     var body: some View {
         RoundedRectangle(cornerRadius: 18)
             .fill(Color("grey"))
             .overlay(
                 VStack {
-                    Image(systemName: "cart")
+                    Image(systemName: folder.icon ?? "folder")
                         .font(.system(size: 50))
-                    Text("Groceries")
+                    Text(folder.title ?? "Folder")
                         .font(.system(.title, design: .rounded))
                         .padding(.bottom, 10)
                     
                     //Spacer()
-                    Text("\(Int.random(in: 2..<33))")
+                    Text("\(folder.numReceipts)")
                         .font(.system(.largeTitle, design: .rounded)).bold()
                         .foregroundColor(.black)
                 }.padding().padding(.top, 10).foregroundColor(.black)
@@ -592,7 +626,7 @@ extension UIScreen{
 struct ShrinkingButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.925 : 1)
+            .scaleEffect(configuration.isPressed ? 0.99 : 1)
             .animation(.spring())
     }
 }
@@ -612,7 +646,7 @@ struct CustomTextField: View {
     }
 }
 
-
+/// Background view - Background of the app
 struct BackgroundView: View {
     var addPanelState : AddPanelType
     var dashPanelState : DashPanelType

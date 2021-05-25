@@ -13,10 +13,25 @@ struct PersistenceController {
     static var preview: PersistenceController = {
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
-        for _ in 0..<10 {
-            let newItem = Item(context: viewContext)
-            newItem.timestamp = Date()
+        for index in 0..<10 {
+            let newReceipt = Receipt(context: viewContext)
+            newReceipt.body = "BODY TEXT EXAMPLE"
+            newReceipt.date = Date()
+            newReceipt.id = UUID()
+            newReceipt.store = "Example Store"
+            newReceipt.tags = "tag1,tag2,tag3,tag4"
+            newReceipt.warrenty = ""
+            newReceipt.folder = "example".capitalized
+            newReceipt.total = Double(index)
         }
+        let newFolder = Folder(context: viewContext)
+        newFolder.title = "example".capitalized
+        newFolder.icon = "folder"
+        newFolder.numReceipts = 1
+        newFolder.id = UUID()
+        newFolder.favorite = false
+        
+        
         do {
             try viewContext.save()
         } catch {
