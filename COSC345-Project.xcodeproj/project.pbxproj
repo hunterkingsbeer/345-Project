@@ -14,6 +14,7 @@
 		5A3DCE21264490EB003442C3 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A3DCE20264490EB003442C3 /* Persistence.swift */; };
 		5A3DCE24264490EB003442C3 /* COSC345_Project.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5A3DCE22264490EB003442C3 /* COSC345_Project.xcdatamodeld */; };
 		5A8A7203265DCD6300786372 /* ScanDocumentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A8A7202265DCD6300786372 /* ScanDocumentView.swift */; };
+		5A8A7205265E059A00786372 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A8A7204265E059A00786372 /* ImagePicker.swift */; };
 		5AEDB898264DCD8D003A3CDD /* COSC345_ProjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AEDB897264DCD8D003A3CDD /* COSC345_ProjectTests.swift */; platformFilter = ios; };
 		5AEDB8A6264DD6AB003A3CDD /* COSC345_ProjectUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AEDB8A5264DD6AB003A3CDD /* COSC345_ProjectUITests.swift */; platformFilter = ios; };
 /* End PBXBuildFile section */
@@ -45,6 +46,7 @@
 		5A3DCE23264490EB003442C3 /* COSC345_Project.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = COSC345_Project.xcdatamodel; sourceTree = "<group>"; };
 		5A3DCE25264490EB003442C3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5A8A7202265DCD6300786372 /* ScanDocumentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanDocumentView.swift; sourceTree = "<group>"; };
+		5A8A7204265E059A00786372 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		5AEDB895264DCD8C003A3CDD /* COSC345-ProjectTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "COSC345-ProjectTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5AEDB897264DCD8D003A3CDD /* COSC345_ProjectTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = COSC345_ProjectTests.swift; sourceTree = "<group>"; };
 		5AEDB899264DCD8D003A3CDD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -109,6 +111,7 @@
 				5A3DCE22264490EB003442C3 /* COSC345_Project.xcdatamodeld */,
 				5A3DCE1D264490EB003442C3 /* Preview Content */,
 				5A8A7202265DCD6300786372 /* ScanDocumentView.swift */,
+				5A8A7204265E059A00786372 /* ImagePicker.swift */,
 			);
 			path = "COSC345-Project";
 			sourceTree = "<group>";
@@ -275,6 +278,7 @@
 				5A3DCE21264490EB003442C3 /* Persistence.swift in Sources */,
 				5A3DCE1A264490E7003442C3 /* ContentView.swift in Sources */,
 				5A3DCE24264490EB003442C3 /* COSC345_Project.xcdatamodeld in Sources */,
+				5A8A7205265E059A00786372 /* ImagePicker.swift in Sources */,
 				5A8A7203265DCD6300786372 /* ScanDocumentView.swift in Sources */,
 				5A3DCE18264490E7003442C3 /* COSC345_ProjectApp.swift in Sources */,
 			);

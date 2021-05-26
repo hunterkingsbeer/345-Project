@@ -143,6 +143,12 @@ struct AddPanelHomepageView: View {
     }
 }
 
+enum ValidScanType {
+    case noScan
+    case validScan
+    case invalidScan
+}
+
 /// Add panel detail view - Handles the respective input of receipts
 struct AddPanelDetailView: View {
     @Environment(\.managedObjectContext) var viewContext
@@ -153,6 +159,8 @@ struct AddPanelDetailView: View {
     
     @Binding var addPanelState : AddPanelType
     @State var recognizedText : String = ""
+    @State var validScan : ValidScanType = .noScan
+    @State var validScanAlert : Bool = false
     
     var body: some View {
         VStack{
@@ -160,24 +168,18 @@ struct AddPanelDetailView: View {
                 Text("Scan using Camera")
                     .font(.largeTitle)
                     .padding(.bottom, 5)
-                ScanDocumentView(recognizedText: self.$recognizedText, scanToggle: self.$addPanelState)
-                
+                ScanDocumentView(recognizedText: self.$recognizedText, validScan: $validScan)
+                    .cornerRadius(18)
+                    .animation(.spring())
             } else if addPanelState == .gallery {
                 Text("Scan using Gallery")
                     .font(.largeTitle)
                     .padding(.bottom, 5)
                 
-                ScrollView {
-                    VStack {
-                        ForEach(0..<10){ index in
-                            RoundedRectangle(cornerRadius: 18)
-                                .fill(Color("grey"))
-                                .frame(height: UIScreen.screenHeight * 0.3)
-                        }
-                    }
-                }.cornerRadius(18)
+                ImagePicker(recognizedText: self.$recognizedText, validScan: $validScan)
+                    .cornerRadius(18)
+                    .animation(.spring())
             }
-
             Button(action: {
                 withAnimation(.spring()){
                     addPanelState = .homepage
@@ -192,15 +194,27 @@ struct AddPanelDetailView: View {
                     ).frame(height: UIScreen.screenHeight*0.1)
             }.buttonStyle(ShrinkingButton())
             Spacer()
-            
         }.padding()
         .onChange(of: recognizedText, perform: { _ in
-            save()
-        })
+            validScanAlert = validScan == .invalidScan ? true : false
+            debugPrint("VALID SCAN ALERT BOOL \(validScanAlert)")
+            if validScan == .validScan { // IMPROVE THIS! Go to a "is this correct?" screen
+                saveScan()
+                withAnimation(.spring()) {
+                    addPanelState = .homepage
+                }
+            }
+        }).alert(isPresented: $validScanAlert){
+            Alert(
+                title: Text("Receipt Not Saved!"),
+                message: Text("This scan is not valid. Try scanning again."),
+                dismissButton: .default(Text("Okay"))
+            )
+        }
     }
     
     // takes the recognized text and transforms it into a receipt object
-    func save(){
+    func saveScan(){
         let newReceipt = Receipt(context: viewContext)
         
         newReceipt.id = UUID()
@@ -212,11 +226,10 @@ struct AddPanelDetailView: View {
             do {
                 try self.viewContext.save()
             } catch {
-                print("Failed to save the context: \(error.localizedDescription)")
+                print("Failed to save the receipt's context: \(error.localizedDescription)")
             }
         }
     }
-
 }
 
 /// Dashboard Panel - Handles the various view states for the dashboard panel
@@ -562,7 +575,7 @@ struct ReceiptView: View {
             .onTapGesture {
                 selected.toggle()
             }
-            .onLongPressGesture(minimumDuration: 0.2, maximumDistance: 2, perform: {
+            .onLongPressGesture(minimumDuration: 0.1, maximumDistance: 2, perform: {
                 pendingDelete.toggle()
             })
         .overlay(

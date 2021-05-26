@@ -2,7 +2,8 @@
 //  ScanDocumentView.swift
 //  COSC345-Project
 //
-//  Created by Hunter Kingsbeer on 26/05/21.
+//  Created by AppCoda - https://github.com/appcoda
+//  Modified by Hunter Kingsbeer on 26/05/21.
 //
 
 import SwiftUI
@@ -12,10 +13,10 @@ import Vision
 struct ScanDocumentView: UIViewControllerRepresentable {
     @Environment(\.presentationMode) var presentationMode
     @Binding var recognizedText: String
-    @Binding var scanToggle: AddPanelType
+    @Binding var validScan: ValidScanType
         
     func makeCoordinator() -> Coordinator {
-        Coordinator(recognizedText: $recognizedText, parent: self, scanToggle: $scanToggle)
+        Coordinator(recognizedText: $recognizedText, parent: self, validScan: $validScan)
     }
     
     func makeUIViewController(context: Context) -> VNDocumentCameraViewController {
@@ -33,22 +34,22 @@ struct ScanDocumentView: UIViewControllerRepresentable {
 class Coordinator: NSObject, VNDocumentCameraViewControllerDelegate {
     var recognizedText: Binding<String>
     var parent: ScanDocumentView
-    var scanToggle: Binding<AddPanelType>
+    var validScan: Binding<ValidScanType>
     
-    init(recognizedText: Binding<String>, parent: ScanDocumentView, scanToggle: Binding<AddPanelType>) {
+    init(recognizedText: Binding<String>, parent: ScanDocumentView, validScan: Binding<ValidScanType>) {
         self.recognizedText = recognizedText
         self.parent = parent
-        self.scanToggle = scanToggle
+        self.validScan = validScan
     }
     
     func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFinishWith scan: VNDocumentCameraScan) {
-        
+    
         let extractedImages = extractImages(from: scan)
         let processedText = recognizeText(from: extractedImages)
         recognizedText.wrappedValue = processedText
+        validScan.wrappedValue = .validScan //always a valid scan if they take the pic themselves
         
-        scanToggle.wrappedValue = .homepage //for boolean view
-        //parent.presentationMode.wrappedValue.dismiss() //for sheet view
+        //parent.presentationMode.wrappedValue.dismiss() //for sheet controlled view
     }
     
     fileprivate func extractImages(from scan: VNDocumentCameraScan) -> [CGImage] {
