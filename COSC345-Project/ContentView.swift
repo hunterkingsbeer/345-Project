@@ -197,7 +197,6 @@ struct AddPanelDetailView: View {
         }.padding()
         .onChange(of: recognizedText, perform: { _ in
             validScanAlert = validScan == .invalidScan ? true : false
-            debugPrint("VALID SCAN ALERT BOOL \(validScanAlert)")
             if validScan == .validScan { // IMPROVE THIS! Go to a "is this correct?" screen
                 saveScan()
                 withAnimation(.spring()) {
