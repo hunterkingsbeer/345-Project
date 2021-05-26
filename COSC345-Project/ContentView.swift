@@ -50,7 +50,7 @@ struct ContentView: View {
                 
                 // COMPANY TITLE ------------------
                 VStack{
-                    Text("COMPANY.")
+                    Text("Receipted.")
                         .foregroundColor(.white)
                         .font(.system(.title, design: .rounded)).bold()
                     
@@ -145,7 +145,14 @@ struct AddPanelHomepageView: View {
 
 /// Add panel detail view - Handles the respective input of receipts
 struct AddPanelDetailView: View {
+    @Environment(\.managedObjectContext) var viewContext
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)],
+        animation: .spring())
+    var receipts: FetchedResults<Receipt>
+    
     @Binding var addPanelState : AddPanelType
+    @State var recognizedText : String = ""
     
     var body: some View {
         VStack{
@@ -153,16 +160,7 @@ struct AddPanelDetailView: View {
                 Text("Scan using Camera")
                     .font(.largeTitle)
                     .padding(.bottom, 5)
-                RoundedRectangle(cornerRadius: 18)
-                    .fill(Color(.black))
-                    .overlay(
-                        VStack{
-                            Spacer()
-                            Circle().fill(Color("grey"))
-                                .frame(height: UIScreen.screenHeight * 0.075)
-                                .padding(.bottom)
-                        }
-                    )
+                ScanDocumentView(recognizedText: self.$recognizedText, scanToggle: self.$addPanelState)
                 
             } else if addPanelState == .gallery {
                 Text("Scan using Gallery")
@@ -196,7 +194,29 @@ struct AddPanelDetailView: View {
             Spacer()
             
         }.padding()
+        .onChange(of: recognizedText, perform: { _ in
+            save()
+        })
     }
+    
+    // takes the recognized text and transforms it into a receipt object
+    func save(){
+        let newReceipt = Receipt(context: viewContext)
+        
+        newReceipt.id = UUID()
+        newReceipt.store = String(recognizedText.components(separatedBy: CharacterSet.newlines).first!)
+        newReceipt.body = String(recognizedText.dropFirst((newReceipt.store ?? "").count))
+        newReceipt.date = Date()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.7){
+            do {
+                try self.viewContext.save()
+            } catch {
+                print("Failed to save the context: \(error.localizedDescription)")
+            }
+        }
+    }
+
 }
 
 /// Dashboard Panel - Handles the various view states for the dashboard panel
@@ -260,7 +280,9 @@ struct DashboardHomePageView: View {
                     ReceiptsFoldersButtons(dashPanelState: $dashPanelState)
                         .transition(AnyTransition.scale(scale: 0.8).combined(with: .opacity))
                 } else {
-                    Text("Add a receipt!")
+                    Spacer()
+                    Text("Add a receipt from\none of the button below.").font(.system(.title, design: .rounded))
+                    Spacer()
                 }
             } else if toolbarFocus == .settings {
                 SettingsView()
@@ -500,47 +522,78 @@ struct ReceiptCollectionView: View {
 }
 
 /// Receipt view - The receipt that is displayed, starts minimized then after interaction expands to full size
-struct ReceiptView: View{
+struct ReceiptView: View {
+    @Environment(\.managedObjectContext) var viewContext
+    
     @State var receipt : Receipt
     @State var selected : Bool = false
+    @State var pendingDelete = false
     
     var body: some View {
-        Button(action: {
-            selected = selected == true ? false : true
-        }){
-            RoundedRectangle(cornerRadius: 18)
-                .fill(Color("grey"))
-                .overlay(
-                    VStack {
-                        HStack {
-                            Text(receipt.store ?? "")
-                                .font(.system(size: selected ? 30 : 22,
-                                              weight: selected ? .bold : .regular,
-                                              design: .rounded))
-                            Spacer()
-                        }
-                        if selected {
-                            Text(receipt.body ?? "")
-                                .padding(.vertical, 5)
-                            /*ForEach(0..<7){ index in
-                                HStack {
-                                    Text("Item \(index)")
-                                    Spacer()
-                                    Text("$0.00")
-                                }.padding(.vertical, 5)
-                            }*/
-                        }
+        RoundedRectangle(cornerRadius: 18)
+            .fill(Color("grey"))
+            .overlay(
+                // the title and body
+                VStack {
+                    HStack {
+                        // title
+                        Text(receipt.store ?? "")
+                            .font(.system(size: selected ? 30 : 22,
+                                          weight: selected ? .bold : .regular,
+                                          design: .rounded))
                         Spacer()
-                        HStack {
-                            Spacer()
-                            VStack (alignment: .trailing){
-                                Text("Total")
-                                Text("$\(receipt.total , specifier: "%.2f")").font(.system(.title, design: .rounded)).bold()
-                            }
+                    }
+                    if selected {
+                        // body
+                        Text(receipt.body ?? "")
+                            .padding(.vertical, 5)
+                    }
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        VStack (alignment: .trailing){
+                            Text("Total")
+                            Text("$\(receipt.total , specifier: "%.2f")").font(.system(.title, design: .rounded)).bold()
                         }
-                    }.padding().foregroundColor(.black)
-                ).frame(height: selected ? UIScreen.screenHeight*0.5 : UIScreen.screenHeight*0.12)
-        }.buttonStyle(ShrinkingButton())
+                    }
+                }.padding().foregroundColor(.black)
+                
+            ).frame(height: selected ? UIScreen.screenHeight*0.5 : UIScreen.screenHeight*0.12)
+            .onTapGesture {
+                selected.toggle()
+            }
+            .onLongPressGesture(minimumDuration: 0.2, maximumDistance: 2, perform: {
+                pendingDelete.toggle()
+            })
+        .overlay(
+            // the delete button
+            VStack{
+                if pendingDelete == true {
+                    HStack{
+                        Spacer()
+                        Circle().fill(Color.red)
+                            .frame(width: UIScreen.screenHeight*0.05,
+                                   height: UIScreen.screenHeight*0.05)
+                            .overlay(Image(systemName: "xmark").foregroundColor(.white))
+                            .onTapGesture{
+                                self.delete()
+                            }
+                    }
+                    Spacer()
+                }
+            }
+        )
+    }
+    
+    private func delete() {
+        self.viewContext.delete(receipt)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
+            do {
+                try self.viewContext.save()
+            } catch {
+                print("Failed to delete and save the context: \(error.localizedDescription)")
+            }
+        }
     }
 }
 
