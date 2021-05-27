@@ -6,40 +6,37 @@
 //
 
 import CoreData
+import SwiftUI
 
 struct PersistenceController {
+    
     static let shared = PersistenceController()
 
     static var preview: PersistenceController = {
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
+        
+        let newFolder = Folder(context: viewContext)
+        newFolder.title = "example".capitalized
+        newFolder.icon = "folder"
+        newFolder.id = UUID()
+        newFolder.favorite = false
+        
+        save(viewContext: viewContext)
+        
         for index in 0..<10 {
             let newReceipt = Receipt(context: viewContext)
             newReceipt.body = "BODY TEXT EXAMPLE"
             newReceipt.date = Date()
             newReceipt.id = UUID()
             newReceipt.store = "Example Store"
+            newReceipt.folder = setFolderType(text: ((newReceipt.store ?? "") + (newReceipt.body ?? "")))
             newReceipt.tags = "tag1,tag2,tag3,tag4"
             newReceipt.warrenty = ""
-            newReceipt.folder = "example".capitalized
             newReceipt.total = Double(index)
         }
-        let newFolder = Folder(context: viewContext)
-        newFolder.title = "example".capitalized
-        newFolder.icon = "folder"
-        newFolder.numReceipts = 1
-        newFolder.id = UUID()
-        newFolder.favorite = false
         
-        
-        do {
-            try viewContext.save()
-        } catch {
-            // Replace this implementation with code to handle the error appropriately.
-            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-        }
+        save(viewContext: viewContext)
         return result
     }()
 
@@ -66,5 +63,16 @@ struct PersistenceController {
                 fatalError("Unresolved error \(error), \(error.userInfo)")
             }
         })
+    }
+    
+    static func save(viewContext: NSManagedObjectContext) {
+        do {
+            try  viewContext.save()
+        } catch {
+            // Replace this implementation with code to handle the error appropriately.
+            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+            let nserror = error as NSError
+            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+        }
     }
 }

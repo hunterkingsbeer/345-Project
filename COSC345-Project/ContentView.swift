@@ -43,7 +43,6 @@ struct ContentView: View {
 
     var body: some View {
         NavigationView {
-            
             ZStack(alignment: .top) {
                 // BACKGROUND BLOBS ------------------
                 BackgroundView(addPanelState: addPanelState, dashPanelState: dashPanelState)
@@ -68,7 +67,10 @@ struct ContentView: View {
                     }
                 }.padding(.horizontal, addPanelState == .homepage ? 15 : 0)
             }.navigationBarTitle("").navigationBarHidden(true)
-        }
+        }.ignoresSafeArea(.keyboard)
+        .onAppear(perform: {
+            print("testing")
+        })
     }
 }
 
@@ -196,9 +198,11 @@ struct AddPanelDetailView: View {
             Spacer()
         }.padding()
         .onChange(of: recognizedText, perform: { _ in
-            validScanAlert = validScan == .invalidScan ? true : false
+            validScanAlert = validScan == .invalidScan ? true : false // if validScanType == invalid then alert the user
+            
             if validScan == .validScan { // IMPROVE THIS! Go to a "is this correct?" screen
-                saveScan()
+                print("SAVING")
+                Receipt.saveScan(viewContext: viewContext, recognizedText: recognizedText)
                 withAnimation(.spring()) {
                     addPanelState = .homepage
                 }
@@ -209,24 +213,6 @@ struct AddPanelDetailView: View {
                 message: Text("This scan is not valid. Try scanning again."),
                 dismissButton: .default(Text("Okay"))
             )
-        }
-    }
-    
-    // takes the recognized text and transforms it into a receipt object
-    func saveScan(){
-        let newReceipt = Receipt(context: viewContext)
-        
-        newReceipt.id = UUID()
-        newReceipt.store = String(recognizedText.components(separatedBy: CharacterSet.newlines).first!)
-        newReceipt.body = String(recognizedText.dropFirst((newReceipt.store ?? "").count))
-        newReceipt.date = Date()
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.7){
-            do {
-                try self.viewContext.save()
-            } catch {
-                print("Failed to save the receipt's context: \(error.localizedDescription)")
-            }
         }
     }
 }
@@ -279,7 +265,7 @@ struct DashboardHomePageView: View {
  
     let size : CGFloat
     @Binding var dashPanelState : DashPanelType
-    @State var toolbarFocus : ToolbarFocusType = .homepage //0 = none, 1 = settings, 2 = notifications
+    @State var toolbarFocus : ToolbarFocusType = .homepage // 0 = none, 1 = settings, 2 = notifications
     
     var body: some View {
         VStack(alignment: .center){
@@ -395,7 +381,6 @@ struct ReceiptsFoldersButtons: View {
             }){
                 VStack{
                     Spacer()
-                    //Text("\(folders.count)").font(.system(.title, design: .rounded))
                     Text("\(folders.count)").font(.system(.title, design: .rounded))
                     Text("Folders").font(.system(.largeTitle, design: .rounded)).bold()
                     Spacer()
@@ -410,7 +395,7 @@ struct ReceiptsFoldersButtons: View {
 struct SettingsView: View {
     var body: some View {
         VStack {
-            ForEach(0..<7){ index in // could probably be a list, goes darkmode though bit weird
+            ForEach(0..<7){ index in // could probably be a list, however the list goes darkmode though which is a bit weird
                 HStack {
                     Text("Setting \(index)")
                         .font(.system(.body, design: .rounded))
@@ -449,12 +434,13 @@ struct ReceiptCollectionView: View {
     @Environment(\.colorScheme) var colorScheme
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)],
+        //predicate: NSPredicate(format: "store == %@", input), ------------------------------------------- FITLERS RESULTS
         animation: .spring())
     var receipts: FetchedResults<Receipt>
     
     @Binding var dashPanelState : DashPanelType
     @State var showingFilters : Bool = false
-    @State var input : String = ""
+    @State var searchInput : String = ""
     
     //settings
     @State var warrenty = false
@@ -478,9 +464,17 @@ struct ReceiptCollectionView: View {
                     .overlay(
                         HStack {
                             Image(systemName: "magnifyingglass")
-                            CustomTextField(placeholder: Text("Search...").foregroundColor(.black),text: $input)
+                            CustomTextField(placeholder: Text("Search...").foregroundColor(.black),text: $searchInput)
+                                .ignoresSafeArea(.keyboard)
                             //TextField("Search...", text: $input)
                             Spacer()
+                            if searchInput.count > 0{
+                                Button(action: {
+                                    searchInput = ""
+                                }){
+                                    Image(systemName: "xmark")
+                                }
+                            }
                         }.foregroundColor(.black).padding(.horizontal, 10)
                 )
                 Button(action:{
@@ -509,7 +503,7 @@ struct ReceiptCollectionView: View {
             
             // receipts
             ScrollView(showsIndicators: false) {
-                ForEach(receipts){ receipt in
+                ForEach(receipts.filter({ searchInput.count > 0 ? $0.body!.localizedCaseInsensitiveContains(searchInput) || $0.store!.localizedCaseInsensitiveContains(searchInput) : $0.body!.count > 0 })){ receipt in
                     ReceiptView(receipt: receipt)
                 }
             }.cornerRadius(18)
@@ -529,7 +523,7 @@ struct ReceiptCollectionView: View {
                     ).frame(height: UIScreen.screenHeight*0.1)
             }.buttonStyle(ShrinkingButton())
             Spacer()
-        }.padding()
+        }.padding().ignoresSafeArea(.keyboard)
     }
 }
 
@@ -549,16 +543,22 @@ struct ReceiptView: View {
                 VStack {
                     HStack {
                         // title
-                        Text(receipt.store ?? "")
-                            .font(.system(size: selected ? 30 : 22,
-                                          weight: selected ? .bold : .regular,
+                        VStack(alignment: .leading) {
+                            Text(receipt.store ?? "")
+                                .font(.system(size: selected ? 30 : 22,
+                                              weight: selected ? .bold : .regular,
                                           design: .rounded))
+                            Text(receipt.folder ?? "Default")
+                                .font(.system(.body, design: .rounded))
+                        }
                         Spacer()
                     }
                     if selected {
                         // body
-                        Text(receipt.body ?? "")
-                            .padding(.vertical, 5)
+                        ScrollView(.vertical) {
+                            Text(receipt.body ?? "")
+                                .padding(.vertical, 5)
+                        }
                     }
                     Spacer()
                     HStack {
@@ -570,12 +570,20 @@ struct ReceiptView: View {
                     }
                 }.padding().foregroundColor(.black)
                 
-            ).frame(height: selected ? UIScreen.screenHeight*0.5 : UIScreen.screenHeight*0.12)
+            ).frame(height: selected ? UIScreen.screenHeight*0.5 : UIScreen.screenHeight*0.16)
             .onTapGesture {
                 selected.toggle()
             }
             .onLongPressGesture(minimumDuration: 0.1, maximumDistance: 2, perform: {
                 pendingDelete.toggle()
+            }).onChange(of: pendingDelete, perform: { _ in
+                withAnimation(.spring()){
+                    if pendingDelete == true {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                            pendingDelete = false // turns off delete button after 2 secs
+                        }
+                    }
+                }
             })
         .overlay(
             // the delete button
@@ -588,24 +596,13 @@ struct ReceiptView: View {
                                    height: UIScreen.screenHeight*0.05)
                             .overlay(Image(systemName: "xmark").foregroundColor(.white))
                             .onTapGesture{
-                                self.delete()
+                                Receipt.delete(viewContext: viewContext, receipt: receipt)
                             }
                     }
                     Spacer()
                 }
             }
         )
-    }
-    
-    private func delete() {
-        self.viewContext.delete(receipt)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
-            do {
-                try self.viewContext.save()
-            } catch {
-                print("Failed to delete and save the context: \(error.localizedDescription)")
-            }
-        }
     }
 }
 
@@ -615,6 +612,7 @@ struct FolderCollectionView: View {
         sortDescriptors: [NSSortDescriptor(keyPath: \Folder.title, ascending: false)],
         animation: .spring())
     var folders: FetchedResults<Folder>
+    @State var currentFolder : String = ""
     
     @Binding var dashPanelState : DashPanelType
     let columns = [
@@ -629,7 +627,7 @@ struct FolderCollectionView: View {
                 .foregroundColor(.black)
             ScrollView(showsIndicators: false) {
                 LazyVGrid(columns: columns) {
-                    ForEach(folders){ folder in
+                    ForEach(folders.filter({ $0.icon!.count > 0 })){ folder in
                         FolderView(folder: folder)
                     }
                 }
@@ -670,7 +668,7 @@ struct FolderView: View{
                         .padding(.bottom, 10)
                     
                     //Spacer()
-                    Text("\(folder.numReceipts)")
+                    Text("\(folder.receiptCount)")
                         .font(.system(.largeTitle, design: .rounded)).bold()
                         .foregroundColor(.black)
                 }.padding().padding(.top, 10).foregroundColor(.black)
@@ -679,6 +677,88 @@ struct FolderView: View{
 }
 
 // -------------------------------------------------------------------------- UTILITIES
+
+extension Receipt {
+    static func saveScan(viewContext: NSManagedObjectContext, recognizedText: String){
+        let newReceipt = Receipt(context: viewContext)
+        let title = String(recognizedText.components(separatedBy: CharacterSet.newlines).first!).capitalized
+        print("saving\n")
+        
+        
+        
+        newReceipt.id = UUID()
+        newReceipt.store = title
+        newReceipt.body = String(recognizedText.dropFirst((newReceipt.store ?? "").count)).capitalized
+        newReceipt.date = Date()
+        print("STORE NAME + BODY\n \(title + (newReceipt.body ?? ""))\n\n--------")
+        newReceipt.folder = setFolderType(text: (title + (newReceipt.body ?? "")))
+        save(viewContext: viewContext)
+    }
+    
+    static func doesExist(search: String, folders: FetchedResults<Folder>) -> Bool {
+        for folder in folders {
+            if folder.title?.capitalized == search.capitalized {
+                return true
+            }
+        }
+        return false
+    }
+    
+    static func delete(viewContext: NSManagedObjectContext, receipt: Receipt) {
+        viewContext.delete(receipt)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
+            do {
+                try viewContext.save()
+            } catch {
+                print("Failed to delete and save the context: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    static func save(viewContext: NSManagedObjectContext) {
+        do {
+            try  viewContext.save()
+        } catch {
+            // Replace this implementation with code to handle the error appropriately.
+            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+            let nserror = error as NSError
+            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+        }
+    }
+}
+
+extension Folder {
+    static func addFolder(viewContext: NSManagedObjectContext, title: String, icon: String){
+        let newFolder = Folder(context: viewContext)
+        
+        newFolder.id = UUID()
+        newFolder.title = title.capitalized
+        newFolder.icon = icon.lowercased()
+        save(viewContext: viewContext)
+    }
+    
+    static func delete(viewContext: NSManagedObjectContext, folder: Folder) {
+        viewContext.delete(folder)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
+            do {
+                try viewContext.save()
+            } catch {
+                print("Failed to delete and save the context: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    static func save(viewContext: NSManagedObjectContext) {
+        do {
+            try  viewContext.save()
+        } catch {
+            // Replace this implementation with code to handle the error appropriately.
+            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+            let nserror = error as NSError
+            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+        }
+    }
+}
 
 /// used for getting screen sizes
 extension UIScreen{
