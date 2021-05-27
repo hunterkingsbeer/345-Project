@@ -30,7 +30,7 @@ struct PersistenceController {
             newReceipt.date = Date()
             newReceipt.id = UUID()
             newReceipt.store = "Example Store"
-            newReceipt.folder = setFolderType(text: ((newReceipt.store ?? "") + (newReceipt.body ?? "")))
+            newReceipt.folder = Receipt.predictFolderType(text: ((newReceipt.store ?? "") + (newReceipt.body ?? "")))
             newReceipt.tags = "tag1,tag2,tag3,tag4"
             newReceipt.warrenty = ""
             newReceipt.total = Double(index)

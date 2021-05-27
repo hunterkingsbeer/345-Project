@@ -68,9 +68,6 @@ struct ContentView: View {
                 }.padding(.horizontal, addPanelState == .homepage ? 15 : 0)
             }.navigationBarTitle("").navigationBarHidden(true)
         }.ignoresSafeArea(.keyboard)
-        .onAppear(perform: {
-            print("testing")
-        })
     }
 }
 
@@ -201,7 +198,6 @@ struct AddPanelDetailView: View {
             validScanAlert = validScan == .invalidScan ? true : false // if validScanType == invalid then alert the user
             
             if validScan == .validScan { // IMPROVE THIS! Go to a "is this correct?" screen
-                print("SAVING")
                 Receipt.saveScan(viewContext: viewContext, recognizedText: recognizedText)
                 withAnimation(.spring()) {
                     addPanelState = .homepage
@@ -673,121 +669,6 @@ struct FolderView: View{
                         .foregroundColor(.black)
                 }.padding().padding(.top, 10).foregroundColor(.black)
             ).frame(height: UIScreen.screenHeight*0.25)
-    }
-}
-
-// -------------------------------------------------------------------------- UTILITIES
-
-extension Receipt {
-    static func saveScan(viewContext: NSManagedObjectContext, recognizedText: String){
-        let newReceipt = Receipt(context: viewContext)
-        let title = String(recognizedText.components(separatedBy: CharacterSet.newlines).first!).capitalized
-        print("saving\n")
-        
-        
-        
-        newReceipt.id = UUID()
-        newReceipt.store = title
-        newReceipt.body = String(recognizedText.dropFirst((newReceipt.store ?? "").count)).capitalized
-        newReceipt.date = Date()
-        print("STORE NAME + BODY\n \(title + (newReceipt.body ?? ""))\n\n--------")
-        newReceipt.folder = setFolderType(text: (title + (newReceipt.body ?? "")))
-        save(viewContext: viewContext)
-    }
-    
-    static func doesExist(search: String, folders: FetchedResults<Folder>) -> Bool {
-        for folder in folders {
-            if folder.title?.capitalized == search.capitalized {
-                return true
-            }
-        }
-        return false
-    }
-    
-    static func delete(viewContext: NSManagedObjectContext, receipt: Receipt) {
-        viewContext.delete(receipt)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
-            do {
-                try viewContext.save()
-            } catch {
-                print("Failed to delete and save the context: \(error.localizedDescription)")
-            }
-        }
-    }
-
-    static func save(viewContext: NSManagedObjectContext) {
-        do {
-            try  viewContext.save()
-        } catch {
-            // Replace this implementation with code to handle the error appropriately.
-            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-            let nserror = error as NSError
-            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
-        }
-    }
-}
-
-extension Folder {
-    static func addFolder(viewContext: NSManagedObjectContext, title: String, icon: String){
-        let newFolder = Folder(context: viewContext)
-        
-        newFolder.id = UUID()
-        newFolder.title = title.capitalized
-        newFolder.icon = icon.lowercased()
-        save(viewContext: viewContext)
-    }
-    
-    static func delete(viewContext: NSManagedObjectContext, folder: Folder) {
-        viewContext.delete(folder)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
-            do {
-                try viewContext.save()
-            } catch {
-                print("Failed to delete and save the context: \(error.localizedDescription)")
-            }
-        }
-    }
-
-    static func save(viewContext: NSManagedObjectContext) {
-        do {
-            try  viewContext.save()
-        } catch {
-            // Replace this implementation with code to handle the error appropriately.
-            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-            let nserror = error as NSError
-            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
-        }
-    }
-}
-
-/// used for getting screen sizes
-extension UIScreen{
-   static let screenWidth = UIScreen.main.bounds.size.width
-   static let screenHeight = UIScreen.main.bounds.size.height
-   static let screenSize = UIScreen.main.bounds.size
-}
-
-/// shrinking button effect
-struct ShrinkingButton: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .scaleEffect(configuration.isPressed ? 0.99 : 1)
-            .animation(.spring())
-    }
-}
-
-// Normal TextField doesn't allow colored placeholder text, this does. SOLUTION FOUND AT THIS LINK https://stackoverflow.com/questions/57688242/swiftui-how-to-change-the-placeholder-color-of-the-textfield
-struct CustomTextField: View {
-    var placeholder: Text
-    @Binding var text: String
-    var editingChanged: (Bool)->() = { _ in }
-    var commit: ()->() = { }
-
-    var body: some View {
-        ZStack(alignment: .leading) {
-            if text.isEmpty { placeholder }
-            TextField("", text: $text, onEditingChanged: editingChanged, onCommit: commit)
-        }
     }
 }
 
