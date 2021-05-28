@@ -11,13 +11,15 @@ import SwiftUI
 struct PersistenceController {
     
     static let shared = PersistenceController()
+ 
 
     static var preview: PersistenceController = {
+
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
         
         let newFolder = Folder(context: viewContext)
-        newFolder.title = "example".capitalized
+        newFolder.title = "groceries".capitalized
         newFolder.icon = "folder"
         newFolder.id = UUID()
         newFolder.favorite = false
@@ -30,18 +32,17 @@ struct PersistenceController {
             newReceipt.date = Date()
             newReceipt.id = UUID()
             newReceipt.store = "Example Store"
-            newReceipt.folder = Receipt.predictFolderType(text: ((newReceipt.store ?? "") + (newReceipt.body ?? "")))
+            newReceipt.folder = Prediction.predictFolderType(text: ((newReceipt.store ?? "") + (newReceipt.body ?? "")))
             newReceipt.tags = "tag1,tag2,tag3,tag4"
             newReceipt.warrenty = ""
             newReceipt.total = Double(index)
         }
-        
+                
         save(viewContext: viewContext)
         return result
     }()
 
     let container: NSPersistentContainer
-
     init(inMemory: Bool = false) {
         container = NSPersistentContainer(name: "COSC345_Project")
         if inMemory {
@@ -63,6 +64,26 @@ struct PersistenceController {
                 fatalError("Unresolved error \(error), \(error.userInfo)")
             }
         })
+    }
+    
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \Folder.title, ascending: false)],
+        animation: .spring())
+    static var folders: FetchedResults<Folder>
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)],
+        animation: .spring())
+    static var receipts: FetchedResults<Receipt>
+    /*
+    static func getReceipts() -> FetchedResults<Receipt>{
+        return receipts
+    }
+    static func getFolders() -> FetchedResults<Folder>{
+        return folders
+    }*/
+    
+    func getContext() -> NSManagedObjectContext {
+        return container.viewContext
     }
     
     static func save(viewContext: NSManagedObjectContext) {

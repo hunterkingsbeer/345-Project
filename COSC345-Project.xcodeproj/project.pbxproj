@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5A07749E2660BA4F008E3909 /* Prediction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A07749D2660BA4F008E3909 /* Prediction.swift */; };
 		5A32772C265E6D01009EA8A3 /* AdaptsToKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A32772B265E6D01009EA8A3 /* AdaptsToKeyboard.swift */; };
 		5A3DCE18264490E7003442C3 /* COSC345_ProjectApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A3DCE17264490E7003442C3 /* COSC345_ProjectApp.swift */; };
 		5A3DCE1A264490E7003442C3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A3DCE19264490E7003442C3 /* ContentView.swift */; };
@@ -39,6 +40,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		5A07749D2660BA4F008E3909 /* Prediction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prediction.swift; sourceTree = "<group>"; };
 		5A32772B265E6D01009EA8A3 /* AdaptsToKeyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptsToKeyboard.swift; sourceTree = "<group>"; };
 		5A3DCE14264490E7003442C3 /* COSC345-Project.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "COSC345-Project.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A3DCE17264490E7003442C3 /* COSC345_ProjectApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = COSC345_ProjectApp.swift; sourceTree = "<group>"; };
@@ -118,6 +120,7 @@
 				5A8A7204265E059A00786372 /* ImagePicker.swift */,
 				5A32772B265E6D01009EA8A3 /* AdaptsToKeyboard.swift */,
 				5AB20BC7265FC3F50055D2AD /* UtilityFunctions.swift */,
+				5A07749D2660BA4F008E3909 /* Prediction.swift */,
 			);
 			path = "COSC345-Project";
 			sourceTree = "<group>";
@@ -283,6 +286,7 @@
 			files = (
 				5A3DCE21264490EB003442C3 /* Persistence.swift in Sources */,
 				5A32772C265E6D01009EA8A3 /* AdaptsToKeyboard.swift in Sources */,
+				5A07749E2660BA4F008E3909 /* Prediction.swift in Sources */,
 				5A3DCE1A264490E7003442C3 /* ContentView.swift in Sources */,
 				5A3DCE24264490EB003442C3 /* COSC345_Project.xcdatamodeld in Sources */,
 				5A8A7205265E059A00786372 /* ImagePicker.swift in Sources */,

@@ -4,16 +4,22 @@
 //
 //  Created by Hunter Kingsbeer on 28/05/21.
 //
-// --------------------------------------------------------- UTILITIES
-
 
 import Foundation
 import SwiftUI
 import CoreData
 import Swift
 
+class GameSettings: ObservableObject {
+    @Published var score = 0
+}
+
+// --------------------------------------------------------- RECEIPT
 extension Receipt {
-    static func saveScan(viewContext: NSManagedObjectContext, recognizedText: String){
+    /// takes scanned text and puts it into a receipt entity
+    static func saveScan(recognizedText: String){
+        let viewContext = PersistenceController.shared.getContext()
+        
         let newReceipt = Receipt(context: viewContext)
         let title = String(recognizedText.components(separatedBy: CharacterSet.newlines).first!).capitalized
     
@@ -21,107 +27,157 @@ extension Receipt {
         newReceipt.store = title
         newReceipt.body = String(recognizedText.dropFirst((newReceipt.store ?? "").count)).capitalized
         newReceipt.date = Date()
-        newReceipt.folder = Receipt.predictFolderType(text: (title + (newReceipt.body ?? "")))
-        save(viewContext: viewContext)
+        newReceipt.folder = Prediction.predictFolderType(text: (title + (newReceipt.body ?? "")))
+        Folder.verifyFolder(folderTitle: newReceipt.folder ?? "Default")
+        save()
+        print("New receipt: \(title)")
     }
     
-    /// Predict Folder Type -- Input the text compared against keywords to predict a folder name
-    static func predictFolderType(text: String) -> String{
-        let groceries = ["new world", "paknsave", "countdown",
-                         "freshchoice", "supermarket", "mart"]
-        let retail = ["harvey norman", "noel leeming", "smith city",
-                      "jb hifi", "farmers"]
-        let clothing = ["cotton on", "hallensteins", "countdown"]
-        print("\nDetected: ")
-        
-        if matchString(parameters: groceries, input: text){
-            print("Category Groceries")
-            return "Groceries"
-            
-        } else if matchString(parameters: retail, input: text){
-            print("Category Retail")
-            return "Retail"
-            
-        } else if matchString(parameters: clothing, input: text){
-            print("Category Clothing")
-            return "Clothing"
-            
-        } else {
-            print("Category Default")
-            return "Default"
+    static func delete(receipt: Receipt) {
+        if Folder.folderExists(folderTitle: receipt.folder ?? "Default"){
+            Folder.getFolder(folderTitle: receipt.folder ?? "Default").receiptCount -= 1
+            Folder.ifEmptyDelete(folderTitle: receipt.folder ?? "")
         }
-    }
-    
-    static func delete(viewContext: NSManagedObjectContext, receipt: Receipt) {
+        let viewContext = PersistenceController.shared.getContext()
+        print("Deleted Receipt: \(String(describing: receipt.store))")
         viewContext.delete(receipt)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
-            do {
-                try viewContext.save()
-            } catch {
-                print("Failed to delete and save the context: \(error.localizedDescription)")
-            }
-        }
+        save()
     }
 
-    static func save(viewContext: NSManagedObjectContext) {
+    static func save() {
+        let viewContext = PersistenceController.shared.getContext()
+        
         do {
             try  viewContext.save()
         } catch {
-            // Replace this implementation with code to handle the error appropriately.
-            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
             let nserror = error as NSError
             fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
         }
     }
 }
 
+// --------------------------------------------------------- FOLDER
 extension Folder {
-    static func addFolder(viewContext: NSManagedObjectContext, title: String, icon: String){
-        let newFolder = Folder(context: viewContext)
-        
-        newFolder.id = UUID()
-        newFolder.title = title.capitalized
-        newFolder.icon = icon.lowercased()
-        save(viewContext: viewContext)
+    static let folderMatch = [(title: "Default", icon: "folder", color: "black"),
+                              (title: "Retail", icon: "tag", color: "blue"),
+                              (title: "Groceries", icon: "cart", color: "green"),
+                              (title: "Clothing", icon: "bag", color: "pink")]
+    
+    static func getIcon(title: String) -> String {
+        for match in folderMatch {
+            if match.title.lowercased() == title.lowercased() {
+                return match.icon.lowercased()
+            }
+        }
+        return "folder".lowercased()
     }
     
-    static func delete(viewContext: NSManagedObjectContext, folder: Folder) {
-        viewContext.delete(folder)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
-            do {
-                try viewContext.save()
-            } catch {
-                print("Failed to delete and save the context: \(error.localizedDescription)")
+    static func getColor(title: String) -> String {
+        for match in folderMatch {
+            if match.title.lowercased() == title.lowercased() {
+                return match.color.lowercased()
             }
+        }
+        return "black".lowercased()
+    }
+    
+    /// returns back array of all folders
+    static func getFolders() -> [Folder] {
+        let fetchRequest: NSFetchRequest<Folder> = Folder.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(keyPath: \Folder.receiptCount, ascending: true)]
+        do {
+            let managedObjectContext = PersistenceController.shared.getContext()
+            let folders = try managedObjectContext.fetch(fetchRequest)
+            return folders
+          } catch let error as NSError {
+            print("Error fetching Folders: \(error.localizedDescription), \(error.userInfo)")
+          }
+        return [Folder]()
+    }
+    
+    ///returns folder with matching title
+    static func getFolder(folderTitle: String) -> Folder {
+        for folder in getFolders() {
+            if folder.title == folderTitle.capitalized {
+                return folder
+            }
+        }
+        return Folder()
+    }
+    
+    /// adds a folder to the database, taking a title and icon
+    static func addFolder(title: String, icon: String){
+        let viewContext = PersistenceController.shared.getContext()
+        
+        let newFolder = Folder(context: viewContext)
+        newFolder.id = UUID()
+        newFolder.title = title.capitalized
+        newFolder.icon = getIcon(title: title)
+        newFolder.color = getColor(title: title)
+        newFolder.receiptCount = 1
+        save()
+        print("New folder: \(title) folder")
+    }
+    
+    /// deletes folder
+    static func delete(folder: Folder) {
+        if folder.title != nil {
+            let viewContext = PersistenceController.shared.getContext()
+            print("Deleted folder: \(String(describing: folder.title))")
+            viewContext.delete(folder)
+            save()
+        }
+        
+    }
+    
+    static func ifEmptyDelete(folderTitle: String) {
+        let folder = getFolder(folderTitle: folderTitle)
+        if folder.receiptCount == 0 {
+            delete(folder: folder)
         }
     }
     
-    static func doesFolderExist(search: String, folders: FetchedResults<Folder>) -> Bool {
+    /// takes a folders title in and checks whether it exists, creating a new folder if not
+    // function name could be better but im tired
+    static func verifyFolder(folderTitle: String){
+        if folderExists(folderTitle: folderTitle) { //if the folder exists, increment its count
+            getFolder(folderTitle: folderTitle).receiptCount += 1
+            print("Added to: \(folderTitle) folder")
+        } else {
+            addFolder(title: folderTitle, icon: "folder")
+        }
+    }
+    
+    /// input folder title, returns true if folder exists
+    static func folderExists(folderTitle: String) -> Bool {
+        let folders = Folder.getFolders()
         for folder in folders {
-            if folder.title?.capitalized == search.capitalized {
+            if folder.title?.capitalized == folderTitle.capitalized {
                 return true
             }
         }
         return false
     }
-
-    static func save(viewContext: NSManagedObjectContext) {
+    /// saves context
+    static func save() {
+        let viewContext = PersistenceController.shared.getContext()
         do {
             try  viewContext.save()
         } catch {
             // Replace this implementation with code to handle the error appropriately.
-            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
             let nserror = error as NSError
             fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
         }
     }
 }
 
+// --------------------------------------------------------- UTILITIES
+
 /// checks whether an input string contains words found in parameters, true if it does, false otherwise
 func matchString(parameters: [String], input: String) -> Bool{
     for parameter in parameters { // and check it against the parameter
         if input.lowercased().contains(parameter){
-            print("Match for '\(parameter)'")
+            print("\nMatched word '\(parameter)'")
             return true
         }
     }

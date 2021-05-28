@@ -150,7 +150,6 @@ enum ValidScanType {
 
 /// Add panel detail view - Handles the respective input of receipts
 struct AddPanelDetailView: View {
-    @Environment(\.managedObjectContext) var viewContext
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)],
         animation: .spring())
@@ -198,7 +197,7 @@ struct AddPanelDetailView: View {
             validScanAlert = validScan == .invalidScan ? true : false // if validScanType == invalid then alert the user
             
             if validScan == .validScan { // IMPROVE THIS! Go to a "is this correct?" screen
-                Receipt.saveScan(viewContext: viewContext, recognizedText: recognizedText)
+                Receipt.saveScan(recognizedText: recognizedText)
                 withAnimation(.spring()) {
                     addPanelState = .homepage
                 }
@@ -206,7 +205,7 @@ struct AddPanelDetailView: View {
         }).alert(isPresented: $validScanAlert){
             Alert(
                 title: Text("Receipt Not Saved!"),
-                message: Text("This scan is not valid. Try scanning again."),
+                message: Text("This image is not valid. Try something else."),
                 dismissButton: .default(Text("Okay"))
             )
         }
@@ -255,7 +254,7 @@ struct DashboardHomePageView: View {
         animation: .spring())
     var receipts: FetchedResults<Receipt>
     @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Folder.title, ascending: false)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \Folder.receiptCount, ascending: false)],
         animation: .spring())
     var folders: FetchedResults<Folder>
  
@@ -270,7 +269,7 @@ struct DashboardHomePageView: View {
             Divider()
             
             if toolbarFocus == .homepage {
-                if receipts.count != 0 || folders.count != 0 {
+                if receipts.count > 0 {
                     ReceiptsFoldersButtons(dashPanelState: $dashPanelState)
                         .transition(AnyTransition.scale(scale: 0.8).combined(with: .opacity))
                 } else {
@@ -346,7 +345,7 @@ struct ReceiptsFoldersButtons: View {
         animation: .spring())
     var receipts: FetchedResults<Receipt>
     @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Folder.title, ascending: false)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \Folder.receiptCount, ascending: false)],
         animation: .spring())
     var folders: FetchedResults<Folder>
     
@@ -427,22 +426,15 @@ struct NotificationsView: View {
 
 /// Receipt Collection View - View that displays all the receipts (interactive), along with a search/filter bar
 struct ReceiptCollectionView: View {
-    @Environment(\.colorScheme) var colorScheme
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)],
-        //predicate: NSPredicate(format: "store == %@", input), ------------------------------------------- FITLERS RESULTS
-        animation: .spring())
+    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)], animation: .spring())
     var receipts: FetchedResults<Receipt>
     
     @Binding var dashPanelState : DashPanelType
-    @State var showingFilters : Bool = false
-    @State var searchInput : String = ""
+    @State var userSearch : String = ""
     
     //settings
     @State var warrenty = false
     @State var favorites = false
-    @State var category = ""
-    var categories = ["Groceries", "Technology", "Utilities"]
     
     var body: some View {
         VStack {
@@ -452,54 +444,11 @@ struct ReceiptCollectionView: View {
                 .foregroundColor(.black)
 
             // search bar
-            HStack {
-                RoundedRectangle(cornerRadius: 18)
-                    .fill(Color("grey"))
-                    //.strokeBorder(Color("grey"), lineWidth: 1)
-                    .frame(height: UIScreen.screenHeight*0.05).frame(minWidth: 0, maxWidth: .infinity)
-                    .overlay(
-                        HStack {
-                            Image(systemName: "magnifyingglass")
-                            CustomTextField(placeholder: Text("Search...").foregroundColor(.black),text: $searchInput)
-                                .ignoresSafeArea(.keyboard)
-                            //TextField("Search...", text: $input)
-                            Spacer()
-                            if searchInput.count > 0{
-                                Button(action: {
-                                    searchInput = ""
-                                }){
-                                    Image(systemName: "xmark")
-                                }
-                            }
-                        }.foregroundColor(.black).padding(.horizontal, 10)
-                )
-                Button(action:{
-                    showingFilters = showingFilters ? false : true
-                }){
-                    Image(systemName: "slider.horizontal.3")
-                        .font(.title)
-                        .foregroundColor(.black)
-                }.buttonStyle(ShrinkingButton())
-            }.padding(.bottom, 1)
+            SearchBar(userSearch: $userSearch, warrenty: $warrenty, favorites: $favorites)
             
-            // search/display filters
-            if showingFilters {
-                VStack {
-                    Group {
-                        HStack {
-                            Text("Category")
-                            Spacer()
-                            Text("something")
-                        }
-                        Toggle("Warrenty", isOn: $warrenty)
-                        Toggle("Favorites", isOn: $favorites)
-                    }.foregroundColor(.black).font(.system(.body, design: .rounded))
-                }.padding(.horizontal)
-            }
-            
-            // receipts
+            // receipts including search results
             ScrollView(showsIndicators: false) {
-                ForEach(receipts.filter({ searchInput.count > 0 ? $0.body!.localizedCaseInsensitiveContains(searchInput) || $0.store!.localizedCaseInsensitiveContains(searchInput) : $0.body!.count > 0 })){ receipt in
+                ForEach(receipts.filter({ userSearch.count > 0 ? $0.body!.localizedCaseInsensitiveContains(userSearch) ||  $0.folder!.localizedCaseInsensitiveContains(userSearch)  || $0.store!.localizedCaseInsensitiveContains(userSearch) : $0.body!.count > 0 })){ receipt in
                     ReceiptView(receipt: receipt)
                 }
             }.cornerRadius(18)
@@ -525,8 +474,6 @@ struct ReceiptCollectionView: View {
 
 /// Receipt view - The receipt that is displayed, starts minimized then after interaction expands to full size
 struct ReceiptView: View {
-    @Environment(\.managedObjectContext) var viewContext
-    
     @State var receipt : Receipt
     @State var selected : Bool = false
     @State var pendingDelete = false
@@ -537,23 +484,25 @@ struct ReceiptView: View {
             .overlay(
                 // the title and body
                 VStack {
-                    HStack {
+                    HStack (alignment: .top){
                         // title
                         VStack(alignment: .leading) {
                             Text(receipt.store ?? "")
-                                .font(.system(size: selected ? 30 : 22,
-                                              weight: selected ? .bold : .regular,
-                                          design: .rounded))
+                                .font(.system(.title, design: .rounded)).bold()
                             Text(receipt.folder ?? "Default")
                                 .font(.system(.body, design: .rounded))
                         }
                         Spacer()
                     }
                     if selected {
+                        Spacer()
                         // body
-                        ScrollView(.vertical) {
-                            Text(receipt.body ?? "")
-                                .padding(.vertical, 5)
+                        ScrollView(.vertical, showsIndicators: false) {
+                            VStack (alignment: .leading){
+                                Text(receipt.body ?? "")
+                                    .padding(.vertical, 5)
+                                    .frame(minWidth: 0, maxWidth: .infinity)
+                            }.frame(minWidth: 0, maxWidth: .infinity)
                         }
                     }
                     Spacer()
@@ -561,7 +510,11 @@ struct ReceiptView: View {
                         Spacer()
                         VStack (alignment: .trailing){
                             Text("Total")
-                            Text("$\(receipt.total , specifier: "%.2f")").font(.system(.title, design: .rounded)).bold()
+                                .font(.system(.subheadline, design: .rounded))
+                                .padding(.bottom, -5)
+                            Divider()//.padding(.leading, 20)
+                            Text(receipt.total > 0 ? "$\(receipt.total , specifier: "%.2f")" : "Unknown")
+                                .font(.system(.body, design: .rounded))
                         }
                     }
                 }.padding().foregroundColor(.black)
@@ -570,19 +523,18 @@ struct ReceiptView: View {
             .onTapGesture {
                 selected.toggle()
             }
-            .onLongPressGesture(minimumDuration: 0.1, maximumDistance: 2, perform: {
+            .onLongPressGesture(minimumDuration: 0.25, maximumDistance: 2, perform: {
                 pendingDelete.toggle()
             }).onChange(of: pendingDelete, perform: { _ in
                 withAnimation(.spring()){
                     if pendingDelete == true {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                             pendingDelete = false // turns off delete button after 2 secs
                         }
                     }
                 }
             })
-        .overlay(
-            // the delete button
+        .overlay( // the delete button
             VStack{
                 if pendingDelete == true {
                     HStack{
@@ -592,7 +544,7 @@ struct ReceiptView: View {
                                    height: UIScreen.screenHeight*0.05)
                             .overlay(Image(systemName: "xmark").foregroundColor(.white))
                             .onTapGesture{
-                                Receipt.delete(viewContext: viewContext, receipt: receipt)
+                                Receipt.delete(receipt: receipt)
                             }
                     }
                     Spacer()
@@ -605,11 +557,21 @@ struct ReceiptView: View {
 /// Folder Collection View - View that displays all the folders
 struct FolderCollectionView: View {
     @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Folder.title, ascending: false)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \Folder.favorite, ascending: false),
+                          NSSortDescriptor(keyPath: \Folder.receiptCount, ascending: false),
+                          NSSortDescriptor(keyPath: \Folder.title, ascending: false)],
         animation: .spring())
     var folders: FetchedResults<Folder>
-    @State var currentFolder : String = ""
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)],
+        animation: .spring())
+    var receipts: FetchedResults<Receipt>
     
+    //settings
+    @State var warrenty = false
+    @State var favorites = false
+    @State var currentFolder : String = ""
+    @State var userSearch : String = ""
     @Binding var dashPanelState : DashPanelType
     let columns = [
             GridItem(.flexible()),
@@ -618,20 +580,58 @@ struct FolderCollectionView: View {
     
     var body: some View {
         VStack {
-            Text("Folders")
-                .font(.system(.largeTitle, design: .rounded)).bold()
-                .foregroundColor(.black)
-            ScrollView(showsIndicators: false) {
-                LazyVGrid(columns: columns) {
-                    ForEach(folders.filter({ $0.icon!.count > 0 })){ folder in
-                        FolderView(folder: folder)
+            HStack {
+                if viewingFolder() {
+                    Button(action: {
+                        currentFolder = ""
+                    }){
+                        Image(systemName: "chevron.left")
+                            .font(.title)
+                            .foregroundColor(.black)
                     }
                 }
-            }.cornerRadius(18).padding(.horizontal)
+                Spacer()
+                Text(viewingFolder()  ? "\(currentFolder)" : "All Folders")
+                    .font(.system(.largeTitle, design: .rounded)).bold()
+                    .foregroundColor(.black)
+                Spacer()
+                if viewingFolder() {
+                    Button(action:{
+                        Folder.getFolder(folderTitle: currentFolder).favorite.toggle()
+                        Folder.save()
+                    }){
+                        Image(systemName: Folder.getFolder(folderTitle: currentFolder).favorite ? "bookmark.fill" : "bookmark") // just to make sure its the exact size
+                            .font(.title)
+                            .foregroundColor(Color(Folder.getFolder(folderTitle: currentFolder).favorite ? Folder.getFolder(folderTitle: currentFolder).color ?? "black" : "black")) // make it clear so we dont see it
+                            .padding(.leading, -10)
+                    }
+                }
+            }.padding(.horizontal)
+            
+            SearchBar(userSearch: $userSearch, warrenty: $warrenty, favorites: $favorites)
+                .padding(.horizontal)
+            
+            ScrollView(showsIndicators: false) {
+                if viewingFolder() && Folder.getFolder(folderTitle: currentFolder).receiptCount > 0 {
+                    ForEach(receipts.filter({ userSearch.count > 0 ? $0.body!.localizedCaseInsensitiveContains(userSearch) ||  $0.folder!.localizedCaseInsensitiveContains(userSearch)  ||   $0.store!.localizedCaseInsensitiveContains(userSearch) : $0.folder! == currentFolder })){ receipt in
+                        ReceiptView(receipt: receipt)
+                    }.transition(AnyTransition.move(edge: .trailing)).animation(.spring())
+                    .padding(.horizontal)
+                } else {
+                    LazyVGrid(columns: columns) {
+                        ForEach(folders.filter({ userSearch.count > 0 ? $0.title!.localizedCaseInsensitiveContains(userSearch) : $0.title!.count > 0 })){ folder in
+                            FolderView(folder: folder, currentFolder: $currentFolder)
+                        }
+                    }//.transition(AnyTransition.move(edge: .leading)).animation(.spring())
+                    .padding(.horizontal)
+                }
+                
+            }.cornerRadius(18)
             
             Button(action: {
                 withAnimation(.spring()){
                     dashPanelState = .homepage
+                    currentFolder = ""
                 }
             }){
                 RoundedRectangle(cornerRadius: 18)
@@ -641,16 +641,22 @@ struct FolderCollectionView: View {
                             .font(.system(.largeTitle, design: .rounded))
                             .foregroundColor(.white)
                     ).frame(height: UIScreen.screenHeight*0.1)
-                    .padding()
-            }.buttonStyle(ShrinkingButton())
+                    .padding(.vertical)
+            }.buttonStyle(ShrinkingButton()).padding(.horizontal)
             Spacer()
         }.padding(.top)
+    }
+    
+    func viewingFolder() -> Bool {
+        return currentFolder.count > 0 ? true : false
     }
 }
 
 /// Folder view - Extremely basic folder
 struct FolderView: View{
     @State var folder : Folder
+    @Binding var currentFolder : String
+    @State var pendingDelete = false
     
     var body: some View {
         RoundedRectangle(cornerRadius: 18)
@@ -659,6 +665,7 @@ struct FolderView: View{
                 VStack {
                     Image(systemName: folder.icon ?? "folder")
                         .font(.system(size: 50))
+                        .foregroundColor(Color.black)
                     Text(folder.title ?? "Folder")
                         .font(.system(.title, design: .rounded))
                         .padding(.bottom, 10)
@@ -669,6 +676,46 @@ struct FolderView: View{
                         .foregroundColor(.black)
                 }.padding().padding(.top, 10).foregroundColor(.black)
             ).frame(height: UIScreen.screenHeight*0.25)
+            .onTapGesture {
+                currentFolder = currentFolder == folder.title! ? "" : folder.title!
+                pendingDelete = false
+            }.onLongPressGesture(minimumDuration: 0.25, maximumDistance: 2, perform: {
+                pendingDelete.toggle()
+            }).onChange(of: pendingDelete, perform: { _ in
+                withAnimation(.spring()){
+                    if pendingDelete == true {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            pendingDelete = false // turns off delete button after 2 secs
+                        }
+                    }
+                }
+            })
+            .overlay(
+                // the delete button
+                VStack{
+                    HStack{
+                        Spacer()
+                        if pendingDelete == true {
+                            Circle().fill(Color.red)
+                                .frame(width: UIScreen.screenHeight*0.05,
+                                       height: UIScreen.screenHeight*0.05)
+                                .overlay(Image(systemName: "xmark").foregroundColor(.white))
+                                .onTapGesture{
+                                    Folder.delete(folder: folder)
+                                }
+                        } else if folder.favorite {
+                            Image(systemName: "bookmark.fill")
+                                .font(.title)
+                                .foregroundColor(Color(folder.color ?? "black"))
+                                .frame(width: UIScreen.screenHeight*0.05,
+                                       height: UIScreen.screenHeight*0.05)
+                                .padding(5)
+                        }
+                    }
+                    Spacer()
+                    
+                }
+            )
     }
 }
 
@@ -694,6 +741,56 @@ struct BackgroundView: View {
                 .scaleEffect(x: 1.5)
                 .padding(.bottom, -UIScreen.screenHeight * (addPanelState == .homepage ? 0.5 : 0.38))
                 .animation(.spring())
+        }
+    }
+}
+
+/// search bar along with filters
+struct SearchBar: View {
+    @Binding var userSearch: String
+    @State var showingFilters : Bool = false
+    @Binding var warrenty : Bool
+    @Binding var favorites : Bool
+    
+    var body: some View {
+        VStack {
+            HStack {
+                RoundedRectangle(cornerRadius: 18)
+                    .fill(Color("grey"))
+                    //.strokeBorder(Color("grey"), lineWidth: 1)
+                    .frame(height: UIScreen.screenHeight*0.05).frame(minWidth: 0, maxWidth: .infinity)
+                    .overlay(
+                        HStack {
+                            Image(systemName: "magnifyingglass")
+                            CustomTextField(placeholder: Text("Search...").foregroundColor(.black),text: $userSearch)
+                                .ignoresSafeArea(.keyboard)
+                            Spacer()
+                            if userSearch.count > 0{
+                                Button(action: {
+                                    userSearch = ""
+                                }){
+                                    Image(systemName: "xmark")
+                                }
+                            }
+                        }.foregroundColor(.black).padding(.horizontal, 10)
+                )
+                Button(action:{
+                    showingFilters = showingFilters ? false : true
+                }){
+                    Image(systemName: "slider.horizontal.3")
+                        .font(.title)
+                        .foregroundColor(.black)
+                }.buttonStyle(ShrinkingButton())
+            }.padding(.bottom, 1)
+            
+            if showingFilters {
+                VStack {
+                    Group {
+                        //Toggle("Warrenty", isOn: $warrenty)  not working yet
+                        Toggle("Favorites", isOn: $favorites)
+                    }.foregroundColor(.black).font(.system(.body, design: .rounded))
+                }.padding(.horizontal, 5)
+            }
         }
     }
 }
