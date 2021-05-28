@@ -40,6 +40,7 @@ enum DashPanelType {
 struct ContentView: View {
     @State var addPanelState : AddPanelType = .homepage // need to make these global vars
     @State var dashPanelState : DashPanelType = .homepage
+    //@ObservedObject var settings = UserSettings()
 
     var body: some View {
         NavigationView {
@@ -49,6 +50,7 @@ struct ContentView: View {
                 
                 // COMPANY TITLE ------------------
                 VStack{
+                    Spacer()
                     Text("Receipted.")
                         .foregroundColor(.white)
                         .font(.system(.title, design: .rounded)).bold()
@@ -65,9 +67,12 @@ struct ContentView: View {
                         AddPanel(addPanelState: $addPanelState)
                             .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.75)))
                     }
-                }.padding(.horizontal, addPanelState == .homepage ? 15 : 0)
+                    Spacer()
+                }.ignoresSafeArea(.keyboard)
+                .padding(.horizontal, addPanelState == .homepage ? 15 : 0)
             }.navigationBarTitle("").navigationBarHidden(true)
-        }.ignoresSafeArea(.keyboard)
+            .colorScheme(UserSettings().darkMode ? .dark : .light)
+        }
     }
 }
 
@@ -77,15 +82,18 @@ struct AddPanel: View {
     
     var body: some View {
         RoundedRectangle(cornerRadius: 25)
-            .foregroundColor(.white)
+            .shadow(color: (Color(.black)).opacity(0.15), radius: 5, x: 0, y: 0)
+            .foregroundColor(Color("object"))
             .overlay(
                 VStack{
                     if addPanelState == .homepage {
                         AddPanelHomepageView(addPanelState: $addPanelState)
                             .transition(AnyTransition.move(edge: .bottom).combined(with: .opacity)).animation(.spring())
+                            .foregroundColor(Color("text"))
                     } else {
                         AddPanelDetailView(addPanelState: $addPanelState)
                             .transition(AnyTransition.move(edge: .bottom).combined(with: .opacity)).animation(.spring())
+                            .foregroundColor(Color("text"))
                     }
                 }
             ).foregroundColor(.black)
@@ -216,9 +224,12 @@ struct AddPanelDetailView: View {
 struct DashboardPanel: View{
     let size : CGFloat
     @Binding var dashPanelState : DashPanelType
+    @ObservedObject var settings = UserSettings()
     
     var body: some View{
         RoundedRectangle(cornerRadius: 25)
+            .shadow(color: Color(.black).opacity(0.15), radius: 5, x: 0, y: 0)
+            .foregroundColor(Color("object"))
             .overlay(
                 VStack {
                     if dashPanelState == .homepage {
@@ -265,6 +276,7 @@ struct DashboardHomePageView: View {
     var body: some View {
         VStack(alignment: .center){
             DashboardToolbar(size: size, toolbarFocus: $toolbarFocus).frame(height: size/3.5)
+                .foregroundColor(Color("text"))
             
             Divider()
             
@@ -280,9 +292,11 @@ struct DashboardHomePageView: View {
             } else if toolbarFocus == .settings {
                 SettingsView()
                     .transition(AnyTransition.move(edge: .leading).combined(with: .opacity))
+                    .foregroundColor(Color("text"))
             } else if toolbarFocus == .notifications {
                 NotificationsView()
                     .transition(AnyTransition.move(edge: .trailing).combined(with: .opacity))
+                    .foregroundColor(Color("text"))
             }
         }.foregroundColor(.black).padding(.horizontal)
     }
@@ -382,26 +396,20 @@ struct ReceiptsFoldersButtons: View {
                 }.frame(minWidth: 0, maxWidth: .infinity)
                 .contentShape(Rectangle())
             }.buttonStyle(ShrinkingButton())
-        }
+        }.foregroundColor(Color("text"))
     }
 }
 
 /// SettingsView - The settings menu
 struct SettingsView: View {
+    @ObservedObject var settings = UserSettings()
+    
     var body: some View {
         VStack {
-            ForEach(0..<7){ index in // could probably be a list, however the list goes darkmode though which is a bit weird
-                HStack {
-                    Text("Setting \(index)")
-                        .font(.system(.body, design: .rounded))
-                        .padding(.leading)
-                    Spacer()
-                }
-                Divider()
-            }.frame(minWidth: 0, maxWidth: .infinity)
+            Toggle("Darkmode", isOn: $settings.darkMode)
             .contentShape(Rectangle())
             Spacer()
-        }
+        }.frame(minWidth: 0, maxWidth: .infinity)
     }
 }
 
@@ -441,7 +449,6 @@ struct ReceiptCollectionView: View {
             // title
             Text("Receipts")
                 .font(.system(.largeTitle, design: .rounded)).bold()
-                .foregroundColor(.black)
 
             // search bar
             SearchBar(userSearch: $userSearch, warrenty: $warrenty, favorites: $favorites)
@@ -469,6 +476,7 @@ struct ReceiptCollectionView: View {
             }.buttonStyle(ShrinkingButton())
             Spacer()
         }.padding().ignoresSafeArea(.keyboard)
+        .foregroundColor(Color("text"))
     }
 }
 
@@ -480,7 +488,7 @@ struct ReceiptView: View {
     
     var body: some View {
         RoundedRectangle(cornerRadius: 18)
-            .fill(Color("grey"))
+            .fill(Color("accent"))
             .overlay(
                 // the title and body
                 VStack {
@@ -517,7 +525,7 @@ struct ReceiptView: View {
                                 .font(.system(.body, design: .rounded))
                         }
                     }
-                }.padding().foregroundColor(.black)
+                }.padding().foregroundColor(Color("text"))
                 
             ).frame(height: selected ? UIScreen.screenHeight*0.5 : UIScreen.screenHeight*0.16)
             .onTapGesture {
@@ -542,7 +550,8 @@ struct ReceiptView: View {
                         Circle().fill(Color.red)
                             .frame(width: UIScreen.screenHeight*0.05,
                                    height: UIScreen.screenHeight*0.05)
-                            .overlay(Image(systemName: "xmark").foregroundColor(.white))
+                            .overlay(Image(systemName: "xmark")
+                                        .foregroundColor(Color("white")))
                             .onTapGesture{
                                 Receipt.delete(receipt: receipt)
                             }
@@ -587,13 +596,11 @@ struct FolderCollectionView: View {
                     }){
                         Image(systemName: "chevron.left")
                             .font(.title)
-                            .foregroundColor(.black)
                     }
                 }
                 Spacer()
                 Text(viewingFolder()  ? "\(currentFolder)" : "All Folders")
                     .font(.system(.largeTitle, design: .rounded)).bold()
-                    .foregroundColor(.black)
                 Spacer()
                 if viewingFolder() {
                     Button(action:{
@@ -602,7 +609,7 @@ struct FolderCollectionView: View {
                     }){
                         Image(systemName: Folder.getFolder(folderTitle: currentFolder).favorite ? "bookmark.fill" : "bookmark") // just to make sure its the exact size
                             .font(.title)
-                            .foregroundColor(Color(Folder.getFolder(folderTitle: currentFolder).favorite ? Folder.getFolder(folderTitle: currentFolder).color ?? "black" : "black")) // make it clear so we dont see it
+                            .foregroundColor(Color(Folder.getFolder(folderTitle: currentFolder).favorite ? Folder.getFolder(folderTitle: currentFolder).color ?? "text" : "text")) // make it clear so we dont see it
                             .padding(.leading, -10)
                     }
                 }
@@ -639,12 +646,13 @@ struct FolderCollectionView: View {
                     .overlay(
                         Image(systemName: "xmark")
                             .font(.system(.largeTitle, design: .rounded))
-                            .foregroundColor(.white)
+                            .foregroundColor(Color("white"))
+                        
                     ).frame(height: UIScreen.screenHeight*0.1)
                     .padding(.vertical)
             }.buttonStyle(ShrinkingButton()).padding(.horizontal)
             Spacer()
-        }.padding(.top)
+        }.padding(.top).foregroundColor(Color("text"))
     }
     
     func viewingFolder() -> Bool {
@@ -660,12 +668,11 @@ struct FolderView: View{
     
     var body: some View {
         RoundedRectangle(cornerRadius: 18)
-            .fill(Color("grey"))
+            .fill(Color("accent"))
             .overlay(
                 VStack {
                     Image(systemName: folder.icon ?? "folder")
                         .font(.system(size: 50))
-                        .foregroundColor(Color.black)
                     Text(folder.title ?? "Folder")
                         .font(.system(.title, design: .rounded))
                         .padding(.bottom, 10)
@@ -673,8 +680,8 @@ struct FolderView: View{
                     //Spacer()
                     Text("\(folder.receiptCount)")
                         .font(.system(.largeTitle, design: .rounded)).bold()
-                        .foregroundColor(.black)
-                }.padding().padding(.top, 10).foregroundColor(.black)
+                }.padding().padding(.top, 10)
+                .foregroundColor(Color("text"))
             ).frame(height: UIScreen.screenHeight*0.25)
             .onTapGesture {
                 currentFolder = currentFolder == folder.title! ? "" : folder.title!
@@ -699,14 +706,14 @@ struct FolderView: View{
                             Circle().fill(Color.red)
                                 .frame(width: UIScreen.screenHeight*0.05,
                                        height: UIScreen.screenHeight*0.05)
-                                .overlay(Image(systemName: "xmark").foregroundColor(.white))
+                                .overlay(Image(systemName: "xmark").foregroundColor(Color("white")))
                                 .onTapGesture{
                                     Folder.delete(folder: folder)
                                 }
                         } else if folder.favorite {
                             Image(systemName: "bookmark.fill")
                                 .font(.title)
-                                .foregroundColor(Color(folder.color ?? "black"))
+                                .foregroundColor(Color(folder.color ?? "text"))
                                 .frame(width: UIScreen.screenHeight*0.05,
                                        height: UIScreen.screenHeight*0.05)
                                 .padding(5)
@@ -723,24 +730,26 @@ struct FolderView: View{
 struct BackgroundView: View {
     var addPanelState : AddPanelType
     var dashPanelState : DashPanelType
+    @ObservedObject var settings = UserSettings()
     
     var body: some View {
-        VStack {
-            Circle()
-                .fill(LinearGradient(gradient: Gradient(colors: [Color("orange"), Color("purple")]),
-                                     startPoint: .top, endPoint: .bottom))
-                .scaleEffect(x: 1.5) // gives it that clean stretched out look
-                .padding(.top, -UIScreen.screenHeight * (dashPanelState == .homepage ? 0.5 : 0.38))
-                .animation(.spring())
-            
-            Spacer()
-            
-            Circle()
-                .fill(LinearGradient(gradient: Gradient(colors: [Color("purple"), Color("cyan")]),
-                                     startPoint: .top, endPoint: .bottom))
-                .scaleEffect(x: 1.5)
-                .padding(.bottom, -UIScreen.screenHeight * (addPanelState == .homepage ? 0.5 : 0.38))
-                .animation(.spring())
+        ZStack {
+            Color("background").ignoresSafeArea(.all)
+            VStack {
+                Circle()
+                    .fill(LinearGradient(gradient: Gradient(colors: [Color("orange"), Color("purple")]),
+                                         startPoint: .top, endPoint: .bottom))
+                    .scaleEffect(x: 1.5) // gives it that clean stretched out look
+                    .padding(.top, -UIScreen.screenHeight * (dashPanelState == .homepage ? 0.5 : 0.38))
+                    .animation(.spring())
+                Spacer()
+                Circle()
+                    .fill(LinearGradient(gradient: Gradient(colors: [Color("purple"), Color("cyan")]),
+                                         startPoint: .top, endPoint: .bottom))
+                    .scaleEffect(x: 1.5)
+                    .padding(.bottom, -UIScreen.screenHeight * (addPanelState == .homepage ? 0.5 : 0.38))
+                    .animation(.spring())
+            }
         }
     }
 }
@@ -756,13 +765,13 @@ struct SearchBar: View {
         VStack {
             HStack {
                 RoundedRectangle(cornerRadius: 18)
-                    .fill(Color("grey"))
+                    .fill(Color("accent"))
                     //.strokeBorder(Color("grey"), lineWidth: 1)
                     .frame(height: UIScreen.screenHeight*0.05).frame(minWidth: 0, maxWidth: .infinity)
                     .overlay(
                         HStack {
                             Image(systemName: "magnifyingglass")
-                            CustomTextField(placeholder: Text("Search...").foregroundColor(.black),text: $userSearch)
+                            CustomTextField(placeholder: Text("Search..."),text: $userSearch)
                                 .ignoresSafeArea(.keyboard)
                             Spacer()
                             if userSearch.count > 0{
@@ -772,22 +781,23 @@ struct SearchBar: View {
                                     Image(systemName: "xmark")
                                 }
                             }
-                        }.foregroundColor(.black).padding(.horizontal, 10)
+                        }.foregroundColor(Color("text")).padding(.horizontal, 10)
                 )
                 Button(action:{
                     showingFilters = showingFilters ? false : true
                 }){
                     Image(systemName: "slider.horizontal.3")
                         .font(.title)
-                        .foregroundColor(.black)
+                        .foregroundColor(Color("text"))
                 }.buttonStyle(ShrinkingButton())
             }.padding(.bottom, 1)
             
             if showingFilters {
                 VStack {
                     Group {
+                        Toggle(" ", isOn: $warrenty)
                         //Toggle("Warrenty", isOn: $warrenty)  not working yet
-                        Toggle("Favorites", isOn: $favorites)
+                        //Toggle("Favorites", isOn: $favorites)
                     }.foregroundColor(.black).font(.system(.body, design: .rounded))
                 }.padding(.horizontal, 5)
             }

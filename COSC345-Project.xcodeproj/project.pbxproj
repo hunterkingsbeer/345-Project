@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		5A07749E2660BA4F008E3909 /* Prediction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A07749D2660BA4F008E3909 /* Prediction.swift */; };
-		5A32772C265E6D01009EA8A3 /* AdaptsToKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A32772B265E6D01009EA8A3 /* AdaptsToKeyboard.swift */; };
 		5A3DCE18264490E7003442C3 /* COSC345_ProjectApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A3DCE17264490E7003442C3 /* COSC345_ProjectApp.swift */; };
 		5A3DCE1A264490E7003442C3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A3DCE19264490E7003442C3 /* ContentView.swift */; };
 		5A3DCE1C264490EB003442C3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5A3DCE1B264490EB003442C3 /* Assets.xcassets */; };
@@ -18,6 +17,7 @@
 		5A8A7203265DCD6300786372 /* ScanDocumentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A8A7202265DCD6300786372 /* ScanDocumentView.swift */; };
 		5A8A7205265E059A00786372 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A8A7204265E059A00786372 /* ImagePicker.swift */; };
 		5AB20BC8265FC3F50055D2AD /* UtilityFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AB20BC7265FC3F50055D2AD /* UtilityFunctions.swift */; };
+		5AC3EA1B266107D100891542 /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AC3EA1A266107D100891542 /* UserSettings.swift */; };
 		5AEDB898264DCD8D003A3CDD /* COSC345_ProjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AEDB897264DCD8D003A3CDD /* COSC345_ProjectTests.swift */; platformFilter = ios; };
 		5AEDB8A6264DD6AB003A3CDD /* COSC345_ProjectUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AEDB8A5264DD6AB003A3CDD /* COSC345_ProjectUITests.swift */; platformFilter = ios; };
 /* End PBXBuildFile section */
@@ -41,7 +41,6 @@
 
 /* Begin PBXFileReference section */
 		5A07749D2660BA4F008E3909 /* Prediction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prediction.swift; sourceTree = "<group>"; };
-		5A32772B265E6D01009EA8A3 /* AdaptsToKeyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptsToKeyboard.swift; sourceTree = "<group>"; };
 		5A3DCE14264490E7003442C3 /* COSC345-Project.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "COSC345-Project.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A3DCE17264490E7003442C3 /* COSC345_ProjectApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = COSC345_ProjectApp.swift; sourceTree = "<group>"; };
 		5A3DCE19264490E7003442C3 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -53,6 +52,7 @@
 		5A8A7202265DCD6300786372 /* ScanDocumentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanDocumentView.swift; sourceTree = "<group>"; };
 		5A8A7204265E059A00786372 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		5AB20BC7265FC3F50055D2AD /* UtilityFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UtilityFunctions.swift; sourceTree = "<group>"; };
+		5AC3EA1A266107D100891542 /* UserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettings.swift; sourceTree = "<group>"; };
 		5AEDB895264DCD8C003A3CDD /* COSC345-ProjectTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "COSC345-ProjectTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5AEDB897264DCD8D003A3CDD /* COSC345_ProjectTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = COSC345_ProjectTests.swift; sourceTree = "<group>"; };
 		5AEDB899264DCD8D003A3CDD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -118,9 +118,9 @@
 				5A3DCE1D264490EB003442C3 /* Preview Content */,
 				5A8A7202265DCD6300786372 /* ScanDocumentView.swift */,
 				5A8A7204265E059A00786372 /* ImagePicker.swift */,
-				5A32772B265E6D01009EA8A3 /* AdaptsToKeyboard.swift */,
 				5AB20BC7265FC3F50055D2AD /* UtilityFunctions.swift */,
 				5A07749D2660BA4F008E3909 /* Prediction.swift */,
+				5AC3EA1A266107D100891542 /* UserSettings.swift */,
 			);
 			path = "COSC345-Project";
 			sourceTree = "<group>";
@@ -285,10 +285,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				5A3DCE21264490EB003442C3 /* Persistence.swift in Sources */,
-				5A32772C265E6D01009EA8A3 /* AdaptsToKeyboard.swift in Sources */,
 				5A07749E2660BA4F008E3909 /* Prediction.swift in Sources */,
 				5A3DCE1A264490E7003442C3 /* ContentView.swift in Sources */,
 				5A3DCE24264490EB003442C3 /* COSC345_Project.xcdatamodeld in Sources */,
+				5AC3EA1B266107D100891542 /* UserSettings.swift in Sources */,
 				5A8A7205265E059A00786372 /* ImagePicker.swift in Sources */,
 				5A8A7203265DCD6300786372 /* ScanDocumentView.swift in Sources */,
 				5AB20BC8265FC3F50055D2AD /* UtilityFunctions.swift in Sources */,

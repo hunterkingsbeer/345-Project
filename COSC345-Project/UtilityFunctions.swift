@@ -184,6 +184,17 @@ func matchString(parameters: [String], input: String) -> Bool{
     return false
 }
 
+func overrideDisplayMode(darkMode: Bool) {
+        var userInterfaceStyle: UIUserInterfaceStyle
+
+        if darkMode {
+            userInterfaceStyle = .dark
+        } else {
+            userInterfaceStyle = .light
+        }
+        UIApplication.shared.windows.first?.overrideUserInterfaceStyle = userInterfaceStyle
+    }
+
 /// used for getting screen sizes
 extension UIScreen{
    static let screenWidth = UIScreen.main.bounds.size.width
