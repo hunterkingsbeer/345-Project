@@ -40,19 +40,20 @@ enum DashPanelType {
 struct ContentView: View {
     @State var addPanelState : AddPanelType = .homepage // need to make these global vars
     @State var dashPanelState : DashPanelType = .homepage
-    //@ObservedObject var settings = UserSettings()
+    @ObservedObject var settings = UserSettings()
 
     var body: some View {
         NavigationView {
             ZStack(alignment: .top) {
                 // BACKGROUND BLOBS ------------------
-                BackgroundView(addPanelState: addPanelState, dashPanelState: dashPanelState)
+                BackgroundView(addPanelState: addPanelState,
+                               dashPanelState: dashPanelState)
                 
                 // COMPANY TITLE ------------------
                 VStack{
                     Spacer()
                     Text("Receipted.")
-                        .foregroundColor(.white)
+                        .foregroundColor(Color("text"))
                         .font(.system(.title, design: .rounded)).bold()
                     
                     // DASHBOARD (UPPER) ------------------
@@ -71,7 +72,7 @@ struct ContentView: View {
                 }.ignoresSafeArea(.keyboard)
                 .padding(.horizontal, addPanelState == .homepage ? 15 : 0)
             }.navigationBarTitle("").navigationBarHidden(true)
-            .colorScheme(UserSettings().darkMode ? .dark : .light)
+            .colorScheme(settings.darkMode ? .dark : .light)
         }
     }
 }
@@ -172,14 +173,14 @@ struct AddPanelDetailView: View {
         VStack{
             if addPanelState == .camera {
                 Text("Scan using Camera")
-                    .font(.largeTitle)
+                    .font(.system(.title, design: .rounded))
                     .padding(.bottom, 5)
                 ScanDocumentView(recognizedText: self.$recognizedText, validScan: $validScan)
                     .cornerRadius(18)
                     .animation(.spring())
             } else if addPanelState == .gallery {
                 Text("Scan using Gallery")
-                    .font(.largeTitle)
+                    .font(.system(.title, design: .rounded))
                     .padding(.bottom, 5)
                 
                 ImagePicker(recognizedText: self.$recognizedText, validScan: $validScan)
@@ -405,9 +406,29 @@ struct SettingsView: View {
     @ObservedObject var settings = UserSettings()
     
     var body: some View {
-        VStack {
-            Toggle("Darkmode", isOn: $settings.darkMode)
+        VStack (alignment: .leading){
+            Text("All changes require application\nrestart in order to take effect.")
+                .padding(.bottom, 20)
+            
+            Toggle("Dark Mode", isOn: $settings.darkMode)
             .contentShape(Rectangle())
+            Divider()
+            
+            Toggle("Minimal Mode", isOn: $settings.minimal)
+            .contentShape(Rectangle())
+            Divider()
+            
+            Toggle("Contrast Mode", isOn: $settings.contrast)
+            .contentShape(Rectangle())
+            Divider()
+            
+            Picker("Flavor", selection: $settings.style) {
+                ForEach(0..<Color.getColors().count){ color in
+                    Text("Style \(color+1)").tag(color)
+                }
+            }.pickerStyle(SegmentedPickerStyle())
+            Divider()
+            
             Spacer()
         }.frame(minWidth: 0, maxWidth: .infinity)
     }
@@ -543,16 +564,17 @@ struct ReceiptView: View {
                 }
             })
         .overlay( // the delete button
-            VStack{
+            VStack {
                 if pendingDelete == true {
-                    HStack{
+                    HStack {
                         Spacer()
                         Circle().fill(Color.red)
-                            .frame(width: UIScreen.screenHeight*0.05,
-                                   height: UIScreen.screenHeight*0.05)
                             .overlay(Image(systemName: "xmark")
                                         .foregroundColor(Color("white")))
-                            .onTapGesture{
+                            .frame(width: UIScreen.screenHeight*0.04,
+                                   height: UIScreen.screenHeight*0.04)
+                            .padding(8)
+                            .onTapGesture {
                                 Receipt.delete(receipt: receipt)
                             }
                     }
@@ -604,14 +626,19 @@ struct FolderCollectionView: View {
                 Spacer()
                 if viewingFolder() {
                     Button(action:{
-                        Folder.getFolder(folderTitle: currentFolder).favorite.toggle()
+                        withAnimation(.spring()){
+                            getFolder().favorite.toggle()
+                        }
                         Folder.save()
                     }){
-                        Image(systemName: Folder.getFolder(folderTitle: currentFolder).favorite ? "bookmark.fill" : "bookmark") // just to make sure its the exact size
-                            .font(.title)
-                            .foregroundColor(Color(Folder.getFolder(folderTitle: currentFolder).favorite ? Folder.getFolder(folderTitle: currentFolder).color ?? "text" : "text")) // make it clear so we dont see it
-                            .padding(.leading, -10)
-                    }
+                        if getFolder().favorite {
+                            Image(systemName: "bookmark.fill")
+                                .foregroundColor(Color(getFolder().color ?? "text"))
+                        } else {
+                            Image(systemName: "bookmark")
+                                .foregroundColor(Color("text"))
+                        }
+                    }.padding(.leading, -10).font(.title)
                 }
             }.padding(.horizontal)
             
@@ -619,7 +646,7 @@ struct FolderCollectionView: View {
                 .padding(.horizontal)
             
             ScrollView(showsIndicators: false) {
-                if viewingFolder() && Folder.getFolder(folderTitle: currentFolder).receiptCount > 0 {
+                if viewingFolder() && getFolder().receiptCount > 0 {
                     ForEach(receipts.filter({ userSearch.count > 0 ? $0.body!.localizedCaseInsensitiveContains(userSearch) ||  $0.folder!.localizedCaseInsensitiveContains(userSearch)  ||   $0.store!.localizedCaseInsensitiveContains(userSearch) : $0.folder! == currentFolder })){ receipt in
                         ReceiptView(receipt: receipt)
                     }.transition(AnyTransition.move(edge: .trailing)).animation(.spring())
@@ -653,6 +680,10 @@ struct FolderCollectionView: View {
             }.buttonStyle(ShrinkingButton()).padding(.horizontal)
             Spacer()
         }.padding(.top).foregroundColor(Color("text"))
+    }
+    
+    func getFolder() -> Folder {
+        return Folder.getFolder(folderTitle: currentFolder)
     }
     
     func viewingFolder() -> Bool {
@@ -696,17 +727,17 @@ struct FolderView: View{
                         }
                     }
                 }
-            })
-            .overlay(
+            }).overlay(
                 // the delete button
                 VStack{
                     HStack{
                         Spacer()
                         if pendingDelete == true {
                             Circle().fill(Color.red)
-                                .frame(width: UIScreen.screenHeight*0.05,
-                                       height: UIScreen.screenHeight*0.05)
                                 .overlay(Image(systemName: "xmark").foregroundColor(Color("white")))
+                                .frame(width: UIScreen.screenHeight*0.04,
+                                       height: UIScreen.screenHeight*0.04)
+                                .padding(8)
                                 .onTapGesture{
                                     Folder.delete(folder: folder)
                                 }
@@ -728,27 +759,28 @@ struct FolderView: View{
 
 /// Background view - Background of the app
 struct BackgroundView: View {
+    @State var update = false
     var addPanelState : AddPanelType
     var dashPanelState : DashPanelType
     @ObservedObject var settings = UserSettings()
     
     var body: some View {
         ZStack {
-            Color("background").ignoresSafeArea(.all)
-            VStack {
-                Circle()
-                    .fill(LinearGradient(gradient: Gradient(colors: [Color("orange"), Color("purple")]),
-                                         startPoint: .top, endPoint: .bottom))
-                    .scaleEffect(x: 1.5) // gives it that clean stretched out look
-                    .padding(.top, -UIScreen.screenHeight * (dashPanelState == .homepage ? 0.5 : 0.38))
-                    .animation(.spring())
-                Spacer()
-                Circle()
-                    .fill(LinearGradient(gradient: Gradient(colors: [Color("purple"), Color("cyan")]),
-                                         startPoint: .top, endPoint: .bottom))
-                    .scaleEffect(x: 1.5)
-                    .padding(.bottom, -UIScreen.screenHeight * (addPanelState == .homepage ? 0.5 : 0.38))
-                    .animation(.spring())
+            Color(settings.contrast ? "backgroundContrast" : "background").ignoresSafeArea(.all)
+            if !settings.minimal {
+                VStack {
+                    Circle()
+                        .fill(getGradient(top: true))
+                        .scaleEffect(x: 1.5) // gives it that clean stretched out look
+                        .padding(.top, -UIScreen.screenHeight * (dashPanelState == .homepage ? 0.5 : 0.38))
+                        .animation(.spring())
+                    Spacer()
+                    Circle()
+                        .fill(getGradient(top: false))
+                        .scaleEffect(x: 1.5)
+                        .padding(.bottom, -UIScreen.screenHeight * (addPanelState == .homepage ? 0.5 : 0.38))
+                        .animation(.spring())
+                }
             }
         }
     }

@@ -10,10 +10,6 @@ import SwiftUI
 import CoreData
 import Swift
 
-class GameSettings: ObservableObject {
-    @Published var score = 0
-}
-
 // --------------------------------------------------------- RECEIPT
 extension Receipt {
     /// takes scanned text and puts it into a receipt entity
@@ -58,7 +54,7 @@ extension Receipt {
 
 // --------------------------------------------------------- FOLDER
 extension Folder {
-    static let folderMatch = [(title: "Default", icon: "folder", color: "black"),
+    static let folderMatch = [(title: "Default", icon: "folder", color: "text"),
                               (title: "Retail", icon: "tag", color: "blue"),
                               (title: "Groceries", icon: "cart", color: "green"),
                               (title: "Clothing", icon: "bag", color: "pink")]
@@ -171,7 +167,39 @@ extension Folder {
     }
 }
 
+// --------------------------------------------------------- COLORS
+
+extension Color {
+    static let colors = [(top1: Color("purple"), top2: Color("orange"),
+                          bottom1: Color("cyan"), bottom2: Color("purple")),
+                         
+                         (top1: Color("green"), top2: Color("cyan"),
+                          bottom1: Color("cyan"), bottom2: Color("blue")),
+                         
+                         (top1: Color("object"), top2: Color("text"),
+                          bottom1: Color("object"), bottom2: Color("text"))]
+    
+    static func getColors() -> [(top1: Color, top2: Color, bottom1: Color, bottom2: Color)] {
+        return colors
+    }
+}
+
 // --------------------------------------------------------- UTILITIES
+
+/// gets a linear gradient for the background, colors holds each style of colors
+func getGradient(top: Bool) -> LinearGradient {
+    let colors = Color.getColors()
+    let style = UserSettings().style
+    var gradient = LinearGradient(gradient: Gradient(colors: [top ? colors[0].top1 : colors[0].bottom1, top ? colors[0].top2 : colors[0].bottom2]),
+                                  startPoint: .top, endPoint: .bottom)
+    
+    if style < colors.count {
+        gradient = LinearGradient(gradient: Gradient(colors: [top ? colors[style].top1 : colors[style].bottom1, top ? colors[style].top2 : colors[style].bottom2]),
+                           startPoint: .top, endPoint: .bottom)
+    }
+    
+    return gradient
+}
 
 /// checks whether an input string contains words found in parameters, true if it does, false otherwise
 func matchString(parameters: [String], input: String) -> Bool{

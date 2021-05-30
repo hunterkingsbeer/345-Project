@@ -15,8 +15,29 @@ class UserSettings: ObservableObject {
             UserDefaults.standard.set(darkMode, forKey: "darkMode")
         }
     }
+    
+    @Published var minimal: Bool {
+        didSet {
+            UserDefaults.standard.set(minimal, forKey: "minimal")
+        }
+    }
+    
+    @Published var contrast: Bool {
+        didSet {
+            UserDefaults.standard.set(contrast, forKey: "contrast")
+        }
+    }
+    
+    @Published var style: Int {
+        didSet {
+            UserDefaults.standard.set(style, forKey: "style")
+        }
+    }
 
     init() {
         self.darkMode = UserDefaults.standard.object(forKey: "darkMode") as? Bool ?? true
+        self.minimal = UserDefaults.standard.object(forKey: "minimal") as? Bool ?? false
+        self.contrast = UserDefaults.standard.object(forKey: "contrast") as? Bool ?? false
+        self.style = UserDefaults.standard.object(forKey: "style") as? Int ?? 0
     }
 }
