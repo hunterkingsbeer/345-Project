@@ -8,8 +8,7 @@
 import CoreData
 import SwiftUI
 
-/// initializes all the tester core data values for previews
-/// also holds the view context 
+/// Initializes default Core Data information with example Core Data entries when previewing the application within Xcode, also holds the context in relation to Core Data
 struct PersistenceController {
     
     static let shared = PersistenceController()
@@ -18,6 +17,7 @@ struct PersistenceController {
     static var preview: PersistenceController = {
 
         let result = PersistenceController(inMemory: true)
+        /// Context in relation to Core Data
         let viewContext = result.container.viewContext
         
         let newFolder = Folder(context: viewContext)
