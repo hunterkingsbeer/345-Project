@@ -8,9 +8,13 @@
 import Foundation
 import SwiftUI
 
+/// Prediction
+///
+/// Determines the category of a receipt via specific key words present in the body text.
+
 struct Prediction {
     
-    /// for grocery stores
+    /// Keywords for the grcoeries category.
     static var groceries = ["grocer", "grocery", "supermarket", "market",
                             "grcoeries", "new world", "countdown", "veggie boys",
                             "veggieboys", "count down", "newworld", "food town",
@@ -24,8 +28,7 @@ struct Prediction {
                             "butcher", "butchers", "butchery", "chicken",
                             "beef", "pork", "milk", "cheese", "sauce"]
     
-    /// for very general department store
-    // VERY general category that will be split up in beta
+    /// Keywords for the retail category. Very generalized, needs refining in beta
     static var retail = ["harvey norman", "noel leeming", "noel leemings",
                          "jb","hi-fi", "the warehouse", "the ware house",
                          "hifi", "store", "department", "furniture", "tech",
@@ -37,7 +40,7 @@ struct Prediction {
                          "garden", "stihl", "appliance", "headphone", "phone",
                          "computer", "laptop", "watch"]
     
-    /// for clothing stores
+    /// Keywords for the clothing category.
     static var clothing = ["clothing", "toff's", "toffs", "second hand",
                            "secondhand", "opshop", "restore", "outlet",
                            "footwear", "shoes", "shoe", "sneaker",
@@ -50,7 +53,9 @@ struct Prediction {
                            "sweater", "sweatshirt", "sweatshirts", "hood",
                            "hoodie", "hoody", "swimsuit", "bikini", "tee"]
     
-    /// Predict Folder Type -- An input  text is compared against keywords to predict a folder name
+    /** predictFolderType
+    Input text is compared against keywords in order to find the highest scoring total as our prediction.
+    */
     static func predictFolderType(text: String) -> String {
         if matchString(parameters: Prediction.groceries, input: text){
             print("Prediction: Groceries")
@@ -70,7 +75,9 @@ struct Prediction {
         }
     }
     
-    /// checks whether an input string contains words found in parameters, true if it does, false otherwise
+    /** matchString
+    Checks whether an input string contains words found in parameters, true if it does, false otherwise.
+    */
     static func matchString(parameters: [String], input: String) -> Bool{
         for parameter in parameters { // and check it against the parameter
             if input.lowercased().contains(parameter){
