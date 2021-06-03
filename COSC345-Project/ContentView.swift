@@ -172,7 +172,8 @@ enum ValidScanType {
 
 
 struct AddPanelDetailView: View {
-    /// Fetches receipt data by date, Will be the latest receipt that was added
+    /// Fetches receipt data by date
+    /// Will be the latest receipt that was added
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)],
         animation: .spring())
