@@ -18,7 +18,7 @@ struct ContentView_Previews: PreviewProvider {
 
 // -------------------------------------------------------------------------- VIEWS
 
-/// AddPanelType - Holds the various states for the add receipt panel
+/// AddPanelType - Holds the various states for the add receipt panel.
 /// - Cases:
 ///     - homepage: State that handles view switching for the homepage view
 ///     - camera: State that handles view switching for the camera  view
