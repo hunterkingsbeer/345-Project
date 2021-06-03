@@ -10,6 +10,7 @@ import CoreData
 
 
 // -------------------------------------------------------------------------- PREVIEW
+/// ContentView_Previews is what xCode uses to preview the app in the IDE.
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
@@ -18,36 +19,37 @@ struct ContentView_Previews: PreviewProvider {
 
 // -------------------------------------------------------------------------- VIEWS
 
-/**
- #AddPanelType
- 
- Holds the various states for the add receipt panel.
- 
- */
+/// AddPanelType holds the various states for the Add panel.
 enum AddPanelType {
-    case homepage /// - homepage: State that handles view switching for the homepage view
-    case camera /// - camera: State that handles view switching for the camera  view
-    case gallery /// - gallery: State that  handles view switching for gallery view
-}
-
-/// DashPanelType - Holds the various states for the dashboard panel
-/// - Cases:
-///     - homepage: State that handles view switching for the homepage view
-///     - camera: State that handles view switching for the camera  view
-///     - gallery: State that  handles view switching for gallery view
-enum DashPanelType {
+    /// Case that handles view switching for the homepage view.
     case homepage
+    /// Case that handles view switching for the camera  view.
+    case camera
+    /// Case that handles view switching for gallery view.
+    case gallery
+
+/// DashPanelType holds the various states for the dashboard panel.
+enum DashPanelType {
+    /// Case that handles view switching for the homepage view
+    case homepage
+    /// Case that handles view switching for receipts view
     case receipts
+    /// Case that handles view switching for folders view
     case folders
+    /// Case that handles view switching for settings view
     case settings
+    /// Case that handles view switching for notifications view
     case notifications
 }
 
-/// Calls the initial background for the app,
-/// checks and changes views based off what state is active.
+
+/// ContentView is the main content view that is called when starting the app.
 struct ContentView: View {
+    /// AddPanelType maintains and updates the add panels view state.
     @State var addPanelState : AddPanelType = .homepage // need to make these global vars
+    /// DashPanelState maintains and updates the dashboards view state.
     @State var dashPanelState : DashPanelType = .homepage
+    /// Settings imports the UserSettings
     @ObservedObject var settings = UserSettings()
 
     var body: some View {
@@ -85,8 +87,9 @@ struct ContentView: View {
     }
 }
 
-/// Add panel Parent Struct - Handles the various view states for the add receipt panel
+/// AddPanel handles the visibility of the various add panel views.
 struct AddPanel: View {
+    /// AddPanelType maintains and updates the add panels view state.
     @Binding var addPanelState : AddPanelType
     
     var body: some View {
@@ -109,8 +112,10 @@ struct AddPanel: View {
     }
 }
 
-/// Add panel Homepage View - Displays the option to either add a receipt via gallery or camera
+/// AddPanelHomepageView displays the homepage view for the Add Panel.
+///  Displays the add a receipt via gallery or camera buttons
 struct AddPanelHomepageView: View {
+    /// AddPanelType maintains and updates the add panels view state.
     @Binding var addPanelState : AddPanelType
     var body: some View {
         HStack {
@@ -160,31 +165,32 @@ struct AddPanelHomepageView: View {
 }
 
 /// ValidScanType holds the different cases for handling the input of a scan.
-///
-/// - Cases:
-///     - noScan: no scan has been input.
-///     - validScan: A valid scan has been input.
-///     - invalidScan: An invalid scan has been input.
 enum ValidScanType {
+    /// no scan has been input.
     case noScan
+    /// A valid scan has been input.
     case validScan
+    /// An invalid scan has been input.
     case invalidScan
 }
 
-
+/// AddPanelDetailView shows the expanded Add Panel with respect to the AddPanelState
 struct AddPanelDetailView: View {
-    /// Fetches receipt data by date
-    /// Will be the latest receipt that was added
+    /// Fetches receipts entities in CoreData sorting by the NSSortDescriptor.
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)],
         animation: .spring())
+    /// Stores the fetched results as a variable.
+    var receipts: FetchedResults<Receipt>
     
-    var receipts: FetchedResults<Receipt> /// holds the latest receipt produced by the fetch request
-    
-    @Binding var addPanelState : AddPanelType /// ??
-    @State var recognizedText : String = ""   /// recognized text from the scan
-    @State var validScan : ValidScanType = .noScan /// Initizizes the first scan to the enum .noScan
-    @State var validScanAlert : Bool = false /// Boolean value that toggles if a valid scan is detected
+    /// AddPanelType maintains and updates the add panels view state.
+    @Binding var addPanelState : AddPanelType
+    /// The recognized text from scanning an image
+    @State var recognizedText : String = ""
+    /// Whether the scan is valid or not, initially there is .noScan
+    @State var validScan : ValidScanType = .noScan
+    /// If a scan is not valid, this bool when set to true will trigger an alert
+    @State var validScanAlert : Bool = false
     
     var body: some View {
         VStack{
@@ -220,7 +226,8 @@ struct AddPanelDetailView: View {
             Spacer()
         }.padding()
         .onChange(of: recognizedText, perform: { _ in
-            validScanAlert = validScan == .invalidScan ? true : false // if validScanType == invalid then alert the user
+            validScanAlert = validScan == .invalidScan ? true : false
+            // if validScanType == invalid then alert the user
             
             if validScan == .validScan { // IMPROVE THIS! Go to a "is this correct?" screen
                 Receipt.saveScan(recognizedText: recognizedText)
@@ -238,10 +245,13 @@ struct AddPanelDetailView: View {
     }
 }
 
-/// Dashboard Panel - Handles the various view states for the dashboard panel
+/// Dashboard Panel handles the various view states for the dashboard panel
 struct DashboardPanel: View{
+    /// The fixed size of the Dashboard panel
     let size : CGFloat
+    /// DashPanelState maintains and updates the dashboards view state.
     @Binding var dashPanelState : DashPanelType
+    ///
     @ObservedObject var settings = UserSettings()
     
     var body: some View{
@@ -268,33 +278,37 @@ struct DashboardPanel: View{
     }
 }
 
-/// ToolbarFocusType holds the different cases for the dashboards toolbar views
-///
-/// - Cases:
-///     - homepage: view is on the homepage
-///     - settings: view is on the settings
-///     - notifications: view is on the notifications
+/// ToolbarFocusType holds the different cases for the dashboard's toolbar views
 enum ToolbarFocusType {
+    /// This is the default view, showing neither of the toolbar views
     case homepage
+    /// Displays the settings view
     case settings
+    /// Displays the notification view
     case notifications
 }
 
-/// DashboardHomePageView - Holds the Toolbar (and its settings/notifations views), Receipts/Folders button.
+/// DashboardHomePageView holds the Dashboard's toolbar, and the receipts/folders section.
 // THIS DEFINITELY could be stream lined. Look into this!!!!
 // Work settings/notifications into DashboardToolbar view
 struct DashboardHomePageView: View {
+    ///
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)],
         animation: .spring())
+    ///
     var receipts: FetchedResults<Receipt>
+    ///
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Folder.receiptCount, ascending: false)],
         animation: .spring())
+    ///
     var folders: FetchedResults<Folder>
- 
+    /// Fixed size for the dashboard panel
     let size : CGFloat
+    ///
     @Binding var dashPanelState : DashPanelType
+    ///
     @State var toolbarFocus : ToolbarFocusType = .homepage // 0 = none, 1 = settings, 2 = notifications
     
     var body: some View {
@@ -328,9 +342,11 @@ struct DashboardHomePageView: View {
     }
 }
 
-/// DashboardToolBar view - The two buttons at the top that lead to settings/notifications screens
+/// DashboardToolBar holds the two buttons at the top that lead to settings/notifications screens
 struct DashboardToolbar: View {
+    /// The fixed size of the dashboard
     let size : CGFloat
+    ///
     @Binding var toolbarFocus: ToolbarFocusType
     
     var body: some View {
@@ -378,15 +394,18 @@ struct DashboardToolbar: View {
     }
 }
 
-/// ReceiptsFoldersButtons - The view that holds the buttons that change the dashPanelState to display receipts/folders
+/// ReceiptsFoldersButtons is the view that holds the buttons that change the dashPanelState to display receipts/folders
 struct ReceiptsFoldersButtons: View {
+    ///
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)],
         animation: .spring())
     var receipts: FetchedResults<Receipt>
+    ///
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Folder.receiptCount, ascending: false)],
         animation: .spring())
+    ///
     var folders: FetchedResults<Folder>
     
     @Binding var dashPanelState : DashPanelType

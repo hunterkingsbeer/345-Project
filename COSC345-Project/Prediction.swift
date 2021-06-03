@@ -8,8 +8,7 @@
 import Foundation
 import SwiftUI
 
-/// Prediction
-///
+
 /// Determines the category of a receipt via specific key words present in the body text.
 
 struct Prediction {
