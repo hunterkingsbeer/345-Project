@@ -10,11 +10,14 @@ import SwiftUI
 import VisionKit
 import Vision
 
+/// ScanDocumentView handles the document scanner to read text
 struct ScanDocumentView: UIViewControllerRepresentable {
-    @Environment(\.presentationMode) var presentationMode
+    /// The recognized text from the scan
     @Binding var recognizedText: String
+    /// Returns if the scan contains a minimum number of words
     @Binding var validScan: ValidScanType
-        
+    
+    
     func makeCoordinator() -> Coordinator {
         Coordinator(recognizedText: $recognizedText, parent: self, validScan: $validScan)
     }
@@ -26,11 +29,11 @@ struct ScanDocumentView: UIViewControllerRepresentable {
     }
     
     func updateUIViewController(_ uiViewController: VNDocumentCameraViewController, context: Context) {
-        // nothing to do here
+        // nothing to do here, required for the UIViewControllerRepresentable type
     }
     
 }
-
+/// Coordinator for ScanDocumentView
 class Coordinator: NSObject, VNDocumentCameraViewControllerDelegate {
     var recognizedText: Binding<String>
     var parent: ScanDocumentView
@@ -42,16 +45,16 @@ class Coordinator: NSObject, VNDocumentCameraViewControllerDelegate {
         self.validScan = validScan
     }
     
+    /// Controller for the document camera
     func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFinishWith scan: VNDocumentCameraScan) {
     
         let extractedImages = extractImages(from: scan)
         let processedText = recognizeText(from: extractedImages)
         recognizedText.wrappedValue = processedText
         validScan.wrappedValue = .validScan //always a valid scan if they take the pic themselves
-        
-        //parent.presentationMode.wrappedValue.dismiss() //for sheet controlled view
     }
     
+    /// converts the document scanners image into a CG Image
     fileprivate func extractImages(from scan: VNDocumentCameraScan) -> [CGImage] {
         var extractedImages = [CGImage]()
         for index in 0..<scan.pageCount {
@@ -63,6 +66,7 @@ class Coordinator: NSObject, VNDocumentCameraViewControllerDelegate {
         return extractedImages
     }
     
+    /// translates a CG Image into a string
     fileprivate func recognizeText(from images: [CGImage]) -> String {
         var entireRecognizedText = ""
         let recognizeTextRequest = VNRecognizeTextRequest { (request, error) in

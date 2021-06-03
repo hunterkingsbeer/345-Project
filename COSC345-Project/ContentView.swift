@@ -495,7 +495,7 @@ struct SettingsView: View {
                 Button(action: {
                     Receipt.generateRandomReceipts()
                 }){
-                    Text("Delete All")
+                    Text("Generate Receipts")
                         .padding(.vertical, 10)
                         .frame(minWidth: 0, maxWidth: .infinity)
                         .background(Color("accent"))
@@ -506,7 +506,7 @@ struct SettingsView: View {
                 Button(action: {
                     Receipt.deleteAll(receipts: receipts)
                 }){
-                    Text("Generate Receipts")
+                    Text("Delete All")
                         .padding(.vertical, 10)
                         .frame(minWidth: 0, maxWidth: .infinity)
                         .background(Color("accent"))

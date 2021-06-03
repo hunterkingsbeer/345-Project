@@ -11,30 +11,29 @@ import SwiftUI
 import VisionKit
 import Vision
 
+/// ImagePicker handles the gallery importing of images to be read
 struct ImagePicker: UIViewControllerRepresentable {
-    
-    var sourceType: UIImagePickerController.SourceType = .photoLibrary
-    @Environment(\.presentationMode) private var presentationMode
-    
-    //@Binding var selectedImage: UIImage
+    /// The recognized text from the scan
     @Binding var recognizedText: String
+    /// Returns if the scan contains a minimum number of words
     @Binding var validScan : ValidScanType
 
     func makeUIViewController(context: UIViewControllerRepresentableContext<ImagePicker>) -> UIImagePickerController {
         let imagePicker = UIImagePickerController()
         imagePicker.allowsEditing = false
-        imagePicker.sourceType = sourceType
+        imagePicker.sourceType = .photoLibrary
         imagePicker.delegate = context.coordinator
         return imagePicker
     }
     
     func updateUIViewController(_ uiViewController: UIImagePickerController, context: UIViewControllerRepresentableContext<ImagePicker>) {
-        
+        // nothing to do here, required for the UIViewControllerRepresentable type
     }
     
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
+    
     
     final class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
         
@@ -44,6 +43,7 @@ struct ImagePicker: UIViewControllerRepresentable {
             self.parent = parent
         }
         
+        /// Controller for ImagePicker
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
             
             if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
@@ -53,6 +53,7 @@ struct ImagePicker: UIViewControllerRepresentable {
             parent.validScan = parent.recognizedText.count < 20 ? .invalidScan : .validScan // less than 20 chars? perhaps this isnt a valid scan
         }
         
+        /// translates a CG Image into a string
         fileprivate func recognizeText(from image: CGImage) -> String {
             var entireRecognizedText = ""
             let recognizeTextRequest = VNRecognizeTextRequest { (request, error) in
@@ -70,11 +71,8 @@ struct ImagePicker: UIViewControllerRepresentable {
             }
             recognizeTextRequest.recognitionLevel = .accurate
             
-            //for image in images {
-                let requestHandler = VNImageRequestHandler(cgImage: image, options: [:])
-                
-                try? requestHandler.perform([recognizeTextRequest])
-            //}
+            let requestHandler = VNImageRequestHandler(cgImage: image, options: [:])
+            try? requestHandler.perform([recognizeTextRequest])
             
             return entireRecognizedText
         }
