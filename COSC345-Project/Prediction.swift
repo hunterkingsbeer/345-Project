@@ -50,7 +50,7 @@ struct Prediction {
                            "sweater", "sweatshirt", "sweatshirts", "hood",
                            "hoodie", "hoody", "swimsuit", "bikini", "tee"]
     
-    /// Input text is compared against keywords in order to find the highest scoring total as our prediction.
+    /// Input text is compared against keywords in order to find matching words to make our prediction.
     static func predictFolderType(text: String) -> String {
         if matchString(parameters: Prediction.groceries, input: text){
             print("Prediction: Groceries")
@@ -72,7 +72,7 @@ struct Prediction {
     
     ///Checks whether an input string contains words found in parameters, true if it does, false otherwise.
     static func matchString(parameters: [String], input: String) -> Bool{
-        for parameter in parameters { // and check it against the parameter
+        for parameter in parameters { 
             if input.lowercased().contains(parameter){
                 print("\nMatched word '\(parameter)'")
                 return true
