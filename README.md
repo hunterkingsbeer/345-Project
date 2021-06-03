@@ -15,5 +15,8 @@ Tane Carney-Stirling,
 Jack Heikell, and
 Kane Colvin.
 
+### Documentation
+https://hunterkingsbeer.github.io/345-Project/index.html
+
 ### Tests: 
 [![PublishDocumentation](https://github.com/hunterkingsbeer/345-Project/actions/workflows/main.yml/badge.svg)](https://github.com/hunterkingsbeer/345-Project/actions/workflows/main.yml) [![PublishDocumentation](https://github.com/hunterkingsbeer/345-Project/actions/workflows/swift.yml/badge.svg)](https://github.com/hunterkingsbeer/345-Project/actions/workflows/swift.yml)
