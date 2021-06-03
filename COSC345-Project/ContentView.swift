@@ -20,28 +20,18 @@ struct ContentView_Previews: PreviewProvider {
 
 /// AddPanelType - Holds the various states for the add receipt panel
 enum AddPanelType {
-    /// Case:
-    /// - homepage: State that handles view switching for the homepage view
-    /// - camera: State that handles view switching for the camera  view
-    /// - gallery: State that  handles view switching for gallery view
-    case homepage
-    case camera
-    case gallery
+    case homepage /// - homepage: State that handles view switching for the homepage view
+    case camera /// - camera: State that handles view switching for the camera  view
+    case gallery /// - gallery: State that  handles view switching for gallery view
 }
 
 /// DashPanelType - Holds the various states for the dashboard panel
 enum DashPanelType {
-    /// Case:
-    /// - homepage: State that handles view switching for the homepage view
-    /// - receipts: State that handles ciew switcing for the recipts view
-    /// - folders: State that handles ciew switcing for the folders view
-    /// - settings: State that handles ciew switcing for the settings view
-    /// - notifications: State that handles ciew switcing for the notifications view
-    case homepage
-    case receipts
-    case folders
-    case settings
-    case notifications
+    case homepage /// - homepage: State that handles view switching for the homepage view
+    case receipts /// - receipts: State that handles ciew switcing for the recipts view
+    case folders /// - folders: State that handles ciew switcing for the folders view
+    case settings  /// - settings: State that handles ciew switcing for the settings view
+    case notifications  /// - notifications: State that handles ciew switcing for the notifications view
 }
 
 /// Calls the initial background for the app,
@@ -162,19 +152,14 @@ struct AddPanelHomepageView: View {
 
  ///States that represent validity of a recepit scan
 enum ValidScanType {
-    /// Case:
-    /// - noScan: Scan did not return any output
-    /// - validScan: Scan was valid
-    /// - invalidScan: Scan was invalid
-    case noScan
-    case validScan
-    case invalidScan
+    case noScan /// - noScan: Scan did not return any output
+    case validScan    /// - validScan: Scan was valid
+    case invalidScan    /// - invalidScan: Scan was invalid
 }
 
 /// Add panel detail view - Handles the respective input of receipts
 struct AddPanelDetailView: View {
-    /// Fetches receipt data by date
-    /// Will be the latest receipt that was added
+    /// Fetches receipt data by date, Will be the latest receipt that was added
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)],
         animation: .spring())
