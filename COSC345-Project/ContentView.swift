@@ -10,7 +10,6 @@ import CoreData
 
 
 // -------------------------------------------------------------------------- PREVIEW
-
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
@@ -21,6 +20,10 @@ struct ContentView_Previews: PreviewProvider {
 
 /// AddPanelType - Holds the various states for the add receipt panel
 enum AddPanelType {
+    /// Case:
+    /// - homepage: State that handles view switching for the homepage view
+    /// - camera: State that handles view switching for the camera  view
+    /// - gallery: State that  handles view switching for gallery view
     case homepage
     case camera
     case gallery
@@ -28,15 +31,21 @@ enum AddPanelType {
 
 /// DashPanelType - Holds the various states for the dashboard panel
 enum DashPanelType {
+    /// Case:
+    /// - homepage: State that handles view switching for the homepage view
+    /// - receipts: State that handles ciew switcing for the recipts view
+    /// - folders: State that handles ciew switcing for the folders view
+    /// - settings: State that handles ciew switcing for the settings view
+    /// - notifications: State that handles ciew switcing for the notifications view
     case homepage
     case receipts
     case folders
     case settings
     case notifications
 }
-/**
- Content View stuff
- */
+
+/// Calls the initial background for the app,
+/// checks and changes views based off what state is active.
 struct ContentView: View {
     @State var addPanelState : AddPanelType = .homepage // need to make these global vars
     @State var dashPanelState : DashPanelType = .homepage
@@ -151,7 +160,12 @@ struct AddPanelHomepageView: View {
     }
 }
 
+ ///States that represent validity of a recepit scan
 enum ValidScanType {
+    /// Case:
+    /// - noScan: Scan did not return any output
+    /// - validScan: Scan was valid
+    /// - invalidScan: Scan was invalid
     case noScan
     case validScan
     case invalidScan
@@ -159,15 +173,18 @@ enum ValidScanType {
 
 /// Add panel detail view - Handles the respective input of receipts
 struct AddPanelDetailView: View {
+    /// Fetches receipt data by date
+    /// Will be the latest receipt that was added
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)],
         animation: .spring())
-    var receipts: FetchedResults<Receipt>
     
-    @Binding var addPanelState : AddPanelType
-    @State var recognizedText : String = ""
-    @State var validScan : ValidScanType = .noScan
-    @State var validScanAlert : Bool = false
+    var receipts: FetchedResults<Receipt> /// holds the latest receipt produced by the fetch request
+    
+    @Binding var addPanelState : AddPanelType /// ??
+    @State var recognizedText : String = ""   /// recognized text from the scan
+    @State var validScan : ValidScanType = .noScan /// Initizizes the first scan to the enum .noScan
+    @State var validScanAlert : Bool = false /// Boolean value that toggles if a valid scan is detected
     
     var body: some View {
         VStack{
