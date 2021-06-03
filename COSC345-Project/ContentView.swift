@@ -18,15 +18,16 @@ struct ContentView_Previews: PreviewProvider {
 
 // -------------------------------------------------------------------------- VIEWS
 
-/// AddPanelType - Holds the various states for the add receipt panel.
-/// - Cases:
-///     - homepage: State that handles view switching for the homepage view
-///     - camera: State that handles view switching for the camera  view
-///     - gallery: State that  handles view switching for gallery view
+/**
+ #AddPanelType
+ 
+ Holds the various states for the add receipt panel.
+ 
+ */
 enum AddPanelType {
-    case homepage
-    case camera
-    case gallery
+    case homepage /// - homepage: State that handles view switching for the homepage view
+    case camera /// - camera: State that handles view switching for the camera  view
+    case gallery /// - gallery: State that  handles view switching for gallery view
 }
 
 /// DashPanelType - Holds the various states for the dashboard panel
