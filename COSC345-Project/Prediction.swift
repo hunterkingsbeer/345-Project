@@ -65,7 +65,7 @@ struct Prediction {
             return "Clothing"
             
         } else {
-            print("Prediction: Default")
+            print("\nPrediction: Default")
             return "Default"
         }
     }

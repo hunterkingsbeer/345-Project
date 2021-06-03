@@ -21,25 +21,25 @@ struct ContentView_Previews: PreviewProvider {
 
 /// AddPanelType holds the various states for the Add panel.
 enum AddPanelType {
-    /// Case that handles view switching for the homepage view.
+    /// Displays the standard homepage view for the add panel. Two option, add from gallery or camera.
     case homepage
-    /// Case that handles view switching for the camera  view.
+    /// Displays the panel's add from camera view
     case camera
-    /// Case that handles view switching for gallery view.
+    /// Displays the panel's add from gallery view
     case gallery
 }
 
 /// DashPanelType holds the various states for the dashboard panel.
 enum DashPanelType {
-    /// Case that handles view switching for the homepage view
+    /// Displays the standard homepage view for the Dashpanel. Showing the Receipts, folders, settings and notifcations.
     case homepage
-    /// Case that handles view switching for receipts view
+    /// Displays the Receipts Collection View
     case receipts
-    /// Case that handles view switching for folders view
+    /// Displays the Folders Collection View
     case folders
-    /// Case that handles view switching for settings view
+    /// Displays the settings view
     case settings
-    /// Case that handles view switching for notifications view
+    /// Displays the notifications view
     case notifications
 }
 
@@ -459,33 +459,64 @@ struct ReceiptsFoldersButtons: View {
 struct SettingsView: View {
     /// Settings imports the UserSettings
     @ObservedObject var settings = UserSettings()
+    /// Fetches Receipt entities in CoreData sorting by the NSSortDescriptor.
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)],
+        animation: .spring())
+    /// Stores the fetched results as an array of Receipt objects.
+    var receipts: FetchedResults<Receipt>
     
     var body: some View {
-        VStack (alignment: .leading){
-            Text("All changes require application\nrestart in order to take effect.\n(Closed from multitasking)")
-                .padding(.bottom, 20)
-            
-            Toggle("Dark Mode", isOn: $settings.darkMode)
-            .contentShape(Rectangle())
-            Divider()
-            
-            Toggle("Minimal Mode", isOn: $settings.minimal)
-            .contentShape(Rectangle())
-            Divider()
-            
-            Toggle("Contrast Mode", isOn: $settings.contrast)
-            .contentShape(Rectangle())
-            Divider()
-            
-            Picker("Background Color", selection: $settings.style) {
-                ForEach(0..<Color.getColors().count){ color in
-                    Text("Style \(color+1)").tag(color)
+        ScrollView(showsIndicators: false){
+            VStack (alignment: .leading){
+                Text("All changes require application\nrestart in order to take effect.\n(Closed from multitasking)")
+                    .padding(.bottom, 20)
+                VStack{
+                    Toggle("Dark Mode", isOn: $settings.darkMode)
+                    .contentShape(Rectangle())
+                    Divider()
+                    
+                    /*Toggle("Minimal Mode", isOn: $settings.minimal)
+                    .contentShape(Rectangle())
+                    Divider()*/
+                    
+                    Toggle("Contrast Mode", isOn: $settings.contrast)
+                    .contentShape(Rectangle())
+                    Divider()
+                    
+                    Picker("Background Color", selection: $settings.style) {
+                        ForEach(0..<Color.getColors().count){ color in
+                            Text("Style \(color+1)").tag(color)
+                        }
+                    }.pickerStyle(SegmentedPickerStyle())
+                    Divider()
                 }
-            }.pickerStyle(SegmentedPickerStyle())
-            Divider()
-            
-            Spacer()
-        }.frame(minWidth: 0, maxWidth: .infinity)
+                
+                Button(action: {
+                    Receipt.generateRandomReceipts()
+                }){
+                    Text("Delete All")
+                        .padding(.vertical, 10)
+                        .frame(minWidth: 0, maxWidth: .infinity)
+                        .background(Color("accent"))
+                        .cornerRadius(10)
+                }
+                Divider()
+                
+                Button(action: {
+                    Receipt.deleteAll(receipts: receipts)
+                }){
+                    Text("Generate Receipts")
+                        .padding(.vertical, 10)
+                        .frame(minWidth: 0, maxWidth: .infinity)
+                        .background(Color("accent"))
+                        .cornerRadius(10)
+                }
+                Divider()
+                
+                Spacer()
+            }.frame(minWidth: 0, maxWidth: .infinity).padding(5)
+        }
     }
 }
 
@@ -606,7 +637,7 @@ struct ReceiptView: View {
                                 .font(.system(.subheadline, design: .rounded))
                                 .padding(.bottom, -5)
                             Divider()//.padding(.leading, 20)
-                            Text(receipt.total > 0 ? "$\(receipt.total , specifier: "%.2f")" : "Unknown")
+                            Text(receipt.total > 0 ? "$\(receipt.total , specifier: "%.2f")" : "")
                                 .font(.system(.body, design: .rounded))
                         }
                     }

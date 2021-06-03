@@ -41,6 +41,22 @@ extension Receipt {
         viewContext.delete(receipt)
         save()
     }
+    
+    static func deleteAll(receipts: FetchedResults<Receipt>) {
+        for receipt in receipts {
+            delete(receipt: receipt)
+        }
+    }
+    
+    static func generateRandomReceipts() {
+        let scans = ["Cotton On\n TEE - $12.00, PANTS - $23.99, HOODIE - $33.99",
+                     "JB Hifi\n Airpods - $300.00, Keyboard - $30.99, Monitor - $275.00",
+                     "Countdown\n Lettuce - $2.00, Doritos - $2.99, Milk - $3",
+                     "Invoice\n LABOR $25p/h, HOURS WORKED - 25. TOTAL $625"]
+        for _ in 0..<10 {
+            Receipt.saveScan(recognizedText: scans.randomElement() ?? "")
+        }
+    }
 
     /// Saves the Receipt object
     static func save() {
