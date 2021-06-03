@@ -289,7 +289,9 @@ struct DashboardHomePageView: View {
                         .transition(AnyTransition.scale(scale: 0.8).combined(with: .opacity))
                 } else {
                     Spacer()
-                    Text("Add a receipt from\none of the button below.").font(.system(.title, design: .rounded))
+                    Text("Add a receipt from\none of the buttons below.")
+                        .font(.system(.title, design: .rounded))
+                        .foregroundColor(Color("text"))
                     Spacer()
                 }
             } else if toolbarFocus == .settings {
@@ -378,7 +380,7 @@ struct ReceiptsFoldersButtons: View {
                 VStack{
                     Spacer()
                     Text("\(receipts.count)").font(.system(.title, design: .rounded))
-                    Text("Receipts").font(.system(.largeTitle, design: .rounded)).bold()
+                    Text("Receipt\(receipts.count>1 ? "s" : "")").font(.system(.largeTitle, design: .rounded)).bold()
                     Spacer()
                 }.frame(minWidth: 0, maxWidth: .infinity)
                 .contentShape(Rectangle())
@@ -394,7 +396,7 @@ struct ReceiptsFoldersButtons: View {
                 VStack{
                     Spacer()
                     Text("\(folders.count)").font(.system(.title, design: .rounded))
-                    Text("Folders").font(.system(.largeTitle, design: .rounded)).bold()
+                    Text("Folder\(folders.count>1 ? "s" : "")").font(.system(.largeTitle, design: .rounded)).bold()
                     Spacer()
                 }.frame(minWidth: 0, maxWidth: .infinity)
                 .contentShape(Rectangle())
@@ -409,7 +411,7 @@ struct SettingsView: View {
     
     var body: some View {
         VStack (alignment: .leading){
-            Text("All changes require application\nrestart in order to take effect.")
+            Text("All changes require application\nrestart in order to take effect.\n(Closed from multitasking)")
                 .padding(.bottom, 20)
             
             Toggle("Dark Mode", isOn: $settings.darkMode)
@@ -424,7 +426,7 @@ struct SettingsView: View {
             .contentShape(Rectangle())
             Divider()
             
-            Picker("Flavor", selection: $settings.style) {
+            Picker("Background Color", selection: $settings.style) {
                 ForEach(0..<Color.getColors().count){ color in
                     Text("Style \(color+1)").tag(color)
                 }

@@ -25,7 +25,7 @@ struct Prediction {
                             "beef", "pork", "milk", "cheese", "sauce"]
     
     /// for very general department store
-    // VERY general category that will be shortened in beta
+    // VERY general category that will be split up in beta
     static var retail = ["harvey norman", "noel leeming", "noel leemings",
                          "jb","hi-fi", "the warehouse", "the ware house",
                          "hifi", "store", "department", "furniture", "tech",
@@ -48,9 +48,9 @@ struct Prediction {
                            "cottonon", "cotton:on", "hallenstein", "shorts",
                            "hallensteins", "barkers", "barker", "suit",
                            "sweater", "sweatshirt", "sweatshirts", "hood",
-                           "hoodie", "hoody", "swimsuit", "bikini"]
+                           "hoodie", "hoody", "swimsuit", "bikini", "tee"]
     
-    /// Predict Folder Type -- Input the text compared against keywords to predict a folder name
+    /// Predict Folder Type -- An input  text is compared against keywords to predict a folder name
     static func predictFolderType(text: String) -> String {
         if matchString(parameters: Prediction.groceries, input: text){
             print("Prediction: Groceries")
@@ -68,5 +68,16 @@ struct Prediction {
             print("Prediction: Default")
             return "Default"
         }
+    }
+    
+    /// checks whether an input string contains words found in parameters, true if it does, false otherwise
+    static func matchString(parameters: [String], input: String) -> Bool{
+        for parameter in parameters { // and check it against the parameter
+            if input.lowercased().contains(parameter){
+                print("\nMatched word '\(parameter)'")
+                return true
+            }
+        }
+        return false
     }
 }

@@ -29,6 +29,7 @@ extension Receipt {
         print("New receipt: \(title)")
     }
     
+    /// deletes a reciept
     static func delete(receipt: Receipt) {
         if Folder.folderExists(folderTitle: receipt.folder ?? "Default"){
             Folder.getFolder(folderTitle: receipt.folder ?? "Default").receiptCount -= 1
@@ -40,6 +41,7 @@ extension Receipt {
         save()
     }
 
+    /// saves context
     static func save() {
         let viewContext = PersistenceController.shared.getContext()
         
@@ -54,11 +56,13 @@ extension Receipt {
 
 // --------------------------------------------------------- FOLDER
 extension Folder {
+    /// folders matching info - Title, icon, color
     static let folderMatch = [(title: "Default", icon: "folder", color: "text"),
                               (title: "Retail", icon: "tag", color: "blue"),
                               (title: "Groceries", icon: "cart", color: "green"),
                               (title: "Clothing", icon: "bag", color: "pink")]
     
+    /// gets icon for a folder title
     static func getIcon(title: String) -> String {
         for match in folderMatch {
             if match.title.lowercased() == title.lowercased() {
@@ -68,6 +72,7 @@ extension Folder {
         return "folder".lowercased()
     }
     
+    /// gets color for a folder title
     static func getColor(title: String) -> String {
         for match in folderMatch {
             if match.title.lowercased() == title.lowercased() {
@@ -126,6 +131,7 @@ extension Folder {
         
     }
     
+    /// if a folder is empty, it will delete it
     static func ifEmptyDelete(folderTitle: String) {
         let folder = getFolder(folderTitle: folderTitle)
         if folder.receiptCount == 0 {
@@ -170,6 +176,7 @@ extension Folder {
 // --------------------------------------------------------- COLORS
 
 extension Color {
+    /// colors for the background gradients. 2 colors for top, 2 colors for bottom.
     static let colors = [(top1: Color("purple"), top2: Color("orange"),
                           bottom1: Color("cyan"), bottom2: Color("purple")),
                          
@@ -179,6 +186,7 @@ extension Color {
                          (top1: Color("object"), top2: Color("text"),
                           bottom1: Color("object"), bottom2: Color("text"))]
     
+    /// returns colors
     static func getColors() -> [(top1: Color, top2: Color, bottom1: Color, bottom2: Color)] {
         return colors
     }
@@ -200,28 +208,6 @@ func getGradient(top: Bool) -> LinearGradient {
     
     return gradient
 }
-
-/// checks whether an input string contains words found in parameters, true if it does, false otherwise
-func matchString(parameters: [String], input: String) -> Bool{
-    for parameter in parameters { // and check it against the parameter
-        if input.lowercased().contains(parameter){
-            print("\nMatched word '\(parameter)'")
-            return true
-        }
-    }
-    return false
-}
-
-func overrideDisplayMode(darkMode: Bool) {
-        var userInterfaceStyle: UIUserInterfaceStyle
-
-        if darkMode {
-            userInterfaceStyle = .dark
-        } else {
-            userInterfaceStyle = .light
-        }
-        UIApplication.shared.windows.first?.overrideUserInterfaceStyle = userInterfaceStyle
-    }
 
 /// used for getting screen sizes
 extension UIScreen{
