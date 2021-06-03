@@ -27,6 +27,7 @@ enum AddPanelType {
     case camera
     /// Case that handles view switching for gallery view.
     case gallery
+}
 
 /// DashPanelType holds the various states for the dashboard panel.
 enum DashPanelType {
@@ -447,6 +448,7 @@ struct ReceiptsFoldersButtons: View {
 
 /// SettingsView - The settings menu
 struct SettingsView: View {
+    ///
     @ObservedObject var settings = UserSettings()
     
     var body: some View {
