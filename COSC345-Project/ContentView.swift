@@ -89,6 +89,7 @@ struct ContentView: View {
 }
 
 /// AddPanel handles the visibility of the various add panel views.
+/// - Main Parent: ContentView
 struct AddPanel: View {
     /// AddPanelType maintains and updates the add panels view state.
     @Binding var addPanelState : AddPanelType
@@ -115,6 +116,7 @@ struct AddPanel: View {
 
 /// AddPanelHomepageView displays the homepage view for the Add Panel.
 ///  Displays the add a receipt via gallery or camera buttons
+/// - Main Parent: AddPanel
 struct AddPanelHomepageView: View {
     /// AddPanelType maintains and updates the add panels view state.
     @Binding var addPanelState : AddPanelType
@@ -176,12 +178,13 @@ enum ValidScanType {
 }
 
 /// AddPanelDetailView shows the expanded Add Panel with respect to the AddPanelState
+/// - Main Parent: AddPanel
 struct AddPanelDetailView: View {
     /// Fetches receipts entities in CoreData sorting by the NSSortDescriptor.
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)],
         animation: .spring())
-    /// Stores the fetched results as a variable.
+    /// Stores the fetched results as an array of Receipt objects.
     var receipts: FetchedResults<Receipt>
     
     /// AddPanelType maintains and updates the add panels view state.
@@ -247,12 +250,13 @@ struct AddPanelDetailView: View {
 }
 
 /// Dashboard Panel handles the various view states for the dashboard panel
+/// - Main Parent: ContentView
 struct DashboardPanel: View{
     /// The fixed size of the Dashboard panel
     let size : CGFloat
     /// DashPanelState maintains and updates the dashboards view state.
     @Binding var dashPanelState : DashPanelType
-    ///
+    /// Settings imports the UserSettings
     @ObservedObject var settings = UserSettings()
     
     var body: some View{
@@ -289,27 +293,28 @@ enum ToolbarFocusType {
     case notifications
 }
 
-/// DashboardHomePageView holds the Dashboard's toolbar, and the receipts/folders section.
 // THIS DEFINITELY could be stream lined. Look into this!!!!
 // Work settings/notifications into DashboardToolbar view
+/// DashboardHomePageView holds the Dashboard's toolbar, and the receipts/folders section.
+/// - Main Parent: DashboardPanel
 struct DashboardHomePageView: View {
-    ///
+    /// Fetches Receipt entities in CoreData sorting by the NSSortDescriptor.
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)],
         animation: .spring())
-    ///
+    /// Stores the fetched results as an array of Receipt objects.
     var receipts: FetchedResults<Receipt>
-    ///
+    /// Fetches Folder entities in CoreData sorting by the NSSortDescriptor.
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Folder.receiptCount, ascending: false)],
         animation: .spring())
-    ///
+    /// Stores the fetched results as an array of Folder objects.
     var folders: FetchedResults<Folder>
     /// Fixed size for the dashboard panel
     let size : CGFloat
-    ///
+    /// DashPanelState maintains and updates the dashboards view state.
     @Binding var dashPanelState : DashPanelType
-    ///
+    /// ToolbarFocus maintains and updates the ToolBar view state.
     @State var toolbarFocus : ToolbarFocusType = .homepage // 0 = none, 1 = settings, 2 = notifications
     
     var body: some View {
@@ -344,10 +349,11 @@ struct DashboardHomePageView: View {
 }
 
 /// DashboardToolBar holds the two buttons at the top that lead to settings/notifications screens
+/// - Main Parent: DashboardHomePageView
 struct DashboardToolbar: View {
     /// The fixed size of the dashboard
     let size : CGFloat
-    ///
+    /// toolbarFocus
     @Binding var toolbarFocus: ToolbarFocusType
     
     var body: some View {
@@ -396,19 +402,21 @@ struct DashboardToolbar: View {
 }
 
 /// ReceiptsFoldersButtons is the view that holds the buttons that change the dashPanelState to display receipts/folders
+/// - Main Parent: DashboardHomePageView
 struct ReceiptsFoldersButtons: View {
-    ///
+    /// Fetches Receipt entities in CoreData sorting by the NSSortDescriptor.
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)],
         animation: .spring())
+    /// Stores the fetched results as an array of Receipt objects.
     var receipts: FetchedResults<Receipt>
-    ///
+    /// Fetches Folder entities in CoreData sorting by the NSSortDescriptor.
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Folder.receiptCount, ascending: false)],
         animation: .spring())
-    ///
+    /// Stores the fetched results as an array of Folder objects.
     var folders: FetchedResults<Folder>
-    
+    /// DashPanelState maintains and updates the dashboards view state.
     @Binding var dashPanelState : DashPanelType
     
     var body: some View {
@@ -446,9 +454,10 @@ struct ReceiptsFoldersButtons: View {
     }
 }
 
-/// SettingsView - The settings menu
+/// SettingsView displays the settings menu
+/// - Main Parent: DashboardHomePageView
 struct SettingsView: View {
-    ///
+    /// Settings imports the UserSettings
     @ObservedObject var settings = UserSettings()
     
     var body: some View {
@@ -480,7 +489,8 @@ struct SettingsView: View {
     }
 }
 
-/// NotifcationsView - The notifications menu
+/// NotifcationsView  displays the notifications menu
+/// - Main Parent: DashboardPanel
 struct NotificationsView: View {
     var body: some View {
         VStack{
@@ -500,15 +510,19 @@ struct NotificationsView: View {
 }
 
 /// Receipt Collection View - View that displays all the receipts (interactive), along with a search/filter bar
+/// - Main Parent: DashboardPanel
 struct ReceiptCollectionView: View {
+    /// Fetches Receipt entities in CoreData sorting by the NSSortDescriptor.
     @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)], animation: .spring())
+    /// Stores the fetched results as an array of Receipt objects.
     var receipts: FetchedResults<Receipt>
-    
+    /// DashPanelState maintains and updates the dashboards view state.
     @Binding var dashPanelState : DashPanelType
+    /// String holding the users current search input
     @State var userSearch : String = ""
-    
-    //settings
+    /// Placeholder for a filtered search setting
     @State var warrenty = false
+    /// Placeholder for a filtered search setting
     @State var favorites = false
     
     var body: some View {
@@ -547,10 +561,14 @@ struct ReceiptCollectionView: View {
     }
 }
 
-/// Receipt view - The receipt that is displayed, starts minimized then after interaction expands to full size
+/// Receipt view is the template receipt design, that starts minimized then after interaction expands to full size
+/// - Main Parent: ReceiptCollectionView
 struct ReceiptView: View {
+    /// An induvidual receipt entity that the view will be based on
     @State var receipt : Receipt
+    /// Whether the receipt is selected and displaying further details
     @State var selected : Bool = false
+    /// Whether the user has held down the receipt (performed the delete action), and is pending delete
     @State var pendingDelete = false
     
     var body: some View {
@@ -631,25 +649,35 @@ struct ReceiptView: View {
     }
 }
 
-/// Folder Collection View - View that displays all the folders
+/// FolderCollectionView displays all the folders
+/// - Main Parent: DashboardPanel
 struct FolderCollectionView: View {
+    /// Fetches Folder entities in CoreData sorting by the NSSortDescriptor.
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Folder.favorite, ascending: false),
                           NSSortDescriptor(keyPath: \Folder.receiptCount, ascending: false),
                           NSSortDescriptor(keyPath: \Folder.title, ascending: false)],
         animation: .spring())
+    /// Stores the fetched results as an array of Folder objects.
     var folders: FetchedResults<Folder>
+    /// Fetches Receipt entities in CoreData sorting by the NSSortDescriptor.
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)],
         animation: .spring())
+    /// Stores the fetched results as an array of Receipt objects.
     var receipts: FetchedResults<Receipt>
     
-    //settings
+    /// Placeholder for a filtered search setting
     @State var warrenty = false
+    /// Placeholder for a filtered search setting
     @State var favorites = false
+    /// If a folder is selected, this will be its title
     @State var currentFolder : String = ""
+    /// String holding the users current search input
     @State var userSearch : String = ""
+    /// DashPanelState maintains and updates the dashboards view state.
     @Binding var dashPanelState : DashPanelType
+    /// Used for determining the LazyZStacks 2 column layout
     let columns = [
             GridItem(.flexible()),
             GridItem(.flexible())
@@ -728,19 +756,25 @@ struct FolderCollectionView: View {
         }.padding(.top).foregroundColor(Color("text"))
     }
     
+    /// Gets the current folder based on the currentFolder string
     func getFolder() -> Folder {
         return Folder.getFolder(folderTitle: currentFolder)
     }
     
+    /// Returns true if the current folder is not empty, false if the folder is empty
     func viewingFolder() -> Bool {
         return currentFolder.count > 0 ? true : false
     }
 }
 
 /// Folder view - Extremely basic folder
+/// - Main Parent: FolderCollectionView
 struct FolderView: View{
+    /// An induvidual folder entity that the view will be based on
     @State var folder : Folder
+    /// The current folder string from the parent FolderCollection, used to determine if this folder is in focus
     @Binding var currentFolder : String
+    /// Whether the user has held down the folder (performed the delete action), and is pending delete
     @State var pendingDelete = false
     
     var body: some View {
@@ -803,11 +837,14 @@ struct FolderView: View{
     }
 }
 
-/// Background view - Background of the app
+/// Background view is the background of the application
+/// - Main Parent: ContentView
 struct BackgroundView: View {
-    @State var update = false
+    /// AddPanelType maintains and updates the add panels view state.
     var addPanelState : AddPanelType
+    /// DashPanelState maintains and updates the dashboards view state.
     var dashPanelState : DashPanelType
+    /// Settings imports the UserSettings
     @ObservedObject var settings = UserSettings()
     
     var body: some View {
@@ -832,11 +869,15 @@ struct BackgroundView: View {
     }
 }
 
-/// search bar along with filters
+/// Generic Search bar that returns the search term and filter booleans
 struct SearchBar: View {
+    /// String holding the users current search input
     @Binding var userSearch: String
+    /// Toggles whether the filters drop down menu is showing
     @State var showingFilters : Bool = false
+    /// Placeholder for a filtered search setting
     @Binding var warrenty : Bool
+    /// Placeholder for a filtered search setting
     @Binding var favorites : Bool
     
     var body: some View {
@@ -844,7 +885,6 @@ struct SearchBar: View {
             HStack {
                 RoundedRectangle(cornerRadius: 18)
                     .fill(Color("accent"))
-                    //.strokeBorder(Color("grey"), lineWidth: 1)
                     .frame(height: UIScreen.screenHeight*0.05).frame(minWidth: 0, maxWidth: .infinity)
                     .overlay(
                         HStack {
