@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import Combine
 
+/// Class of settings that the user may specify, impacting the interface.
 class UserSettings: ObservableObject {
     @Published var darkMode: Bool {
         didSet {
@@ -34,10 +35,15 @@ class UserSettings: ObservableObject {
         }
     }
 
+    /// Default settings.
     init() {
-        self.darkMode = UserDefaults.standard.object(forKey: "darkMode") as? Bool ?? true
+        /// Dark mode.
+        self.darkMode = UserDefaults.standard.object(forKey: "darkMode") as? Bool ?? true 
+        /// Mimimal mode.
         self.minimal = UserDefaults.standard.object(forKey: "minimal") as? Bool ?? false
+        /// High contrast mode.
         self.contrast = UserDefaults.standard.object(forKey: "contrast") as? Bool ?? false
+        /// Colour scheme for background gradients.
         self.style = UserDefaults.standard.object(forKey: "style") as? Int ?? 0
     }
 }
