@@ -19,24 +19,22 @@ struct ContentView_Previews: PreviewProvider {
 // -------------------------------------------------------------------------- VIEWS
 
 /// AddPanelType - Holds the various states for the add receipt panel
+/// - Cases:
+///     - homepage: State that handles view switching for the homepage view
+///     - camera: State that handles view switching for the camera  view
+///     - gallery: State that  handles view switching for gallery view
 enum AddPanelType {
-    /// Case:
-    /// - homepage: State that handles view switching for the homepage view
-    /// - camera: State that handles view switching for the camera  view
-    /// - gallery: State that  handles view switching for gallery view
     case homepage
     case camera
     case gallery
 }
 
 /// DashPanelType - Holds the various states for the dashboard panel
+/// - Cases:
+///     - homepage: State that handles view switching for the homepage view
+///     - camera: State that handles view switching for the camera  view
+///     - gallery: State that  handles view switching for gallery view
 enum DashPanelType {
-    /// Case:
-    /// - homepage: State that handles view switching for the homepage view
-    /// - receipts: State that handles ciew switcing for the recipts view
-    /// - folders: State that handles ciew switcing for the folders view
-    /// - settings: State that handles ciew switcing for the settings view
-    /// - notifications: State that handles ciew switcing for the notifications view
     case homepage
     case receipts
     case folders
@@ -160,18 +158,19 @@ struct AddPanelHomepageView: View {
     }
 }
 
- ///States that represent validity of a recepit scan
+/// ValidScanType holds the different cases for handling the input of a scan.
+///
+/// - Cases:
+///     - noScan: no scan has been input.
+///     - validScan: A valid scan has been input.
+///     - invalidScan: An invalid scan has been input.
 enum ValidScanType {
-    /// Case:
-    /// - noScan: Scan did not return any output
-    /// - validScan: Scan was valid
-    /// - invalidScan: Scan was invalid
     case noScan
     case validScan
     case invalidScan
 }
 
-/// Add panel detail view - Handles the respective input of receipts
+
 struct AddPanelDetailView: View {
     /// Fetches receipt data by date
     /// Will be the latest receipt that was added
@@ -268,6 +267,12 @@ struct DashboardPanel: View{
     }
 }
 
+/// ToolbarFocusType holds the different cases for the dashboards toolbar views
+///
+/// - Cases:
+///     - homepage: view is on the homepage
+///     - settings: view is on the settings
+///     - notifications: view is on the notifications
 enum ToolbarFocusType {
     case homepage
     case settings
