@@ -3,7 +3,11 @@ Receipted is a receipt scanning application that intuitively categorizes receipt
 Made for COSC345's full year project. 
 
 ### Running the application:
-This app has been developed using an iPhone 11 Pro, however should run on any device running iOS 7 and above.
+This app has been developed using an iPhone 11 Pro, however it should run on any device running iOS 7 and above.
+
+Start the app using the Xcode simulator running an iOS phone.
+To generate random receipts, tap the settings icon and press the "generate receipts" button to generate 10 receipts. Tapping the settings button again will bring you back to the home page, where you can now view the entries.
+
 
 ### Team members:
 Hunter Kingsbeer,
