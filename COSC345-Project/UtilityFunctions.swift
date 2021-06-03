@@ -11,8 +11,9 @@ import CoreData
 import Swift
 
 // --------------------------------------------------------- RECEIPT
+/// Extension of the Receipt object.
 extension Receipt {
-    /// takes scanned text and puts it into a receipt entity
+    /// Converts scanned text into a new Receipt object.
     static func saveScan(recognizedText: String){
         let viewContext = PersistenceController.shared.getContext()
         
@@ -29,7 +30,7 @@ extension Receipt {
         print("New receipt: \(title)")
     }
     
-    /// deletes a reciept
+    /// Deletes a Receipt object.
     static func delete(receipt: Receipt) {
         if Folder.folderExists(folderTitle: receipt.folder ?? "Default"){
             Folder.getFolder(folderTitle: receipt.folder ?? "Default").receiptCount -= 1
@@ -41,7 +42,7 @@ extension Receipt {
         save()
     }
 
-    /// saves context
+    /// Saves the Receipt object
     static func save() {
         let viewContext = PersistenceController.shared.getContext()
         
@@ -55,14 +56,15 @@ extension Receipt {
 }
 
 // --------------------------------------------------------- FOLDER
+/// Extension of the Folder object
 extension Folder {
-    /// folders matching info - Title, icon, color
+    /// Defines the folders utilized, with their respective icons and colours.
     static let folderMatch = [(title: "Default", icon: "folder", color: "text"),
                               (title: "Retail", icon: "tag", color: "blue"),
                               (title: "Groceries", icon: "cart", color: "green"),
                               (title: "Clothing", icon: "bag", color: "pink")]
     
-    /// gets icon for a folder title
+    /// Retreives the icon of a folder based on it's title.
     static func getIcon(title: String) -> String {
         for match in folderMatch {
             if match.title.lowercased() == title.lowercased() {
@@ -72,7 +74,7 @@ extension Folder {
         return "folder".lowercased()
     }
     
-    /// gets color for a folder title
+    /// Retreives the colour of a folder based on it's title.
     static func getColor(title: String) -> String {
         for match in folderMatch {
             if match.title.lowercased() == title.lowercased() {
@@ -82,7 +84,7 @@ extension Folder {
         return "black".lowercased()
     }
     
-    /// returns back array of all folders
+    /// Returns an array of all folders.
     static func getFolders() -> [Folder] {
         let fetchRequest: NSFetchRequest<Folder> = Folder.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(keyPath: \Folder.receiptCount, ascending: true)]
@@ -96,7 +98,7 @@ extension Folder {
         return [Folder]()
     }
     
-    ///returns folder with matching title
+    /// Returns the folder matching the input title
     static func getFolder(folderTitle: String) -> Folder {
         for folder in getFolders() {
             if folder.title == folderTitle.capitalized {
@@ -106,7 +108,7 @@ extension Folder {
         return Folder()
     }
     
-    /// adds a folder to the database, taking a title and icon
+    /// Adds a folder to the database with the specified title and icon.
     static func addFolder(title: String, icon: String){
         let viewContext = PersistenceController.shared.getContext()
         
@@ -120,7 +122,7 @@ extension Folder {
         print("New folder: \(title) folder")
     }
     
-    /// deletes folder
+    /// Deletes a folder
     static func delete(folder: Folder) {
         if folder.title != nil {
             let viewContext = PersistenceController.shared.getContext()
@@ -131,7 +133,7 @@ extension Folder {
         
     }
     
-    /// if a folder is empty, it will delete it
+    /// Deletes an input folder if empty.
     static func ifEmptyDelete(folderTitle: String) {
         let folder = getFolder(folderTitle: folderTitle)
         if folder.receiptCount == 0 {
@@ -139,10 +141,9 @@ extension Folder {
         }
     }
     
-    /// takes a folders title in and checks whether it exists, creating a new folder if not
-    // function name could be better but im tired
+    /// Creates a new folder with the input title if the folder doesn't already exist.
     static func verifyFolder(folderTitle: String){
-        if folderExists(folderTitle: folderTitle) { //if the folder exists, increment its count
+        if folderExists(folderTitle: folderTitle) {
             getFolder(folderTitle: folderTitle).receiptCount += 1
             print("Added to: \(folderTitle) folder")
         } else {
@@ -150,7 +151,7 @@ extension Folder {
         }
     }
     
-    /// input folder title, returns true if folder exists
+    /// Returns true if a folder with the input title exists.
     static func folderExists(folderTitle: String) -> Bool {
         let folders = Folder.getFolders()
         for folder in folders {
@@ -160,13 +161,13 @@ extension Folder {
         }
         return false
     }
-    /// saves context
+    /// Saves the CoreData state/context.
     static func save() {
         let viewContext = PersistenceController.shared.getContext()
         do {
             try  viewContext.save()
         } catch {
-            // Replace this implementation with code to handle the error appropriately.
+            // TODO: Replace this implementation with code to handle the error appropriately.
             let nserror = error as NSError
             fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
         }
@@ -174,9 +175,9 @@ extension Folder {
 }
 
 // --------------------------------------------------------- COLORS
-
+/// Extension of the Color object
 extension Color {
-    /// colors for the background gradients. 2 colors for top, 2 colors for bottom.
+    /// Define all gradient schemes for the background colours. Two colours each gradient, top and bottom.
     static let colors = [(top1: Color("purple"), top2: Color("orange"),
                           bottom1: Color("cyan"), bottom2: Color("purple")),
                          
@@ -186,15 +187,14 @@ extension Color {
                          (top1: Color("object"), top2: Color("text"),
                           bottom1: Color("object"), bottom2: Color("text"))]
     
-    /// returns colors
+    /// Returns the defined colours
     static func getColors() -> [(top1: Color, top2: Color, bottom1: Color, bottom2: Color)] {
         return colors
     }
 }
 
 // --------------------------------------------------------- UTILITIES
-
-/// gets a linear gradient for the background, colors holds each style of colors
+/// Gets the specified gradient for the background, based on the user's settings.
 func getGradient(top: Bool) -> LinearGradient {
     let colors = Color.getColors()
     let style = UserSettings().style
@@ -209,14 +209,14 @@ func getGradient(top: Bool) -> LinearGradient {
     return gradient
 }
 
-/// used for getting screen sizes
+/// Retrieves the screen size of the user's device.
 extension UIScreen{
    static let screenWidth = UIScreen.main.bounds.size.width
    static let screenHeight = UIScreen.main.bounds.size.height
    static let screenSize = UIScreen.main.bounds.size
 }
 
-/// shrinking button effect
+/// Shrinking a=nimation for the UI buttons.
 struct ShrinkingButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
@@ -226,6 +226,7 @@ struct ShrinkingButton: ButtonStyle {
 }
 
 // Normal TextField doesn't allow colored placeholder text, this does. SOLUTION FOUND AT THIS LINK https://stackoverflow.com/questions/57688242/swiftui-how-to-change-the-placeholder-color-of-the-textfield
+/// Workaround to allow for coloured placeholder text.
 struct CustomTextField: View {
     var placeholder: Text
     @Binding var text: String
