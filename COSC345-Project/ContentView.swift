@@ -64,14 +64,9 @@ struct ContentView: View {
                 
                 // COMPANY TITLE ------------------
                 VStack{
-                    Spacer()
-                    Text("Receipted.")
-                        .foregroundColor(Color("text"))
-                        .font(.system(.title, design: .rounded)).bold()
-                    
                     // DASHBOARD (UPPER) ------------------
                     if addPanelState == .homepage {
-                        DashboardPanel(size: UIScreen.screenHeight * 0.55, dashPanelState: $dashPanelState)
+                        DashboardPanel(size: UIScreen.screenHeight * 0.65, dashPanelState: $dashPanelState)
                             .padding(.bottom, dashPanelState == .homepage ? 15 : 0)
                             .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.75)))
                     }
@@ -251,6 +246,14 @@ struct AddPanelDetailView: View {
     }
 }
 
+/// ToolbarFocusType holds the different cases for the dashboard's toolbar views
+enum ToolbarFocusType {
+    /// This is the default view, showing neither of the toolbar views
+    case homepage
+    /// Displays the settings view
+    case settings
+}
+
 /// Dashboard Panel handles the various view states for the dashboard panel
 /// - Main Parent: ContentView
 struct DashboardPanel: View{
@@ -261,50 +264,8 @@ struct DashboardPanel: View{
     /// Settings imports the UserSettings
     @EnvironmentObject var settings : UserSettings
     
-    var body: some View{
-        RoundedRectangle(cornerRadius: 25)
-            .shadow(color: Color(.black).opacity(0.15), radius: 5, x: 0, y: 0)
-            .foregroundColor(Color("object"))
-            .overlay(
-                VStack {
-                    if dashPanelState == .homepage {
-                        DashboardHomePageView(size: size, dashPanelState: $dashPanelState)
-                            .transition(AnyTransition.move(edge: .bottom).combined(with: .opacity)).animation(.spring())
-                    } else {
-                        if dashPanelState == .receipts { // receipts
-                            ReceiptCollectionView(dashPanelState: $dashPanelState)
-                                .transition(AnyTransition.move(edge: .top).combined(with: .opacity)).animation(.spring()) // usually bottom
-                                .frame(width: UIScreen.screenWidth*0.9)
-                        } else if dashPanelState == .folders { // folders
-                            FolderCollectionView(dashPanelState: $dashPanelState)
-                                .transition(AnyTransition.move(edge: .top).combined(with: .opacity)).animation(.spring())
-                        }
-                    }
-                }
-            ).frame(height: dashPanelState == .homepage ? size : UIScreen.screenHeight*0.84)
-            .animation(.easeInOut)
-    }
-}
-
-/// ToolbarFocusType holds the different cases for the dashboard's toolbar views
-enum ToolbarFocusType {
-    /// This is the default view, showing neither of the toolbar views
-    case homepage
-    /// Displays the settings view
-    case settings
-    /// Displays the notification view
-    case notifications
-}
-
-// THIS DEFINITELY could be stream lined. Look into this!!!!
-// Work settings/notifications into DashboardToolbar view
-/// DashboardHomePageView holds the Dashboard's toolbar, and the receipts/folders section.
-/// - Main Parent: DashboardPanel
-struct DashboardHomePageView: View {
     /// Fetches Receipt entities in CoreData sorting by the NSSortDescriptor.
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)],
-        animation: .spring())
+    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)], animation: .spring())
     /// Stores the fetched results as an array of Receipt objects.
     var receipts: FetchedResults<Receipt>
     /// Fetches Folder entities in CoreData sorting by the NSSortDescriptor.
@@ -313,44 +274,90 @@ struct DashboardHomePageView: View {
         animation: .spring())
     /// Stores the fetched results as an array of Folder objects.
     var folders: FetchedResults<Folder>
-    /// Fixed size for the dashboard panel
-    let size : CGFloat
-    /// DashPanelState maintains and updates the dashboards view state.
-    @Binding var dashPanelState : DashPanelType
-    /// ToolbarFocus maintains and updates the ToolBar view state.
-    @State var toolbarFocus : ToolbarFocusType = .homepage // 0 = none, 1 = settings, 2 = notifications
     
-    var body: some View {
-        VStack(alignment: .center){
-            DashboardToolbar(size: size, toolbarFocus: $toolbarFocus).frame(height: size/3.5)
-                .foregroundColor(Color("text"))
-            
-            Divider()
-            
-            if toolbarFocus == .homepage {
-                if receipts.count > 0 {
-                    ReceiptsFoldersButtons(dashPanelState: $dashPanelState)
-                        .transition(AnyTransition.scale(scale: 0.8).combined(with: .opacity))
-                } else {
+    /// String holding the users current search input
+    @State var userSearch : String = ""
+    /// Placeholder for a filtered search setting
+    @State var warrenty = false
+    /// Placeholder for a filtered search setting
+    @State var favorites = false
+    
+    var body: some View{
+        RoundedRectangle(cornerRadius: 25)
+            .shadow(color: Color(.black).opacity(0.15), radius: 5, x: 0, y: 0)
+            .foregroundColor(Color("object"))
+            .overlay(
+                VStack {
+                    HStack{
+                        Button(action: {
+                            Receipt.generateRandomReceipts()
+                        }){
+                            Image(systemName: "gearshape.fill")
+                                .font(.title).foregroundColor(Color("text"))
+                        }
+                        
+                        Spacer()
+                        Text("Receipted.")
+                            .foregroundColor(Color("text"))
+                            .font(.system(.title, design: .rounded)).bold()
+                        Spacer()
+                        
+                        Image(systemName: "gearshape.fill")
+                            .font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/).foregroundColor(.clear)
+                    }
+                    
+                    // search bar
+                    SearchBar(userSearch: $userSearch, warrenty: $warrenty, favorites: $favorites)
+
+                    
+                    // category and tags bar
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack {
+                            ForEach(0..<folders.count) { folder in
+                                Button(action:{
+                                    let title = folders[folder].title
+                                    userSearch = title == userSearch ? "" : title ?? ""
+                                }){
+                                    TagView(folder: folders[folder])
+                                }.buttonStyle(PlainButtonStyle())
+                            }
+                        }
+                    }.cornerRadius(15)
+                    
+                    // receipts including search results
+                    ScrollView(showsIndicators: false) {
+                        ForEach(receipts.filter({ userSearch.count > 0 ? $0.body!.localizedCaseInsensitiveContains(userSearch) ||  $0.folder!.localizedCaseInsensitiveContains(userSearch)  || $0.store!.localizedCaseInsensitiveContains(userSearch) : $0.body!.count > 0 })){ receipt in
+                            ReceiptView(receipt: receipt)
+                        }
+                    }.cornerRadius(18)
+                    
                     Spacer()
-                    Text("Add a receipt from\none of the buttons below.")
-                        .font(.system(.title, design: .rounded))
-                        .foregroundColor(Color("text"))
-                    Spacer()
-                }
-            } else if toolbarFocus == .settings {
-                SettingsView()
-                    .transition(AnyTransition.move(edge: .leading).combined(with: .opacity))
-                    .foregroundColor(Color("text"))
-            } else if toolbarFocus == .notifications {
-                NotificationsView()
-                    .transition(AnyTransition.move(edge: .trailing).combined(with: .opacity))
-                    .foregroundColor(Color("text"))
-            }
-        }.foregroundColor(.black).padding(.horizontal)
+                }.padding()
+            ).frame(height: dashPanelState == .homepage ? size : UIScreen.screenHeight*0.84)
+            .animation(.easeInOut)
     }
 }
 
+struct TagView: View {
+    let folder : Folder
+    var body: some View {
+        RoundedRectangle(cornerRadius: 15)
+            .fill(Color(folder.color ?? "accent"))
+            .overlay(
+                HStack {
+                    Image(systemName: folder.icon ?? "folder")
+                    Text("\(folder.receiptCount) \(folder.title ?? " Default")")
+                        .fixedSize(horizontal: false, vertical: true)
+                    Spacer()
+                }
+                .padding(.horizontal, 10)
+            )
+            .frame(minWidth: UIScreen.screenWidth * 0.4)
+            .frame(height: UIScreen.screenHeight*0.05)
+            
+    }
+}
+/*
 /// DashboardToolBar holds the two buttons at the top that lead to settings/notifications screens
 /// - Main Parent: DashboardHomePageView
 struct DashboardToolbar: View {
@@ -403,60 +410,7 @@ struct DashboardToolbar: View {
         }.frame(height: size/3.5)
         .frame(minWidth: 0, maxWidth: .infinity)
     }
-}
-
-/// ReceiptsFoldersButtons is the view that holds the buttons that change the dashPanelState to display receipts/folders
-/// - Main Parent: DashboardHomePageView
-struct ReceiptsFoldersButtons: View {
-    /// Fetches Receipt entities in CoreData sorting by the NSSortDescriptor.
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)],
-        animation: .spring())
-    /// Stores the fetched results as an array of Receipt objects.
-    var receipts: FetchedResults<Receipt>
-    /// Fetches Folder entities in CoreData sorting by the NSSortDescriptor.
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Folder.receiptCount, ascending: false)],
-        animation: .spring())
-    /// Stores the fetched results as an array of Folder objects.
-    var folders: FetchedResults<Folder>
-    /// DashPanelState maintains and updates the dashboards view state.
-    @Binding var dashPanelState : DashPanelType
-    
-    var body: some View {
-        VStack {
-            Button(action: {
-                withAnimation(.spring() ) {
-                    dashPanelState = dashPanelState != .homepage ? .homepage : .receipts
-                }
-            }){
-                VStack{
-                    Spacer()
-                    Text("\(receipts.count)").font(.system(.title, design: .rounded))
-                    Text("Receipt\(receipts.count>1 ? "s" : "")").font(.system(.largeTitle, design: .rounded)).bold()
-                    Spacer()
-                }.frame(minWidth: 0, maxWidth: .infinity)
-                .contentShape(Rectangle())
-            }.buttonStyle(ShrinkingButton())
-            
-            Divider()
-            
-            Button(action: {
-                withAnimation(.spring()) {
-                    dashPanelState = dashPanelState != .homepage ? .homepage : .folders
-                }
-            }){
-                VStack{
-                    Spacer()
-                    Text("\(folders.count)").font(.system(.title, design: .rounded))
-                    Text("Folder\(folders.count>1 ? "s" : "")").font(.system(.largeTitle, design: .rounded)).bold()
-                    Spacer()
-                }.frame(minWidth: 0, maxWidth: .infinity)
-                .contentShape(Rectangle())
-            }.buttonStyle(ShrinkingButton())
-        }.foregroundColor(Color("text"))
-    }
-}
+}*/
 
 /// SettingsView displays the settings menu
 /// - Main Parent: DashboardHomePageView
@@ -519,78 +473,6 @@ struct SettingsView: View {
                 Spacer()
             }.frame(minWidth: 0, maxWidth: .infinity).padding(5)
         }
-    }
-}
-
-/// NotifcationsView  displays the notifications menu
-/// - Main Parent: DashboardPanel
-struct NotificationsView: View {
-    var body: some View {
-        VStack{
-            ForEach(0..<7){ index in // could probably be a list, goes darkmode though bit weird
-                HStack {
-                    Text("Notification \(index)")
-                        .font(.system(.body, design: .rounded))
-                        .padding(.leading)
-                    Spacer()
-                }
-                Divider()
-            }.frame(minWidth: 0, maxWidth: .infinity)
-            .contentShape(Rectangle())
-            Spacer()
-        }
-    }
-}
-
-/// Receipt Collection View - View that displays all the receipts (interactive), along with a search/filter bar
-/// - Main Parent: DashboardPanel
-struct ReceiptCollectionView: View {
-    /// Fetches Receipt entities in CoreData sorting by the NSSortDescriptor.
-    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)], animation: .spring())
-    /// Stores the fetched results as an array of Receipt objects.
-    var receipts: FetchedResults<Receipt>
-    /// DashPanelState maintains and updates the dashboards view state.
-    @Binding var dashPanelState : DashPanelType
-    /// String holding the users current search input
-    @State var userSearch : String = ""
-    /// Placeholder for a filtered search setting
-    @State var warrenty = false
-    /// Placeholder for a filtered search setting
-    @State var favorites = false
-    
-    var body: some View {
-        VStack {
-            // title
-            Text("Receipts")
-                .font(.system(.largeTitle, design: .rounded)).bold()
-
-            // search bar
-            SearchBar(userSearch: $userSearch, warrenty: $warrenty, favorites: $favorites)
-            
-            // receipts including search results
-            ScrollView(showsIndicators: false) {
-                ForEach(receipts.filter({ userSearch.count > 0 ? $0.body!.localizedCaseInsensitiveContains(userSearch) ||  $0.folder!.localizedCaseInsensitiveContains(userSearch)  || $0.store!.localizedCaseInsensitiveContains(userSearch) : $0.body!.count > 0 })){ receipt in
-                    ReceiptView(receipt: receipt)
-                }
-            }.cornerRadius(18)
-            
-            // close button
-            Button(action: {
-                withAnimation(.spring()){
-                    dashPanelState = .homepage
-                }
-            }){
-                RoundedRectangle(cornerRadius: 18)
-                    .fill(Color.red)
-                    .overlay(
-                        Image(systemName: "xmark")
-                            .font(.system(.largeTitle, design: .rounded))
-                            .foregroundColor(.white)
-                    ).frame(height: UIScreen.screenHeight*0.1)
-            }.buttonStyle(ShrinkingButton())
-            Spacer()
-        }.padding().ignoresSafeArea(.keyboard)
-        .foregroundColor(Color("text"))
     }
 }
 
@@ -682,194 +564,6 @@ struct ReceiptView: View {
     }
 }
 
-/// FolderCollectionView displays all the folders
-/// - Main Parent: DashboardPanel
-struct FolderCollectionView: View {
-    /// Fetches Folder entities in CoreData sorting by the NSSortDescriptor.
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Folder.favorite, ascending: false),
-                          NSSortDescriptor(keyPath: \Folder.receiptCount, ascending: false),
-                          NSSortDescriptor(keyPath: \Folder.title, ascending: false)],
-        animation: .spring())
-    /// Stores the fetched results as an array of Folder objects.
-    var folders: FetchedResults<Folder>
-    /// Fetches Receipt entities in CoreData sorting by the NSSortDescriptor.
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)],
-        animation: .spring())
-    /// Stores the fetched results as an array of Receipt objects.
-    var receipts: FetchedResults<Receipt>
-    
-    /// Placeholder for a filtered search setting
-    @State var warrenty = false
-    /// Placeholder for a filtered search setting
-    @State var favorites = false
-    /// If a folder is selected, this will be its title
-    @State var currentFolder : String = ""
-    /// String holding the users current search input
-    @State var userSearch : String = ""
-    /// DashPanelState maintains and updates the dashboards view state.
-    @Binding var dashPanelState : DashPanelType
-    /// Used for determining the LazyZStacks 2 column layout
-    let columns = [
-            GridItem(.flexible()),
-            GridItem(.flexible())
-    ]
-    
-    var body: some View {
-        VStack {
-            HStack {
-                if viewingFolder() {
-                    Button(action: {
-                        currentFolder = ""
-                    }){
-                        Image(systemName: "chevron.left")
-                            .font(.title)
-                    }
-                }
-                Spacer()
-                Text(viewingFolder()  ? "\(currentFolder)" : "All Folders")
-                    .font(.system(.largeTitle, design: .rounded)).bold()
-                Spacer()
-                if viewingFolder() {
-                    Button(action:{
-                        withAnimation(.spring()){
-                            getFolder().favorite.toggle()
-                        }
-                        Folder.save()
-                    }){
-                        if getFolder().favorite {
-                            Image(systemName: "bookmark.fill")
-                                .foregroundColor(Color(getFolder().color ?? "text"))
-                        } else {
-                            Image(systemName: "bookmark")
-                                .foregroundColor(Color("text"))
-                        }
-                    }.padding(.leading, -10).font(.title)
-                }
-            }.padding(.horizontal)
-            
-            SearchBar(userSearch: $userSearch, warrenty: $warrenty, favorites: $favorites)
-                .padding(.horizontal)
-            
-            ScrollView(showsIndicators: false) {
-                if viewingFolder() && getFolder().receiptCount > 0 {
-                    ForEach(receipts.filter({ userSearch.count > 0 ? $0.body!.localizedCaseInsensitiveContains(userSearch) ||  $0.folder!.localizedCaseInsensitiveContains(userSearch)  ||   $0.store!.localizedCaseInsensitiveContains(userSearch) : $0.folder! == currentFolder })){ receipt in
-                        ReceiptView(receipt: receipt)
-                    }.transition(AnyTransition.move(edge: .trailing)).animation(.spring())
-                    .padding(.horizontal)
-                } else {
-                    LazyVGrid(columns: columns) {
-                        ForEach(folders.filter({ userSearch.count > 0 ? $0.title!.localizedCaseInsensitiveContains(userSearch) : $0.title!.count > 0 })){ folder in
-                            FolderView(folder: folder, currentFolder: $currentFolder)
-                        }
-                    }//.transition(AnyTransition.move(edge: .leading)).animation(.spring())
-                    .padding(.horizontal)
-                }
-                
-            }.cornerRadius(18)
-            
-            Button(action: {
-                withAnimation(.spring()){
-                    dashPanelState = .homepage
-                    currentFolder = ""
-                }
-            }){
-                RoundedRectangle(cornerRadius: 18)
-                    .fill(Color.red)
-                    .overlay(
-                        Image(systemName: "xmark")
-                            .font(.system(.largeTitle, design: .rounded))
-                            .foregroundColor(Color("white"))
-                        
-                    ).frame(height: UIScreen.screenHeight*0.1)
-                    .padding(.vertical)
-            }.buttonStyle(ShrinkingButton()).padding(.horizontal)
-            Spacer()
-        }.padding(.top).foregroundColor(Color("text"))
-    }
-    
-    /// Gets the current folder based on the currentFolder string
-    func getFolder() -> Folder {
-        return Folder.getFolder(folderTitle: currentFolder)
-    }
-    
-    /// Returns true if the current folder is not empty, false if the folder is empty
-    func viewingFolder() -> Bool {
-        return currentFolder.count > 0 ? true : false
-    }
-}
-
-/// Folder view - Extremely basic folder
-/// - Main Parent: FolderCollectionView
-struct FolderView: View{
-    /// An induvidual folder entity that the view will be based on
-    @State var folder : Folder
-    /// The current folder string from the parent FolderCollection, used to determine if this folder is in focus
-    @Binding var currentFolder : String
-    /// Whether the user has held down the folder (performed the delete action), and is pending delete
-    @State var pendingDelete = false
-    
-    var body: some View {
-        RoundedRectangle(cornerRadius: 18)
-            .fill(Color("accent"))
-            .overlay(
-                VStack {
-                    Image(systemName: folder.icon ?? "folder")
-                        .font(.system(size: 50))
-                    Text(folder.title ?? "Folder")
-                        .font(.system(.title, design: .rounded))
-                        .padding(.bottom, 10)
-                    
-                    //Spacer()
-                    Text("\(folder.receiptCount)")
-                        .font(.system(.largeTitle, design: .rounded)).bold()
-                }.padding().padding(.top, 10)
-                .foregroundColor(Color("text"))
-            ).frame(height: UIScreen.screenHeight*0.25)
-            .onTapGesture {
-                currentFolder = currentFolder == folder.title! ? "" : folder.title!
-                pendingDelete = false
-            }.onLongPressGesture(minimumDuration: 0.25, maximumDistance: 2, perform: {
-                pendingDelete.toggle()
-            }).onChange(of: pendingDelete, perform: { _ in
-                withAnimation(.spring()){
-                    if pendingDelete == true {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            pendingDelete = false // turns off delete button after 2 secs
-                        }
-                    }
-                }
-            }).overlay(
-                // the delete button
-                VStack{
-                    HStack{
-                        Spacer()
-                        if pendingDelete == true {
-                            Circle().fill(Color.red)
-                                .overlay(Image(systemName: "xmark").foregroundColor(Color("white")))
-                                .frame(width: UIScreen.screenHeight*0.04,
-                                       height: UIScreen.screenHeight*0.04)
-                                .padding(8)
-                                .onTapGesture{
-                                    Folder.delete(folder: folder)
-                                }
-                        } else if folder.favorite {
-                            Image(systemName: "bookmark.fill")
-                                .font(.title)
-                                .foregroundColor(Color(folder.color ?? "text"))
-                                .frame(width: UIScreen.screenHeight*0.05,
-                                       height: UIScreen.screenHeight*0.05)
-                                .padding(5)
-                        }
-                    }
-                    Spacer()
-                    
-                }
-            )
-    }
-}
-
 /// Background view is the background of the application
 /// - Main Parent: ContentView
 struct BackgroundView: View {
@@ -956,3 +650,5 @@ struct SearchBar: View {
         }
     }
 }
+
+
