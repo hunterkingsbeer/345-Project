@@ -210,20 +210,6 @@ extension Color {
 }
 
 // --------------------------------------------------------- UTILITIES
-/// Gets the specified gradient for the background, based on the user's settings.
-func getGradient(top: Bool) -> LinearGradient {
-    let colors = Color.getColors()
-    let style = UserSettings().style
-    var gradient = LinearGradient(gradient: Gradient(colors: [top ? colors[0].top1 : colors[0].bottom1, top ? colors[0].top2 : colors[0].bottom2]),
-                                  startPoint: .top, endPoint: .bottom)
-    
-    if style < colors.count {
-        gradient = LinearGradient(gradient: Gradient(colors: [top ? colors[style].top1 : colors[style].bottom1, top ? colors[style].top2 : colors[style].bottom2]),
-                           startPoint: .top, endPoint: .bottom)
-    }
-    
-    return gradient
-}
 
 /// Retrieves the screen size of the user's device.
 extension UIScreen{

@@ -15,7 +15,9 @@ struct COSC345_ProjectApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(UserSettings())
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
+            
         }
     }
 }

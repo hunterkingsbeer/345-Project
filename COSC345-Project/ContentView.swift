@@ -13,7 +13,9 @@ import CoreData
 /// ContentView_Previews is what xCode uses to preview the app in the IDE.
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+        ContentView()
+            .environmentObject(UserSettings())
+            .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
     }
 }
 
@@ -51,7 +53,7 @@ struct ContentView: View {
     /// DashPanelState maintains and updates the dashboards view state.
     @State var dashPanelState : DashPanelType = .homepage
     /// Settings imports the UserSettings
-    @ObservedObject var settings = UserSettings()
+    @EnvironmentObject var settings : UserSettings
 
     var body: some View {
         NavigationView {
@@ -110,7 +112,7 @@ struct AddPanel: View {
                             .foregroundColor(Color("text"))
                     }
                 }
-            ).foregroundColor(.black)
+            ).foregroundColor(.black).animation(.easeInOut)
     }
 }
 
@@ -257,7 +259,7 @@ struct DashboardPanel: View{
     /// DashPanelState maintains and updates the dashboards view state.
     @Binding var dashPanelState : DashPanelType
     /// Settings imports the UserSettings
-    @ObservedObject var settings = UserSettings()
+    @EnvironmentObject var settings : UserSettings
     
     var body: some View{
         RoundedRectangle(cornerRadius: 25)
@@ -280,6 +282,7 @@ struct DashboardPanel: View{
                     }
                 }
             ).frame(height: dashPanelState == .homepage ? size : UIScreen.screenHeight*0.84)
+            .animation(.easeInOut)
     }
 }
 
@@ -366,11 +369,12 @@ struct DashboardToolbar: View {
                     }
                 }){
                     Image(systemName: "gearshape.fill")
-                        .font(.system(size: 40))
+                        .font(.system(size: 40)).foregroundColor(Color("text"))
                         .scaleEffect((toolbarFocus == .settings ? 1.4 : 1))
                         .frame(minWidth: 0, maxWidth: .infinity)
                         .frame(minHeight: 0, maxHeight: .infinity)
                         .transition(AnyTransition.move(edge: .leading).combined(with: .opacity))
+                        .animation(.spring())
                 }.buttonStyle(ShrinkingButton()).contentShape(Rectangle())
             }
             
@@ -458,7 +462,7 @@ struct ReceiptsFoldersButtons: View {
 /// - Main Parent: DashboardHomePageView
 struct SettingsView: View {
     /// Settings imports the UserSettings
-    @ObservedObject var settings = UserSettings()
+    @EnvironmentObject var settings : UserSettings
     /// Fetches Receipt entities in CoreData sorting by the NSSortDescriptor.
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)],
@@ -469,16 +473,14 @@ struct SettingsView: View {
     var body: some View {
         ScrollView(showsIndicators: false){
             VStack (alignment: .leading){
-                Text("All changes require application\nrestart in order to take effect.\n(Closed from multitasking)")
-                    .padding(.bottom, 20)
                 VStack{
                     Toggle("Dark Mode", isOn: $settings.darkMode)
                     .contentShape(Rectangle())
                     Divider()
                     
-                    /*Toggle("Minimal Mode", isOn: $settings.minimal)
+                    Toggle("Minimal Mode", isOn: $settings.minimal)
                     .contentShape(Rectangle())
-                    Divider()*/
+                    Divider()
                     
                     Toggle("Contrast Mode", isOn: $settings.contrast)
                     .contentShape(Rectangle())
@@ -876,7 +878,8 @@ struct BackgroundView: View {
     /// DashPanelState maintains and updates the dashboards view state.
     var dashPanelState : DashPanelType
     /// Settings imports the UserSettings
-    @ObservedObject var settings = UserSettings()
+    @EnvironmentObject var settings : UserSettings
+    @State var colors = Color.getColors()
     
     var body: some View {
         ZStack {
@@ -884,19 +887,19 @@ struct BackgroundView: View {
             if !settings.minimal {
                 VStack {
                     Circle()
-                        .fill(getGradient(top: true))
+                        .fill(LinearGradient(gradient: Gradient(colors: [colors[settings.style].top1, colors[settings.style].top2]), startPoint: .top, endPoint: .bottom))
                         .scaleEffect(x: 1.5) // gives it that clean stretched out look
                         .padding(.top, -UIScreen.screenHeight * (dashPanelState == .homepage ? 0.5 : 0.38))
                         .animation(.spring())
                     Spacer()
                     Circle()
-                        .fill(getGradient(top: false))
+                        .fill(LinearGradient(gradient: Gradient(colors: [colors[settings.style].bottom1, colors[settings.style].bottom2]), startPoint: .top, endPoint: .bottom))
                         .scaleEffect(x: 1.5)
                         .padding(.bottom, -UIScreen.screenHeight * (addPanelState == .homepage ? 0.5 : 0.38))
                         .animation(.spring())
                 }
             }
-        }
+        }.animation(.easeInOut)
     }
 }
 
