@@ -337,9 +337,15 @@ struct AddPanelDetailView: View {
                 Text("Scan using Camera")
                     .font(.system(.title, design: .rounded))
                     .padding(.bottom, 5)
-                ScanDocumentView(recognizedText: self.$recognizedText, validScan: $validScan)
+                if !UIDevice.current.isSimulator {
+                    ScanDocumentView(recognizedText: self.$recognizedText,
+                                     validScan: $validScan)
                     .cornerRadius(18)
                     .animation(.spring())
+                } else {
+                    Text("Camera not supported in the simulator!")
+                    Spacer()
+                }
             } else if addPanelState == .gallery {
                 Text("Scan using Gallery")
                     .font(.system(.title, design: .rounded))
@@ -367,7 +373,6 @@ struct AddPanelDetailView: View {
         .onChange(of: recognizedText, perform: { _ in
             validScanAlert = validScan == .invalidScan ? true : false
             // if validScanType == invalid then alert the user
-            
             if validScan == .validScan { // IMPROVE THIS! Go to a "is this correct?" screen
                 Receipt.saveScan(recognizedText: recognizedText)
                 withAnimation(.spring()) {

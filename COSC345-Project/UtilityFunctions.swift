@@ -218,6 +218,12 @@ extension UIScreen{
    static let screenSize = UIScreen.main.bounds.size
 }
 
+extension UIDevice {
+    var isSimulator: Bool {
+        return TARGET_OS_SIMULATOR != 0
+    }
+}
+
 /// Shrinking a=nimation for the UI buttons.
 struct ShrinkingButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
