@@ -99,6 +99,10 @@ struct DashboardPanelParent: View{
             .foregroundColor(Color("object"))
             .overlay(
                 VStack {
+                    // TITLE BAR AND SETTINGS -------------
+                    TitleBar(dashPanelState: $dashPanelState)
+                        .padding()
+                    
                     if dashPanelState != .settings {
                         DashboardHomepage(dashPanelState: $dashPanelState)
                             .transition(AnyTransition.move(edge: .leading).combined(with: .opacity))
@@ -139,8 +143,6 @@ struct DashboardHomepage: View {
     
     var body: some View {
         VStack {
-            TitleBar(dashPanelState: $dashPanelState).padding()
-            
             // search bar
             SearchBar(userSearch: $userSearch, warrenty: $warrenty, favorites: $favorites).padding(.horizontal)
             // category and tags bar
@@ -151,7 +153,12 @@ struct DashboardHomepage: View {
                             let title = folder.title
                             userSearch = title == userSearch ? "" : title ?? ""
                         }){
-                            TagView(folder: folder)
+                            VStack{
+                                // Hides the tag if its being searched, tag moves to search bar.
+                                if userSearch.lowercased() != (folder.title ?? "default").lowercased(){
+                                    TagView(folder: folder)
+                                }
+                            }
                         }.buttonStyle(PlainButtonStyle())
                     }
                 }.padding(.horizontal)
@@ -216,7 +223,7 @@ struct TagView: View {
     let folder : Folder
     var body: some View {
         RoundedRectangle(cornerRadius: 15)
-            .fill(Color(folder.color ?? "accent"))
+            .fill(Color(Folder.getColor(title: folder.title ?? "default")))
             .overlay(
                 HStack {
                     Image(systemName: folder.icon ?? "folder")
@@ -225,6 +232,7 @@ struct TagView: View {
                 }.font(.system(size: 16, weight: .bold, design: .rounded))
                 .foregroundColor(Color("background"))
                 .padding(.horizontal, 10)
+                .minimumScaleFactor(0.8).lineLimit(1)
             )
             .frame(minWidth: UIScreen.screenWidth * 0.4)
             .frame(height: UIScreen.screenHeight*0.05)
@@ -458,7 +466,7 @@ struct SettingsView: View {
                 Divider()
                 
                 Spacer()
-            }.frame(minWidth: 0, maxWidth: .infinity).padding(5)
+            }.frame(minWidth: 0, maxWidth: .infinity).padding()
         }
     }
 }
@@ -600,11 +608,11 @@ struct SearchBar: View {
         VStack {
             HStack {
                 RoundedRectangle(cornerRadius: 18)
-                    .fill(Color("accent"))
+                    .fill(Color(getColor(title: userSearch)))
                     .frame(height: UIScreen.screenHeight*0.05).frame(minWidth: 0, maxWidth: .infinity)
                     .overlay(
                         HStack {
-                            Image(systemName: "magnifyingglass")
+                            Image(systemName: folderExists() ? "folder" : "magnifyingglass")
                             CustomTextField(placeholder: Text("Search..."),text: $userSearch)
                                 .ignoresSafeArea(.keyboard)
                             Spacer()
@@ -615,7 +623,12 @@ struct SearchBar: View {
                                     Image(systemName: "xmark")
                                 }
                             }
-                        }.foregroundColor(Color("text")).padding(.horizontal, 10)
+                        }.foregroundColor(Color(textColor(title: userSearch)))
+                        .font(
+                            .system(size: 20,
+                                    weight: folderExists() ? .bold : .regular,
+                                    design: .rounded))
+                        .padding(.horizontal, 10)
                 )
                 Button(action:{
                     showingFilters = showingFilters ? false : true
@@ -636,5 +649,24 @@ struct SearchBar: View {
                 }.padding(.horizontal, 5)
             }
         }
+    }
+    
+    func getColor(title: String) -> String {
+        if folderExists() {
+            return Folder.getColor(title: title)
+        } else {
+            return "accent"
+        }
+    }
+    
+    func textColor(title: String) -> String {
+        if folderExists() {
+            return "background"
+        } else {
+            return "text"
+        }
+    }
+    func folderExists() -> Bool {
+        return Folder.folderExists(title: userSearch)
     }
 }

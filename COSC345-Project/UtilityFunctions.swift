@@ -75,7 +75,7 @@ extension Receipt {
 /// Extension of the Folder object
 extension Folder {
     /// Defines the folders utilized, with their respective icons and colours.
-    static let folderMatch = [(title: "Default", icon: "folder", color: "backgroundContrast"),
+    static let folderMatch = [(title: "Default", icon: "folder", color: "text"),
                               (title: "Retail", icon: "tag", color: "blue"),
                               (title: "Groceries", icon: "cart", color: "green"),
                               (title: "Clothing", icon: "bag", color: "pink")]
@@ -97,7 +97,17 @@ extension Folder {
                 return match.color.lowercased()
             }
         }
-        return "black".lowercased()
+        return "text"
+    }
+    
+    /// Boolean true if folder exists, false if not.
+    static func folderExists(title: String) -> Bool {
+        for match in folderMatch {
+            if match.title.lowercased() == title.lowercased(){
+                return true
+            }
+        }
+        return false
     }
     
     /// Returns an array of all folders.
