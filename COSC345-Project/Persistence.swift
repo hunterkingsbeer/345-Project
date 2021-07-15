@@ -70,6 +70,7 @@ struct PersistenceController {
     }
     
     static func save(viewContext: NSManagedObjectContext) {
+        let viewContext = shared.getContext()
         do {
             try  viewContext.save()
         } catch {

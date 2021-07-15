@@ -63,7 +63,8 @@ struct ContentView: View {
                     if addPanelState == .homepage {
                         DashboardPanelParent(size: UIScreen.screenHeight * 0.7, dashPanelState: $dashPanelState)
                             .padding(.bottom, dashPanelState != .expanded ? 12 : 0)
-                            .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.75)))
+                            .transition(AnyTransition.opacity
+                                            .combined(with: .scale(scale: 0.75)))
                             .animation(.spring())
                     }
                     
@@ -72,9 +73,8 @@ struct ContentView: View {
                         AddPanel(addPanelState: $addPanelState)
                             .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.75)))
                             .animation(.spring())
+                        Spacer()
                     }
-                    
-                    Spacer()
                 }.ignoresSafeArea(.keyboard)
                 .padding(.horizontal, addPanelState == .homepage ? 15 : 0)
             }.navigationBarTitle("").navigationBarHidden(true)
@@ -99,38 +99,6 @@ struct DashboardPanelParent: View{
             .foregroundColor(Color("object"))
             .overlay(
                 VStack {
-                    HStack {
-                        let onSettings = dashPanelState == .settings
-                        if onSettings {
-                            Spacer()
-                        }
-                        
-                        Button(action: {
-                            withAnimation(.spring()){
-                                dashPanelState = dashPanelState == .settings ? .homepage : .settings
-                            }
-                        }){
-                            Image(systemName: "gearshape.fill")
-                                .font(.title).foregroundColor(Color("text"))
-                                .scaleEffect(onSettings ? 1.3 : 1)
-                                .animation(.spring())
-                        }
-                        
-                        Spacer()
-                        if !onSettings {
-                            HStack {
-                                Spacer()
-                                Text("Receipted.")
-                                    .foregroundColor(Color("text"))
-                                    .font(.system(.title, design: .rounded)).bold()
-                                Spacer()
-                                Image(systemName: "gearshape.fill")
-                                    .font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/).foregroundColor(.clear)
-                            }.transition(AnyTransition.move(edge: .trailing).combined(with: .opacity))
-                            .animation(.spring())
-                        }
-                    }
-                    
                     if dashPanelState != .settings {
                         DashboardHomepage(dashPanelState: $dashPanelState)
                             .transition(AnyTransition.move(edge: .leading).combined(with: .opacity))
@@ -140,7 +108,7 @@ struct DashboardPanelParent: View{
                             .transition(AnyTransition.move(edge: .trailing).combined(with: .opacity))
                             .animation(.spring())
                     }
-                }.padding()
+                }
             ).frame(height: dashPanelState != .expanded ? size : UIScreen.screenHeight*0.84)
             .animation(.easeInOut)
     }
@@ -171,33 +139,76 @@ struct DashboardHomepage: View {
     
     var body: some View {
         VStack {
+            TitleBar(dashPanelState: $dashPanelState).padding()
+            
             // search bar
-            SearchBar(userSearch: $userSearch, warrenty: $warrenty, favorites: $favorites)
+            SearchBar(userSearch: $userSearch, warrenty: $warrenty, favorites: $favorites).padding(.horizontal)
             // category and tags bar
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack {
-                    ForEach(0..<folders.count) { folder in
+                    ForEach(folders) { folder in
                         Button(action:{
-                            let title = folders[folder].title
+                            let title = folder.title
                             userSearch = title == userSearch ? "" : title ?? ""
                         }){
-                            TagView(folder: folders[folder])
+                            TagView(folder: folder)
                         }.buttonStyle(PlainButtonStyle())
                     }
-                }
-            }.cornerRadius(15)
+                }.padding(.horizontal)
+            }//.cornerRadius(15)
+            
             // receipts including search results
             ScrollView(showsIndicators: false) {
                 ForEach(receipts.filter({ userSearch.count > 0 ? $0.body!.localizedCaseInsensitiveContains(userSearch) ||  $0.folder!.localizedCaseInsensitiveContains(userSearch)  || $0.store!.localizedCaseInsensitiveContains(userSearch) : $0.body!.count > 0 })){ receipt in
-                    ReceiptView(receipt: receipt)
+                    ReceiptView(receipt: receipt).transition(.opacity)
                 }
             }.cornerRadius(18)
+            .padding(.horizontal)
             Spacer()
-        }.onChange(of: userSearch, perform: { search in
+        }.padding(.bottom, 10)
+        .onChange(of: userSearch, perform: { search in
             withAnimation(.spring()){
                 dashPanelState = search != "" ? .expanded : .homepage
             }
         })
+    }
+}
+
+struct TitleBar: View {
+    @Binding var dashPanelState: DashPanelType
+    
+    var body: some View {
+        HStack {
+            let onSettings = dashPanelState == .settings
+            if onSettings {
+                Spacer()
+            }
+            
+            Button(action: {
+                withAnimation(.spring()){
+                    dashPanelState = dashPanelState == .settings ? .homepage : .settings
+                }
+            }){
+                Image(systemName: "gearshape.fill")
+                    .font(.title).foregroundColor(Color("text"))
+                    .scaleEffect(onSettings ? 1.3 : 1)
+                    .animation(.spring())
+            }
+            
+            Spacer()
+            if !onSettings {
+                HStack {
+                    Spacer()
+                    Text("Receipted.")
+                        .foregroundColor(Color("text"))
+                        .font(.system(.title, design: .rounded)).bold()
+                    Spacer()
+                    Image(systemName: "gearshape.fill")
+                        .font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/).foregroundColor(.clear)
+                }.transition(AnyTransition.move(edge: .trailing).combined(with: .opacity))
+                .animation(.spring())
+            }
+        }
     }
 }
 
@@ -217,7 +228,6 @@ struct TagView: View {
             )
             .frame(minWidth: UIScreen.screenWidth * 0.4)
             .frame(height: UIScreen.screenHeight*0.05)
-            
     }
 }
 
@@ -388,61 +398,6 @@ struct AddPanelDetailView: View {
         }
     }
 }
-
-/*
-/// DashboardToolBar holds the two buttons at the top that lead to settings/notifications screens
-/// - Main Parent: DashboardHomePageView
-struct DashboardToolbar: View {
-    /// The fixed size of the dashboard
-    let size : CGFloat
-    /// toolbarFocus
-    @Binding var toolbarFocus: ToolbarFocusType
-    
-    var body: some View {
-        HStack {
-            Spacer()
-            if toolbarFocus != .notifications {
-                Button(action: {
-                    withAnimation(.spring()) {
-                        toolbarFocus = toolbarFocus != .settings ? .settings : .homepage
-                    }
-                }){
-                    Image(systemName: "gearshape.fill")
-                        .font(.system(size: 40)).foregroundColor(Color("text"))
-                        .scaleEffect((toolbarFocus == .settings ? 1.4 : 1))
-                        .frame(minWidth: 0, maxWidth: .infinity)
-                        .frame(minHeight: 0, maxHeight: .infinity)
-                        .transition(AnyTransition.move(edge: .leading).combined(with: .opacity))
-                        .animation(.spring())
-                }.buttonStyle(ShrinkingButton()).contentShape(Rectangle())
-            }
-            
-            Spacer()
-            if toolbarFocus == .homepage {
-                Divider().padding(.vertical, 35)
-                    .transition(AnyTransition.scale(scale: 0.6).combined(with: .opacity))
-                Spacer()
-            }
-            
-            if toolbarFocus != .settings {
-                Button(action: {
-                    withAnimation(.spring()) {
-                        toolbarFocus = toolbarFocus != .notifications ? .notifications : .homepage
-                    }
-                }){
-                    Image(systemName: "bell.fill")
-                        .font(.system(size: 40))
-                        .scaleEffect((toolbarFocus == .notifications ? 1.4 : 1))
-                        .frame(minWidth: 0, maxWidth: .infinity)
-                        .frame(minHeight: 0, maxHeight: .infinity)
-                        .transition(AnyTransition.move(edge: .trailing).combined(with: .opacity))
-                }.buttonStyle(ShrinkingButton()).contentShape(Rectangle())
-            }
-            Spacer()
-        }.frame(height: size/3.5)
-        .frame(minWidth: 0, maxWidth: .infinity)
-    }
-}*/
 
 /// SettingsView displays the settings menu
 /// - Main Parent: DashboardHomePageView
@@ -615,13 +570,14 @@ struct BackgroundView: View {
                     Circle()
                         .fill(LinearGradient(gradient: Gradient(colors: [colors[settings.style].top1, colors[settings.style].top2]), startPoint: .top, endPoint: .bottom))
                         .scaleEffect(x: 1.5) // gives it that clean stretched out look
-                        .padding(.top, -UIScreen.screenHeight * (dashPanelState != .expanded ? 0.5 : 0.38))
+                        .padding(.top, -UIScreen.screenHeight * 0.55)
+                        //.padding(.top, -UIScreen.screenHeight * (dashPanelState != .expanded ? 0.5 : 0.38))
                         .animation(.spring())
                     Spacer()
                     Circle()
                         .fill(LinearGradient(gradient: Gradient(colors: [colors[settings.style].bottom1, colors[settings.style].bottom2]), startPoint: .top, endPoint: .bottom))
                         .scaleEffect(x: 1.5)
-                        .padding(.bottom, -UIScreen.screenHeight * (addPanelState == .homepage ? 0.5 : 0.38))
+                        .padding(.bottom, -UIScreen.screenHeight * (addPanelState == .homepage ? 0.6 : 0.38))
                         .animation(.spring())
                 }
             }

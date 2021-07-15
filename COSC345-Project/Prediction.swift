@@ -25,7 +25,7 @@ struct Prediction {
                             "butcher", "butchers", "butchery", "chicken",
                             "beef", "pork", "milk", "cheese", "sauce"]
     
-    /// Keywords for the retail category. Very generalized, needs refining in beta
+    /// Keywords for the retail category. Very generalized, needs refining in beta.
     static var retail = ["harvey norman", "noel leeming", "noel leemings",
                          "jb","hi-fi", "the warehouse", "the ware house",
                          "hifi", "store", "department", "furniture", "tech",
@@ -70,7 +70,7 @@ struct Prediction {
         }
     }
     
-    ///Checks whether an input string contains words found in parameters, true if it does, false otherwise.
+    /// Checks whether an input string contains words found in parameters, true if it does, false otherwise.
     static func matchString(parameters: [String], input: String) -> Bool{
         for parameter in parameters { 
             if input.lowercased().contains(parameter){

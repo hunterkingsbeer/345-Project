@@ -75,7 +75,7 @@ extension Receipt {
 /// Extension of the Folder object
 extension Folder {
     /// Defines the folders utilized, with their respective icons and colours.
-    static let folderMatch = [(title: "Default", icon: "folder", color: "accent"),
+    static let folderMatch = [(title: "Default", icon: "folder", color: "backgroundContrast"),
                               (title: "Retail", icon: "tag", color: "blue"),
                               (title: "Groceries", icon: "cart", color: "green"),
                               (title: "Clothing", icon: "bag", color: "pink")]
