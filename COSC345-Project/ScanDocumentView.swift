@@ -31,7 +31,6 @@ struct ScanDocumentView: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: VNDocumentCameraViewController, context: Context) {
         // nothing to do here, required for the UIViewControllerRepresentable type
     }
-    
 }
 /// Coordinator for ScanDocumentView
 class Coordinator: NSObject, VNDocumentCameraViewControllerDelegate {
@@ -93,4 +92,3 @@ class Coordinator: NSObject, VNDocumentCameraViewControllerDelegate {
         return entireRecognizedText
     }
 }
-
