@@ -58,10 +58,11 @@ struct ContentView: View {
                                dashPanelState: dashPanelState)
                 
                 // COMPANY TITLE ------------------
-                VStack{
+                VStack {
                     // DASHBOARD (UPPER) ------------------
                     if addPanelState == .homepage {
-                        DashboardPanelParent(size: UIScreen.screenHeight * 0.7, dashPanelState: $dashPanelState)
+                        DashboardPanelParent(size: UIScreen.screenHeight * 0.74,
+                                             dashPanelState: $dashPanelState)
                             .padding(.bottom, dashPanelState != .expanded ? 12 : 0)
                             .transition(AnyTransition.opacity
                                             .combined(with: .scale(scale: 0.75)))
@@ -113,8 +114,7 @@ struct DashboardPanelParent: View{
                             .animation(.spring())
                     }
                 }
-            ).frame(height: dashPanelState != .expanded ? size : UIScreen.screenHeight*0.84)
-            .animation(.easeInOut)
+            ).animation(.spring())
     }
 }
 
@@ -244,6 +244,7 @@ struct TagView: View {
 struct AddPanel: View {
     /// AddPanelType maintains and updates the add panels view state.
     @Binding var addPanelState : AddPanelType
+    @State var showAddButtons : Bool = false
     
     var body: some View {
         RoundedRectangle(cornerRadius: 25)
@@ -252,16 +253,20 @@ struct AddPanel: View {
             .overlay(
                 VStack{
                     if addPanelState == .homepage {
-                        AddPanelHomepageView(addPanelState: $addPanelState)
-                            .transition(AnyTransition.move(edge: .bottom).combined(with: .opacity)).animation(.spring())
+                        AddPanelHomepageView(addPanelState: $addPanelState, showAddButtons: $showAddButtons)
+                            .transition(AnyTransition.move(edge: .bottom).combined(with: .opacity))
+                            .animation(.spring())
                             .foregroundColor(Color("text"))
                     } else {
                         AddPanelDetailView(addPanelState: $addPanelState)
-                            .transition(AnyTransition.move(edge: .bottom).combined(with: .opacity)).animation(.spring())
+                            .transition(AnyTransition.move(edge: .bottom).combined(with: .opacity))
+                            .animation(.spring())
                             .foregroundColor(Color("text"))
                     }
                 }
             ).foregroundColor(.black).animation(.easeInOut)
+            .frame(height: UIScreen.screenHeight * (addPanelState == .homepage ? showAddButtons ? 0.12 : 0.1 : 0.9))
+            .animation(.spring())
     }
 }
 
@@ -271,52 +276,66 @@ struct AddPanel: View {
 struct AddPanelHomepageView: View {
     /// AddPanelType maintains and updates the add panels view state.
     @Binding var addPanelState : AddPanelType
+    @Binding var showAddButtons : Bool
     var body: some View {
         HStack {
-            HStack{
-                Spacer()
-                Button(action: {
-                    withAnimation(.spring()){
-                        addPanelState = .gallery
-                    }
+            if showAddButtons {
+                HStack{
+                    Spacer()
+                    Button(action: {
+                        withAnimation(.spring()){
+                            addPanelState = .gallery
+                        }
+                    }){
+                        VStack{
+                            Image(systemName: "doc")
+                                .font(.largeTitle)
+                            Text("Gallery")
+                                .font(.system(.title, design: .rounded))//.bold()
+                        }.frame(minWidth: 0, maxWidth: .infinity)
+                        .frame(minHeight: 0, maxHeight: .infinity)
+                        .contentShape(Rectangle())
+                    }.buttonStyle(ShrinkingButton())
+                    .transition(.move(edge: .leading))
+                    Spacer()
+                    
+                    Divider()
+                        .foregroundColor(Color("text"))
+                        .padding(.vertical, 25)
+                    
+                    Spacer()
+                    Button(action: {
+                        withAnimation(.spring()){
+                            addPanelState = .camera
+                        }
+                    }){
+                        VStack{
+                            Image(systemName: "camera")
+                                .font(.largeTitle)
+                            Text("Camera")
+                                .font(.system(.title, design: .rounded))//.bold()
+                        }.frame(minWidth: 0, maxWidth: .infinity)
+                        .frame(minHeight: 0, maxHeight: .infinity)
+                        .contentShape(Rectangle())
+                    }.buttonStyle(ShrinkingButton())
+                    .transition(.move(edge: .trailing))
+                    Spacer()
+                }
+            } else {
+                Button(action:{
+                    showAddButtons.toggle()
                 }){
-                    VStack{
-                        Image(systemName: "doc")
-                            .font(.largeTitle)
-                        Text("Add from")
-                            .font(.system(.title, design: .rounded))
-                        Text("Gallery")
-                            .font(.system(.title, design: .rounded)).bold()
-                    }.frame(minWidth: 0, maxWidth: .infinity)
-                    .frame(minHeight: 0, maxHeight: .infinity)
-                    .contentShape(Rectangle())
-                }.buttonStyle(ShrinkingButton())
-                Spacer()
-                
-                Divider()
-                    .foregroundColor(Color("text"))
-                    .padding(.vertical, 25)
-                
-                Spacer()
-                Button(action: {
-                    withAnimation(.spring()){
-                        addPanelState = .camera
-                    }
-                }){
-                    VStack{
-                        Image(systemName: "camera")
-                            .font(.largeTitle)
-                        Text("Add from")
-                            .font(.system(.title, design: .rounded))
-                        Text("Camera")
-                            .font(.system(.title, design: .rounded)).bold()
-                    }.frame(minWidth: 0, maxWidth: .infinity)
-                    .frame(minHeight: 0, maxHeight: .infinity)
-                    .contentShape(Rectangle())
-                }.buttonStyle(ShrinkingButton())
-                Spacer()
+                    Image(systemName: "plus")
+                        .font(.largeTitle)
+                }
             }
-        }
+        }.onChange(of: showAddButtons, perform: { _ in
+            if showAddButtons {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                    showAddButtons = false // turns off adding button after 4 secs
+                }
+            }
+        })
     }
 }
 
@@ -471,6 +490,7 @@ struct SettingsView: View {
     }
 }
 
+
 /// Receipt view is the template receipt design, that starts minimized then after interaction expands to full size
 /// - Main Parent: ReceiptCollectionView
 struct ReceiptView: View {
@@ -512,9 +532,9 @@ struct ReceiptView: View {
                     HStack {
                         Spacer()
                         VStack (alignment: .trailing){
-                            Text("Total")
+                            /*Text("Total")
                                 .font(.system(.subheadline, design: .rounded))
-                                .padding(.bottom, -5)
+                                .padding(.bottom, -5)*/
                             Divider()//.padding(.leading, 20)
                             Text(receipt.total > 0 ? "$\(receipt.total , specifier: "%.2f")" : "")
                                 .font(.system(.body, design: .rounded))
