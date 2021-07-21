@@ -14,5 +14,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Run tests
-      run: xcodebuild test -scheme COSC345-ProjectTests -destination 'platform=iOS Simulator,OS=14.4,name=iPhone 11 Pro';
+      run: xcodebuild test -scheme COSC345-ProjectTests -destination 'platform=iOS Simulator,OS=14.4,name=iPhone 11 Pro' -enableCodeCoverage YES;
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1.2.1
+  
 
