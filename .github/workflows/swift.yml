@@ -18,5 +18,7 @@ jobs:
       run: xcodebuild test -scheme COSC345-ProjectTests -destination 'platform=iOS Simulator,OS=14.4,name=iPhone 11 Pro' -enableCodeCoverage YES;
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1.2.1
+    - name: Upload coverage to Codacy
+      run: bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r report.xml;
   
 
