@@ -1,10 +1,12 @@
 name: Example workflow for Codecov
 on: [push]
 jobs:
-  run:
-  - name: Upload coverage to Codecov
-  - uses: codecov/codecov-action@v2
-    with:
+  deploy_docs:
+    runs-on: macos-latest
+    steps:
+    - name: Upload coverage to Codecov
+    - uses: codecov/codecov-action@v2
+      with:
         token: ${{ secrets.ACCESS_TOKEN }}
         fail_ci_if_error: true
         flags: unittests
