@@ -1,4 +1,4 @@
-name: Swift
+name: CodeCoverage
 
 on:
   push:
@@ -11,9 +11,6 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Run tests
-      run: xcodebuild test -scheme COSC345-ProjectTests -destination 'platform=iOS Simulator,OS=14.4,name=iPhone 11 Pro' -enableCodeCoverage YES;
       
     - name: GitHub Action for SwiftLint
       uses: norio-nomura/action-swiftlint@3.2.1
