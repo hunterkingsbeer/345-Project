@@ -4,7 +4,7 @@ jobs:
   run:
   - name: Upload coverage to Codecov
   - uses: codecov/codecov-action@v2
-      with:
+    with:
         token: ${{ secrets.ACCESS_TOKEN }}
         fail_ci_if_error: true
         flags: unittests
