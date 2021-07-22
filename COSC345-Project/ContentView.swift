@@ -44,9 +44,9 @@ enum DashPanelType {
 /// ContentView is the main content view that is called when starting the app.
 struct ContentView: View {
     /// AddPanelType maintains and updates the add panels view state.
-    @State var addPanelState : AddPanelType = .homepage // need to make these global vars
+    @State var addPanelState: AddPanelType = .homepage // need to make these global vars
     /// DashPanelState maintains and updates the dashboards view state.
-    @State var dashPanelState : DashPanelType = .homepage
+    @State var dashPanelState: DashPanelType = .homepage
     /// Settings imports the UserSettings
     @EnvironmentObject var settings : UserSettings
 
@@ -88,13 +88,13 @@ struct ContentView: View {
 /// - Main Parent: ContentView
 struct DashboardPanelParent: View{
     /// The fixed size of the Dashboard panel
-    let size : CGFloat
+    let size: CGFloat
     /// DashPanelState maintains and updates the dashboards view state.
-    @Binding var dashPanelState : DashPanelType
+    @Binding var dashPanelState: DashPanelType
     /// Settings imports the UserSettings
-    @EnvironmentObject var settings : UserSettings
+    @EnvironmentObject var settings: UserSettings
     
-    var body: some View{
+    var body: some View {
         RoundedRectangle(cornerRadius: 25)
             .shadow(color: Color(.black).opacity(0.15), radius: 5, x: 0, y: 0)
             .foregroundColor(Color("object"))
@@ -115,69 +115,6 @@ struct DashboardPanelParent: View{
                     }
                 }
             ).animation(.spring())
-    }
-}
-
-/// DashboardHomepage holds the homepage view for the app. Displaying receipts, tags and search.
-/// - Main Parent: ContentView
-struct DashboardHomepage: View {
-    /// Fetches Receipt entities in CoreData sorting by the NSSortDescriptor.
-    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)], animation: .spring())
-    /// Stores the fetched results as an array of Receipt objects.
-    var receipts: FetchedResults<Receipt>
-    /// Fetches Folder entities in CoreData sorting by the NSSortDescriptor.
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Folder.receiptCount, ascending: false)],
-        animation: .spring())
-    /// Stores the fetched results as an array of Folder objects.
-    var folders: FetchedResults<Folder>
-    
-    /// DashPanelState maintains and updates the dashboards view state.
-    @Binding var dashPanelState : DashPanelType
-    /// String holding the users current search input
-    @State var userSearch : String = ""
-    /// Placeholder for a filtered search setting
-    @State var warrenty = false
-    /// Placeholder for a filtered search setting
-    @State var favorites = false
-    
-    var body: some View {
-        VStack {
-            // search bar
-            SearchBar(userSearch: $userSearch, warrenty: $warrenty, favorites: $favorites).padding(.horizontal)
-            // category and tags bar
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack {
-                    ForEach(folders) { folder in
-                        Button(action:{
-                            let title = folder.title
-                            userSearch = title == userSearch ? "" : title ?? ""
-                        }){
-                            VStack{
-                                // Hides the tag if its being searched, tag moves to search bar.
-                                if userSearch.lowercased() != (folder.title ?? "default").lowercased(){
-                                    TagView(folder: folder)
-                                }
-                            }
-                        }.buttonStyle(PlainButtonStyle())
-                    }
-                }.padding(.horizontal)
-            }//.cornerRadius(15)
-            
-            // receipts including search results
-            ScrollView(showsIndicators: false) {
-                ForEach(receipts.filter({ userSearch.count > 0 ? $0.body!.localizedCaseInsensitiveContains(userSearch) ||  $0.folder!.localizedCaseInsensitiveContains(userSearch)  || $0.store!.localizedCaseInsensitiveContains(userSearch) : $0.body!.count > 0 })){ receipt in
-                    ReceiptView(receipt: receipt).transition(.opacity)
-                }
-            }.cornerRadius(18)
-            .padding(.horizontal)
-            Spacer()
-        }.padding(.bottom, 10)
-        .onChange(of: userSearch, perform: { search in
-            withAnimation(.spring()){
-                dashPanelState = search != "" ? .expanded : .homepage
-            }
-        })
     }
 }
 
@@ -219,8 +156,74 @@ struct TitleBar: View {
     }
 }
 
+/// DashboardHomepage holds the homepage view for the app. Displaying receipts, tags and search.
+/// - Main Parent: ContentView
+struct DashboardHomepage: View {
+    /// Fetches Receipt entities in CoreData sorting by the NSSortDescriptor.
+    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)], animation: .spring())
+    /// Stores the fetched results as an array of Receipt objects.
+    var receipts: FetchedResults<Receipt>
+    /// Fetches Folder entities in CoreData sorting by the NSSortDescriptor.
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \Folder.receiptCount, ascending: false)],
+        animation: .spring())
+    /// Stores the fetched results as an array of Folder objects.
+    var folders: FetchedResults<Folder>
+    
+    /// DashPanelState maintains and updates the dashboards view state.
+    @Binding var dashPanelState: DashPanelType
+    /// String holding the users current search input
+    @State var userSearch: String = ""
+    /// Placeholder for a filtered search setting
+    @State var warrenty = false
+    /// Placeholder for a filtered search setting
+    @State var favorites = false
+    
+    var body: some View {
+        VStack {
+            // search bar
+            SearchBar(userSearch: $userSearch, warrenty: $warrenty, favorites: $favorites).padding(.horizontal)
+            // category and tags bar
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack {
+                    ForEach(folders) { folder in
+                        Button(action: {
+                            let title = folder.title
+                            userSearch = title == userSearch ? "" : title ?? ""
+                        }){
+                            VStack{
+                                // Hides the tag if its being searched, tag moves to search bar.
+                                if userSearch.lowercased() != (folder.title ?? "default").lowercased(){
+                                    TagView(folder: folder)
+                                }
+                            }
+                        }.buttonStyle(PlainButtonStyle())
+                    }
+                }.padding(.horizontal)
+            }//.cornerRadius(15)
+            
+            // receipts including search results
+            ScrollView(showsIndicators: false) {
+                ForEach(receipts.filter({ userSearch.count > 0 ?
+                                            $0.body!.localizedCaseInsensitiveContains(userSearch) ||
+                                            $0.folder!.localizedCaseInsensitiveContains(userSearch)  ||
+                                            $0.store!.localizedCaseInsensitiveContains(userSearch) : $0.body!.count > 0 })){ receipt in
+                    ReceiptView(receipt: receipt).transition(.opacity)
+                }
+            }.cornerRadius(18).padding(.horizontal)
+            Spacer()
+        }.padding(.bottom, 10)
+        .onChange(of: userSearch, perform: { search in
+            withAnimation(.spring()){
+                dashPanelState = search != "" ? .expanded : .homepage
+            }
+        })
+    }
+}
+
+/// Tag/Folder
 struct TagView: View {
-    let folder : Folder
+    let folder: Folder
     var body: some View {
         RoundedRectangle(cornerRadius: 15)
             .fill(Color(Folder.getColor(title: folder.title ?? "default")))
@@ -239,12 +242,43 @@ struct TagView: View {
     }
 }
 
+/// Receipt view is the template receipt design, that starts minimized then after interaction expands to full size
+/// - Main Parent: ReceiptCollectionView
+struct ReceiptView: View {
+    /// An induvidual receipt entity that the view will be based on
+    @State var receipt: Receipt
+    /// Whether the receipt is selected and displaying further details
+    @State var selected: Bool = false
+    /// Whether the user has held down the receipt (performed the delete action), and is pending delete
+    @State var pendingDelete = false
+    
+    var body: some View {
+        RoundedRectangle(cornerRadius: 18)
+            .fill(Color("accent"))
+            .overlay(
+                // the title and body
+                HStack {
+                    VStack(alignment: .leading) {
+                        HStack {
+                            Image(systemName: Folder.getIcon(title: receipt.folder ?? "doc.plaintext"))
+                            Text(receipt.store ?? "")
+                                .font(.system(size: 16, weight: .bold, design: .rounded))
+                        }
+                        Spacer()
+                    }
+                    Spacer()
+                }.padding(10)
+            ).frame(height: UIScreen.screenHeight * 0.08)
+    }
+}
+
+
 /// AddPanel handles the visibility of the various add panel views.
 /// - Main Parent: ContentView
 struct AddPanel: View {
     /// AddPanelType maintains and updates the add panels view state.
-    @Binding var addPanelState : AddPanelType
-    @State var showAddButtons : Bool = false
+    @Binding var addPanelState: AddPanelType
+    @State var showAddButtons: Bool = false
     
     var body: some View {
         RoundedRectangle(cornerRadius: 25)
@@ -275,20 +309,20 @@ struct AddPanel: View {
 /// - Main Parent: AddPanel
 struct AddPanelHomepageView: View {
     /// AddPanelType maintains and updates the add panels view state.
-    @Binding var addPanelState : AddPanelType
-    @Binding var showAddButtons : Bool
+    @Binding var addPanelState: AddPanelType
+    @Binding var showAddButtons: Bool
     var body: some View {
         HStack {
             if showAddButtons {
-                HStack{
+                HStack {
                     Spacer()
                     Button(action: {
                         withAnimation(.spring()){
                             addPanelState = .gallery
                         }
                     }){
-                        VStack{
-                            Image(systemName: "doc")
+                        VStack {
+                            Image(systemName: "doc.text")
                                 .font(.largeTitle)
                             Text("Gallery")
                                 .font(.system(.title, design: .rounded))//.bold()
@@ -309,7 +343,7 @@ struct AddPanelHomepageView: View {
                             addPanelState = .camera
                         }
                     }){
-                        VStack{
+                        VStack {
                             Image(systemName: "camera")
                                 .font(.largeTitle)
                             Text("Camera")
@@ -360,13 +394,13 @@ struct AddPanelDetailView: View {
     var receipts: FetchedResults<Receipt>
     
     /// AddPanelType maintains and updates the add panels view state.
-    @Binding var addPanelState : AddPanelType
+    @Binding var addPanelState: AddPanelType
     /// The recognized text from scanning an image
-    @State var recognizedText : String = ""
+    @State var recognizedText: String = ""
     /// Whether the scan is valid or not, initially there is .noScan
-    @State var validScan : ValidScanType = .noScan
+    @State var validScan: ValidScanType = .noScan
     /// If a scan is not valid, this bool when set to true will trigger an alert
-    @State var validScanAlert : Bool = false
+    @State var validScanAlert: Bool = false
     
     var body: some View {
         VStack{
@@ -416,7 +450,7 @@ struct AddPanelDetailView: View {
                     addPanelState = .homepage
                 }
             }
-        }).alert(isPresented: $validScanAlert){
+        }).alert(isPresented: $validScanAlert) {
             Alert(
                 title: Text("Receipt Not Saved!"),
                 message: Text("This image is not valid. Try something else."),
@@ -430,7 +464,7 @@ struct AddPanelDetailView: View {
 /// - Main Parent: DashboardHomePageView
 struct SettingsView: View {
     /// Settings imports the UserSettings
-    @EnvironmentObject var settings : UserSettings
+    @EnvironmentObject var settings: UserSettings
     /// Fetches Receipt entities in CoreData sorting by the NSSortDescriptor.
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)],
@@ -490,7 +524,7 @@ struct SettingsView: View {
     }
 }
 
-
+/*
 /// Receipt view is the template receipt design, that starts minimized then after interaction expands to full size
 /// - Main Parent: ReceiptCollectionView
 struct ReceiptView: View {
@@ -577,17 +611,17 @@ struct ReceiptView: View {
             }
         )
     }
-}
+}*/
 
 /// Background view is the background of the application
 /// - Main Parent: ContentView
 struct BackgroundView: View {
     /// AddPanelType maintains and updates the add panels view state.
-    var addPanelState : AddPanelType
+    var addPanelState: AddPanelType
     /// DashPanelState maintains and updates the dashboards view state.
-    var dashPanelState : DashPanelType
+    var dashPanelState: DashPanelType
     /// Settings imports the UserSettings
-    @EnvironmentObject var settings : UserSettings
+    @EnvironmentObject var settings: UserSettings
     @State var colors = Color.getColors()
     
     var body: some View {
@@ -618,11 +652,11 @@ struct SearchBar: View {
     /// String holding the users current search input
     @Binding var userSearch: String
     /// Toggles whether the filters drop down menu is showing
-    @State var showingFilters : Bool = false
+    @State var showingFilters: Bool = false
     /// Placeholder for a filtered search setting
-    @Binding var warrenty : Bool
+    @Binding var warrenty: Bool
     /// Placeholder for a filtered search setting
-    @Binding var favorites : Bool
+    @Binding var favorites: Bool
     
     var body: some View {
         VStack {

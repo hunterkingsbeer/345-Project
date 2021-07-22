@@ -28,7 +28,7 @@ struct Prediction {
     /// Keywords for the retail category. Very generalized, needs refining in beta.
     static var retail = ["harvey norman", "noel leeming", "noel leemings",
                          "jb","hi-fi", "the warehouse", "the ware house",
-                         "hifi", "store", "department", "furniture", "tech",
+                         "hifi", "department", "furniture", "tech",
                          "technology", "smiths", "smiths city", "mall",
                          "stationery", "farmers", "gift", "gifts", "souvenirs",
                          "eletronics", "beds", "sport", "sports", "trade",
@@ -39,11 +39,11 @@ struct Prediction {
     
     /// Keywords for the clothing category.
     static var clothing = ["clothing", "toff's", "toffs", "second hand",
-                           "secondhand", "opshop", "restore", "outlet",
-                           "footwear", "shoes", "shoe", "sneaker",
-                           "sneakers", "boot", "boots", "jacket", "jackets",
-                           "puffer", "pant", "pantyhose", "shirt", "t-shirt",
-                           "pavement", "void", "huffer", "postie", "jean",
+                           "secondhand", "opshop", "outlet", "footwear",
+                           "shoes", "shoe", "sneaker", "sneakers", "boot",
+                           "boots", "jacket", "jackets", "puffer", "pant",
+                           "pantyhose", "shirt", "t-shirt", "pavement",
+                           "void", "huffer", "postie", "jean",
                            "postie plus", "postie+","amazon","cotton on",
                            "cottonon", "cotton:on", "hallenstein", "shorts",
                            "hallensteins", "barkers", "barker", "suit",

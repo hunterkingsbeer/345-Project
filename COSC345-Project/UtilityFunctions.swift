@@ -102,10 +102,8 @@ extension Folder {
     
     /// Boolean true if folder exists, false if not.
     static func folderExists(title: String) -> Bool {
-        for match in folderMatch {
-            if match.title.lowercased() == title.lowercased(){
-                return true
-            }
+        for match in folderMatch where match.title.lowercased() == title.lowercased() {
+            return true
         }
         return false
     }
@@ -180,10 +178,8 @@ extension Folder {
     /// Returns true if a folder with the input title exists.
     static func folderExists(folderTitle: String) -> Bool {
         let folders = Folder.getFolders()
-        for folder in folders {
-            if folder.title?.capitalized == folderTitle.capitalized {
+        for folder in folders where folder.title?.capitalized == folderTitle.capitalized {
                 return true
-            }
         }
         return false
     }
@@ -193,7 +189,6 @@ extension Folder {
         do {
             try  viewContext.save()
         } catch {
-            // TODO: Replace this implementation with code to handle the error appropriately.
             let nserror = error as NSError
             fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
         }
