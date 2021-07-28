@@ -16,6 +16,7 @@
 		5A3DCE24264490EB003442C3 /* COSC345_Project.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5A3DCE22264490EB003442C3 /* COSC345_Project.xcdatamodeld */; };
 		5A827F9926AFD958001A3E2D /* Folder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A827F9826AFD958001A3E2D /* Folder.swift */; };
 		5A827F9B26AFD98A001A3E2D /* Receipt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A827F9A26AFD98A001A3E2D /* Receipt.swift */; };
+		5A827F9D26B190B9001A3E2D /* Folder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A827F9C26B190B9001A3E2D /* Folder.swift */; };
 		5A8A7203265DCD6300786372 /* ScanDocumentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A8A7202265DCD6300786372 /* ScanDocumentView.swift */; };
 		5A8A7205265E059A00786372 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A8A7204265E059A00786372 /* ImagePicker.swift */; };
 		5AB20BC8265FC3F50055D2AD /* UtilityFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AB20BC7265FC3F50055D2AD /* UtilityFunctions.swift */; };
@@ -53,6 +54,7 @@
 		5A3DCE25264490EB003442C3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5A827F9826AFD958001A3E2D /* Folder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Folder.swift; sourceTree = "<group>"; };
 		5A827F9A26AFD98A001A3E2D /* Receipt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Receipt.swift; sourceTree = "<group>"; };
+		5A827F9C26B190B9001A3E2D /* Folder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Folder.swift; sourceTree = "<group>"; };
 		5A8A7202265DCD6300786372 /* ScanDocumentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanDocumentView.swift; sourceTree = "<group>"; };
 		5A8A7204265E059A00786372 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		5AB20BC7265FC3F50055D2AD /* UtilityFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UtilityFunctions.swift; sourceTree = "<group>"; };
@@ -127,6 +129,7 @@
 				5AC3EA1A266107D100891542 /* UserSettings.swift */,
 				5A827F9826AFD958001A3E2D /* Folder.swift */,
 				5A827F9A26AFD98A001A3E2D /* Receipt.swift */,
+				5A827F9C26B190B9001A3E2D /* Folder.swift */,
 			);
 			path = "COSC345-Project";
 			sourceTree = "<group>";
@@ -301,6 +304,7 @@
 				5A8A7203265DCD6300786372 /* ScanDocumentView.swift in Sources */,
 				5AB20BC8265FC3F50055D2AD /* UtilityFunctions.swift in Sources */,
 				5A3DCE18264490E7003442C3 /* COSC345_ProjectApp.swift in Sources */,
+				5A827F9D26B190B9001A3E2D /* Folder.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
