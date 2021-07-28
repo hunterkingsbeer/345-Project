@@ -14,6 +14,8 @@ jobs:
       CODACY_PROJECT_TOKEN: ${{ secrets.ACCESS_TOKEN }}
     steps:
     - uses: actions/checkout@v2
+    - name: Force Xcode 11
+      run: sudo xcode-select -switch /Applications/Xcode_11.3.app
     - name: Run tests
       run: xcodebuild test -scheme COSC345-ProjectTests -destination 'platform=iOS Simulator,OS=14.4,name=iPhone 11 Pro' -enableCodeCoverage YES;
     - name: Upload coverage to Codecov
