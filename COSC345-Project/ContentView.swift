@@ -191,7 +191,7 @@ struct DashboardHomepage: View {
                                     TagView(folder: folder)
                                 }
                             }
-                        }.buttonStyle(PlainButtonStyle())
+                        }.buttonStyle(ShrinkingButton())
                     }
                 }.padding(.horizontal)
             }//.cornerRadius(15)
@@ -244,6 +244,7 @@ struct SearchBar: View {
                                     userSearch = ""
                                 }){
                                     Image(systemName: "xmark")
+                                        .font(.system(size: 19, weight: .bold, design: .rounded))
                                 }
                             }
                         }.foregroundColor(Color(textColor(title: userSearch)))
@@ -362,7 +363,9 @@ struct ReceiptView: View {
                             Circle()
                                 .fill(Color.red)
                                 .overlay(Image(systemName: "xmark")
-                                            .foregroundColor(Color("background")))
+                                            .foregroundColor(Color("object"))
+                                            .font(.system(size: 15, weight: .bold, design: .rounded)))
+                                           
                                 .frame(width: UIScreen.screenHeight*0.035,
                                        height: UIScreen.screenHeight*0.035)
                                 .padding(8)
@@ -535,8 +538,8 @@ struct AddPanelDetailView: View {
                     .fill(Color.red)
                     .overlay(
                         Image(systemName: "xmark")
-                            .font(.system(.largeTitle, design: .rounded))
-                            .foregroundColor(Color("background"))
+                            .font(.system(size: 30, weight: .bold, design: .rounded))
+                            .foregroundColor(Color("object"))
                     ).frame(height: UIScreen.screenHeight*0.1)
             }.buttonStyle(ShrinkingButton())
             Spacer()
@@ -602,7 +605,7 @@ struct SettingsView: View  {
                         .frame(minWidth: 0, maxWidth: .infinity)
                         .background(Color("accent"))
                         .cornerRadius(10)
-                }.buttonStyle(PlainButtonStyle())
+                }.buttonStyle(ShrinkingButton())
                 Divider()
                 
                 Button(action: {
@@ -613,7 +616,7 @@ struct SettingsView: View  {
                         .frame(minWidth: 0, maxWidth: .infinity)
                         .background(Color("accent"))
                         .cornerRadius(10)
-                }.buttonStyle(PlainButtonStyle())
+                }.buttonStyle(ShrinkingButton())
                 Divider()
                 
                 Spacer()
