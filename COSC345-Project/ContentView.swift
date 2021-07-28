@@ -51,44 +51,38 @@ struct ContentView: View {
     @EnvironmentObject var settings : UserSettings
 
     var body: some View {
-        NavigationView {
-            ZStack(alignment: .top) {
-                // BACKGROUND BLOBS ------------------
-                BackgroundView(addPanelState: addPanelState,
-                               dashPanelState: dashPanelState)
+        ZStack(alignment: .top) {
+            // BACKGROUND BLOBS ------------------
+            BackgroundView(addPanelState: addPanelState,
+                           dashPanelState: dashPanelState)
+            
+            // COMPANY TITLE ------------------
+            VStack {
+                // DASHBOARD (UPPER) ------------------
+                if addPanelState == .homepage {
+                    DashboardPanelParent(dashPanelState: $dashPanelState)
+                        .padding(.bottom, dashPanelState != .expanded ? 12 : 0)
+                        .transition(AnyTransition.opacity
+                                        .combined(with: .scale(scale: 0.75)))
+                        
+                }
                 
-                // COMPANY TITLE ------------------
-                VStack {
-                    // DASHBOARD (UPPER) ------------------
-                    if addPanelState == .homepage {
-                        DashboardPanelParent(size: UIScreen.screenHeight * 0.74,
-                                             dashPanelState: $dashPanelState)
-                            .padding(.bottom, dashPanelState != .expanded ? 12 : 0)
-                            .transition(AnyTransition.opacity
-                                            .combined(with: .scale(scale: 0.75)))
-                            .animation(.spring())
-                    }
-                    
-                    // ADD RECEIPT (LOWER) ------------------
-                    if dashPanelState != .expanded {
-                        AddPanel(addPanelState: $addPanelState)
-                            .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.75)))
-                            .animation(.spring())
-                        Spacer()
-                    }
-                }.ignoresSafeArea(.keyboard)
-                .padding(.horizontal, addPanelState == .homepage ? 15 : 0)
-            }.navigationBarTitle("").navigationBarHidden(true)
-            .colorScheme(settings.darkMode ? .dark : .light)
-        }
+                // ADD RECEIPT (LOWER) ------------------
+                if dashPanelState != .expanded {
+                    AddPanelParent(addPanelState: $addPanelState)
+                        .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.75)))
+                        .animation(.spring())
+                    Spacer()
+                }
+            }.ignoresSafeArea(.keyboard) // broken code, find fix
+            .padding(.horizontal, addPanelState == .homepage ? 15 : 0)
+        }.colorScheme(settings.darkMode ? .dark : .light)
     }
 }
 
 /// DashboardPanelParent handles the view states for the dashboard panel
 /// - Main Parent: ContentView
-struct DashboardPanelParent: View{
-    /// The fixed size of the Dashboard panel
-    let size: CGFloat
+struct DashboardPanelParent: View {
     /// DashPanelState maintains and updates the dashboards view state.
     @Binding var dashPanelState: DashPanelType
     /// Settings imports the UserSettings
@@ -221,10 +215,88 @@ struct DashboardHomepage: View {
     }
 }
 
+/// Generic Search bar that returns the search term and filter booleans
+struct SearchBar: View {
+    /// String holding the users current search input
+    @Binding var userSearch: String
+    /// Toggles whether the filters drop down menu is showing
+    @State var showingFilters: Bool = false
+    /// Placeholder for a filtered search setting
+    @Binding var warrenty: Bool
+    /// Placeholder for a filtered search setting
+    @Binding var favorites: Bool
+    
+    var body: some View {
+        let folderExists = folderExists()
+        VStack {
+            HStack {
+                RoundedRectangle(cornerRadius: 18)
+                    .fill(Color(getColor(title: userSearch)))
+                    .frame(height: UIScreen.screenHeight*0.05).frame(minWidth: 0, maxWidth: .infinity)
+                    .overlay(
+                        HStack {
+                            Image(systemName: folderExists ? Folder.getIcon(title: userSearch) : "magnifyingglass")
+                            CustomTextField(placeholder: Text("Search..."),text: $userSearch)
+                                .ignoresSafeArea(.keyboard)
+                            Spacer()
+                            if userSearch.count > 0 {
+                                Button(action: {
+                                    userSearch = ""
+                                }){
+                                    Image(systemName: "xmark")
+                                }
+                            }
+                        }.foregroundColor(Color(textColor(title: userSearch)))
+                        .font(
+                            .system(size: 20,
+                                    weight: folderExists ? .bold : .regular,
+                                    design: .rounded))
+                        .padding(.horizontal, 10)
+                )
+                Button(action:{
+                    showingFilters = showingFilters ? false : true
+                }){
+                    Image(systemName: "slider.horizontal.3")
+                        .font(.title)
+                        .foregroundColor(Color("text"))
+                }.buttonStyle(ShrinkingButton())
+            }.padding(.bottom, 1)
+            
+            if showingFilters {
+                VStack {
+                    Group {
+                        Toggle(" ", isOn: $warrenty)
+                    }.foregroundColor(.black).font(.system(.body, design: .rounded))
+                }.padding(.horizontal, 5)
+            }
+        }
+    }
+    
+    func getColor(title: String) -> String {
+        if folderExists() {
+            return Folder.getColor(title: title)
+        } else {
+            return "accent"
+        }
+    }
+    
+    func textColor(title: String) -> String {
+        if folderExists() {
+            return "background"
+        } else {
+            return "text"
+        }
+    }
+    func folderExists() -> Bool {
+        return Folder.folderExists(title: userSearch)
+    }
+}
+
 /// Tag/Folder
 struct TagView: View {
-    let folder: Folder
+    @ObservedObject var folder: Folder
     var body: some View {
+        let color: String = Folder.getColor(title: folder.title ?? "default")
         RoundedRectangle(cornerRadius: 15)
             .fill(Color(Folder.getColor(title: folder.title ?? "default")))
             .overlay(
@@ -269,13 +341,46 @@ struct ReceiptView: View {
                     Spacer()
                 }.padding(10)
             ).frame(height: UIScreen.screenHeight * 0.08)
+            .onTapGesture {
+                selected.toggle()
+            }.onLongPressGesture(minimumDuration: 0.25, maximumDistance: 2, perform: {
+                pendingDelete.toggle()
+            }).onChange(of: pendingDelete, perform: { _ in
+                withAnimation(.spring()){
+                    if pendingDelete == true {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            pendingDelete = false // turns off delete button after 2 secs
+                        }
+                    }
+                }
+            })
+            .overlay( // the delete button
+                VStack {
+                    if pendingDelete == true {
+                        HStack {
+                            Spacer()
+                            Circle()
+                                .fill(Color.red)
+                                .overlay(Image(systemName: "xmark")
+                                            .foregroundColor(Color("background")))
+                                .frame(width: UIScreen.screenHeight*0.035,
+                                       height: UIScreen.screenHeight*0.035)
+                                .padding(8)
+                                .onTapGesture {
+                                    Receipt.delete(receipt: receipt)
+                                }
+                        }
+                        Spacer()
+                    }
+                }
+            )
     }
 }
 
 
 /// AddPanel handles the visibility of the various add panel views.
 /// - Main Parent: ContentView
-struct AddPanel: View {
+struct AddPanelParent: View {
     /// AddPanelType maintains and updates the add panels view state.
     @Binding var addPanelState: AddPanelType
     @State var showAddButtons: Bool = false
@@ -299,7 +404,7 @@ struct AddPanel: View {
                     }
                 }
             ).foregroundColor(.black).animation(.easeInOut)
-            .frame(height: UIScreen.screenHeight * (addPanelState == .homepage ? showAddButtons ? 0.12 : 0.1 : 0.9))
+            .frame(height: UIScreen.screenHeight * (addPanelState == .homepage ? (showAddButtons ? 0.12 : 0.1) : 0.9))
             .animation(.spring())
     }
 }
@@ -357,7 +462,8 @@ struct AddPanelHomepageView: View {
                 }
             } else {
                 Button(action:{
-                    showAddButtons.toggle()
+                    showAddButtons = true
+                    
                 }){
                     Image(systemName: "plus")
                         .font(.largeTitle)
@@ -386,12 +492,6 @@ enum ValidScanType {
 /// AddPanelDetailView shows the expanded Add Panel with respect to the AddPanelState
 /// - Main Parent: AddPanel
 struct AddPanelDetailView: View {
-    /// Fetches receipts entities in CoreData sorting by the NSSortDescriptor.
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)],
-        animation: .spring())
-    /// Stores the fetched results as an array of Receipt objects.
-    var receipts: FetchedResults<Receipt>
     
     /// AddPanelType maintains and updates the add panels view state.
     @Binding var addPanelState: AddPanelType
@@ -436,7 +536,7 @@ struct AddPanelDetailView: View {
                     .overlay(
                         Image(systemName: "xmark")
                             .font(.system(.largeTitle, design: .rounded))
-                            .foregroundColor(.white)
+                            .foregroundColor(Color("background"))
                     ).frame(height: UIScreen.screenHeight*0.1)
             }.buttonStyle(ShrinkingButton())
             Spacer()
@@ -462,16 +562,14 @@ struct AddPanelDetailView: View {
 
 /// SettingsView displays the settings menu
 /// - Main Parent: DashboardHomePageView
-struct SettingsView: View {
-    /// Settings imports the UserSettings
-    @EnvironmentObject var settings: UserSettings
+struct SettingsView: View  {
     /// Fetches Receipt entities in CoreData sorting by the NSSortDescriptor.
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)],
-        animation: .spring())
+    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)], animation: .spring())
     /// Stores the fetched results as an array of Receipt objects.
     var receipts: FetchedResults<Receipt>
-    
+    /// Settings imports the UserSettings
+    @EnvironmentObject var settings: UserSettings
+   
     var body: some View {
         ScrollView(showsIndicators: false){
             VStack (alignment: .leading){
@@ -644,83 +742,5 @@ struct BackgroundView: View {
                 }
             }
         }.animation(.easeInOut)
-    }
-}
-
-/// Generic Search bar that returns the search term and filter booleans
-struct SearchBar: View {
-    /// String holding the users current search input
-    @Binding var userSearch: String
-    /// Toggles whether the filters drop down menu is showing
-    @State var showingFilters: Bool = false
-    /// Placeholder for a filtered search setting
-    @Binding var warrenty: Bool
-    /// Placeholder for a filtered search setting
-    @Binding var favorites: Bool
-    
-    var body: some View {
-        VStack {
-            HStack {
-                RoundedRectangle(cornerRadius: 18)
-                    .fill(Color(getColor(title: userSearch)))
-                    .frame(height: UIScreen.screenHeight*0.05).frame(minWidth: 0, maxWidth: .infinity)
-                    .overlay(
-                        HStack {
-                            Image(systemName: folderExists() ? "folder" : "magnifyingglass")
-                            CustomTextField(placeholder: Text("Search..."),text: $userSearch)
-                                .ignoresSafeArea(.keyboard)
-                            Spacer()
-                            if userSearch.count > 0{
-                                Button(action: {
-                                    userSearch = ""
-                                }){
-                                    Image(systemName: "xmark")
-                                }
-                            }
-                        }.foregroundColor(Color(textColor(title: userSearch)))
-                        .font(
-                            .system(size: 20,
-                                    weight: folderExists() ? .bold : .regular,
-                                    design: .rounded))
-                        .padding(.horizontal, 10)
-                )
-                Button(action:{
-                    showingFilters = showingFilters ? false : true
-                }){
-                    Image(systemName: "slider.horizontal.3")
-                        .font(.title)
-                        .foregroundColor(Color("text"))
-                }.buttonStyle(ShrinkingButton())
-            }.padding(.bottom, 1)
-            
-            if showingFilters {
-                VStack {
-                    Group {
-                        Toggle(" ", isOn: $warrenty)
-                        //Toggle("Warrenty", isOn: $warrenty)  not working yet
-                        //Toggle("Favorites", isOn: $favorites)
-                    }.foregroundColor(.black).font(.system(.body, design: .rounded))
-                }.padding(.horizontal, 5)
-            }
-        }
-    }
-    
-    func getColor(title: String) -> String {
-        if folderExists() {
-            return Folder.getColor(title: title)
-        } else {
-            return "accent"
-        }
-    }
-    
-    func textColor(title: String) -> String {
-        if folderExists() {
-            return "background"
-        } else {
-            return "text"
-        }
-    }
-    func folderExists() -> Bool {
-        return Folder.folderExists(title: userSearch)
     }
 }

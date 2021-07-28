@@ -23,9 +23,30 @@ struct PersistenceController {
         let newFolder = Folder(context: viewContext)
         newFolder.title = "groceries".capitalized
         newFolder.color = "green"
-        newFolder.icon = "folder"
+        newFolder.icon = "cart"
         newFolder.id = UUID()
         newFolder.favorite = false
+        
+        let newFolder1 = Folder(context: viewContext)
+        newFolder1.title = "retail".capitalized
+        newFolder1.color = "blue"
+        newFolder1.icon = "tag"
+        newFolder1.id = UUID()
+        newFolder1.favorite = false
+        
+        let newFolder2 = Folder(context: viewContext)
+        newFolder2.title = "clothing".capitalized
+        newFolder2.color = "pink"
+        newFolder2.icon = "bag"
+        newFolder2.id = UUID()
+        newFolder2.favorite = false
+        
+        let newFolder3 = Folder(context: viewContext)
+        newFolder3.title = "default".capitalized
+        newFolder3.color = "white"
+        newFolder3.icon = "folder"
+        newFolder3.id = UUID()
+        newFolder3.favorite = false
         
         save(viewContext: viewContext)
         
@@ -35,7 +56,7 @@ struct PersistenceController {
             newReceipt.date = Date()
             newReceipt.id = UUID()
             newReceipt.store = "Example Store"
-            newReceipt.folder = Prediction.predictFolderType(text: ((newReceipt.store ?? "") + (newReceipt.body ?? "")))
+            newReceipt.folder = Prediction.pointPrediction(text: ((newReceipt.store ?? "") + (newReceipt.body ?? "")))
             newReceipt.tags = "tag1,tag2,tag3,tag4"
             newReceipt.warrenty = ""
             newReceipt.total = Double(index)
