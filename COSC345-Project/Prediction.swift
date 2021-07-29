@@ -82,7 +82,7 @@ struct Prediction {
                                
                                    (title: "retail",
                                     keywords: ["harvey norman", "noel leeming", "noel leemings",
-                                                "jb","hi-fi", "the warehouse", "the ware house",
+                                                "jb", "hi-fi", "the warehouse", "the ware house",
                                                 "hifi", "department", "furniture", "tech",
                                                 "technology", "smiths", "smiths city", "mall",
                                                 "stationery", "farmers", "gift", "gifts", "souvenirs",
