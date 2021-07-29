@@ -16,7 +16,7 @@ struct ImagePicker: UIViewControllerRepresentable {
     /// Recognized text from the scan
     @Binding var recognizedText: String
     /// Returns if the scan contains a minimum number of words.
-    @Binding var validScan : ValidScanType
+    @Binding var validScan: ValidScanType
     
     func makeUIViewController(context: UIViewControllerRepresentableContext<ImagePicker>) -> UIImagePickerController {
         let imagePicker = UIImagePickerController()
@@ -43,7 +43,7 @@ struct ImagePicker: UIViewControllerRepresentable {
         }
         
         /// Controller for ImagePicker.
-        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
             
             if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
                 //parent.selectedImage = image

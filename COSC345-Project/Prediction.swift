@@ -66,7 +66,8 @@ struct Prediction {
     
     /// Collections of keywords associated with each category.
     /// Format : [("TitleOfCategory1", ["key", "words"]), ("TitleOfCategory2", ["key", "words"])]
-    static let categoryKeywords = [(title: "groceries", keywords: ["grocer", "grocery", "supermarket", "market",
+    static let categoryKeywords = [(title: "groceries",
+                                    keywords: ["grocer", "grocery", "supermarket", "market",
                                               "grcoeries", "new world", "countdown", "veggie boys",
                                               "veggieboys", "count down", "newworld", "food town",
                                               "foodtown", "unimart", "uni mart", "kosco",
@@ -79,28 +80,30 @@ struct Prediction {
                                               "butcher", "butchers", "butchery", "chicken",
                                               "beef", "pork", "milk", "cheese", "sauce"]),
                                
-                                   (title: "retail", keywords: ["harvey norman", "noel leeming", "noel leemings",
-                                                    "jb","hi-fi", "the warehouse", "the ware house",
-                                                    "hifi", "department", "furniture", "tech",
-                                                    "technology", "smiths", "smiths city", "mall",
-                                                    "stationery", "farmers", "gift", "gifts", "souvenirs",
-                                                    "eletronics", "beds", "sport", "sports", "trade",
-                                                    "flooring", "bathrooms", "bed", "bedding", "outlet",
-                                                    "post", "world", "craft", "crafts", "supply",
-                                                    "garden", "stihl", "appliance", "headphone", "phone",
-                                                    "computer", "laptop", "watch"]),
+                                   (title: "retail",
+                                    keywords: ["harvey norman", "noel leeming", "noel leemings",
+                                                "jb","hi-fi", "the warehouse", "the ware house",
+                                                "hifi", "department", "furniture", "tech",
+                                                "technology", "smiths", "smiths city", "mall",
+                                                "stationery", "farmers", "gift", "gifts", "souvenirs",
+                                                "eletronics", "beds", "sport", "sports", "trade",
+                                                "flooring", "bathrooms", "bed", "bedding", "outlet",
+                                                "post", "world", "craft", "crafts", "supply",
+                                                "garden", "stihl", "appliance", "headphone", "phone",
+                                                "computer", "laptop", "watch"]),
                                
-                                   (title: "clothing", keywords: ["clothing", "toff's", "toffs", "second hand",
-                                                      "secondhand", "opshop", "outlet", "footwear",
-                                                      "shoes", "shoe", "sneaker", "sneakers", "boot",
-                                                      "boots", "jacket", "jackets", "puffer", "pant",
-                                                      "pantyhose", "shirt", "t-shirt", "pavement",
-                                                      "void", "huffer", "postie", "jean",
-                                                      "postie plus", "postie+", "amazon", "cotton on",
-                                                      "cottonon", "cotton:on", "hallenstein", "shorts",
-                                                      "hallensteins", "barkers", "barker", "suit",
-                                                      "sweater", "sweatshirt", "sweatshirts", "hood",
-                                                      "hoodie", "hoody", "swimsuit", "bikini", "tee"])
+                                   (title: "clothing",
+                                    keywords: ["clothing", "toff's", "toffs", "second hand",
+                                              "secondhand", "opshop", "outlet", "footwear",
+                                              "shoes", "shoe", "sneaker", "sneakers", "boot",
+                                              "boots", "jacket", "jackets", "puffer", "pant",
+                                              "pantyhose", "shirt", "t-shirt", "pavement",
+                                              "void", "huffer", "postie", "jean",
+                                              "postie plus", "postie+", "amazon", "cotton on",
+                                              "cottonon", "cotton:on", "hallenstein", "shorts",
+                                              "hallensteins", "barkers", "barker", "suit",
+                                              "sweater", "sweatshirt", "sweatshirts", "hood",
+                                              "hoodie", "hoody", "swimsuit", "bikini", "tee"])
     ]
     
     /// Searches through keywordLists. Checking the title (category.0) until it matches, upon which it returns said category.

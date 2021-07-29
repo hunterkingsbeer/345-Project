@@ -15,7 +15,7 @@ struct AddPanelParent: View {
     /// AddPanelType maintains and updates the add panels view state.
     @Binding var addPanelState: AddPanelType
     @State var showAddButtons: Bool = false
-    
+
     var body: some View {
         RoundedRectangle(cornerRadius: 25)
             .shadow(color: (Color(.black)).opacity(0.15), radius: 5, x: 0, y: 0)
@@ -92,7 +92,7 @@ struct AddPanelHomepageView: View {
                     Spacer()
                 }
             } else {
-                Button(action:{
+                Button(action: { 
                     showAddButtons = true
                     
                 }){
@@ -135,7 +135,7 @@ struct AddPanelDetailView: View {
     
     var body: some View {
         VStack{
-            if addPanelState == .camera {
+            if addPanelState == .camera { 
                 Text("Scan using Camera")
                     .font(.system(.title, design: .rounded))
                     .padding(.bottom, 5)

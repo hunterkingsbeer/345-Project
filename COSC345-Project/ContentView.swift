@@ -8,7 +8,6 @@
 import SwiftUI
 import CoreData
 
-
 // -------------------------------------------------------------------------- PREVIEW
 /// ContentView_Previews is what xCode uses to preview the app in the IDE.
 struct ContentView_Previews: PreviewProvider {
@@ -48,7 +47,7 @@ struct ContentView: View {
     /// DashPanelState maintains and updates the dashboards view state.
     @State var dashPanelState: DashPanelType = .homepage
     /// Settings imports the UserSettings
-    @EnvironmentObject var settings : UserSettings
+    @EnvironmentObject var settings: UserSettings
 
     var body: some View {
         ZStack(alignment: .top) {

@@ -166,7 +166,7 @@ struct SearchBar: View {
                     .overlay(
                         HStack {
                             Image(systemName: folderExists ? Folder.getIcon(title: userSearch) : "magnifyingglass")
-                            CustomTextField(placeholder: Text("Search..."),text: $userSearch)
+                            CustomTextField(placeholder: Text("Search..."), text: $userSearch)
                                 .ignoresSafeArea(.keyboard)
                             Spacer()
                             if userSearch.count > 0 {
@@ -184,7 +184,7 @@ struct SearchBar: View {
                                     design: .rounded))
                         .padding(.horizontal, 10)
                 )
-                Button(action:{
+                Button(action: {
                     showingFilters = showingFilters ? false : true
                 }){
                     Image(systemName: "slider.horizontal.3")
