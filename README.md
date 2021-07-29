@@ -1,4 +1,6 @@
 # Receipted.
+[![PublishDocumentation](https://github.com/hunterkingsbeer/345-Project/actions/workflows/main.yml/badge.svg)](https://github.com/hunterkingsbeer/345-Project/actions/workflows/main.yml) [![PublishDocumentation](https://github.com/hunterkingsbeer/345-Project/actions/workflows/swift.yml/badge.svg)](https://github.com/hunterkingsbeer/345-Project/actions/workflows/swift.yml) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/f50d2c33986744c68b1372ff88f9b8d6)](https://www.codacy.com/gh/hunterkingsbeer/345-Project/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hunterkingsbeer/345-Project&amp;utm_campaign=Badge_Grade)
+
 Receipted is a receipt scanning application that intuitively categorizes receipts based on the body text within. 
 Made for COSC345's full year project. 
 
@@ -16,6 +18,3 @@ Jack Heikell, and
 Kane Colvin.
 
 ### [Documentation](https://hunterkingsbeer.github.io/345-Project/index.html)
-
-### Tests: 
-[![PublishDocumentation](https://github.com/hunterkingsbeer/345-Project/actions/workflows/main.yml/badge.svg)](https://github.com/hunterkingsbeer/345-Project/actions/workflows/main.yml) [![PublishDocumentation](https://github.com/hunterkingsbeer/345-Project/actions/workflows/swift.yml/badge.svg)](https://github.com/hunterkingsbeer/345-Project/actions/workflows/swift.yml)
