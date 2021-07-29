@@ -31,7 +31,7 @@ extension Receipt {
     
     /// Deletes a Receipt object.
     static func delete(receipt: Receipt) {
-        if Folder.folderExists(folderTitle: receipt.folder ?? "Default"){
+        if Folder.folderExists(folderTitle: receipt.folder ?? "Default"){ 
             Folder.getFolder(folderTitle: receipt.folder ?? "Default").receiptCount -= 1
             Folder.ifEmptyDelete(folderTitle: receipt.folder ?? "")
         }

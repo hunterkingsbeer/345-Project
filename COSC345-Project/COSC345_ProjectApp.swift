@@ -17,7 +17,6 @@ struct COSC345_ProjectApp: App {
             ContentView()
                 .environmentObject(UserSettings())
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
-            
         }
     }
 }

@@ -17,7 +17,6 @@ struct ScanDocumentView: UIViewControllerRepresentable {
     /// Returns if the scan contains a minimum number of words
     @Binding var validScan: ValidScanType
     
-    
     func makeCoordinator() -> Coordinator {
         Coordinator(recognizedText: $recognizedText, parent: self, validScan: $validScan)
     }

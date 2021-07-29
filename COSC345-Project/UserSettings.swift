@@ -38,7 +38,7 @@ class UserSettings: ObservableObject {
     /// Default settings.
     init() {
         /// Dark mode.
-        self.darkMode = UserDefaults.standard.object(forKey: "darkMode") as? Bool ?? true 
+        self.darkMode = UserDefaults.standard.object(forKey: "darkMode") as? Bool ?? true
         /// Mimimal mode.
         self.minimal = UserDefaults.standard.object(forKey: "minimal") as? Bool ?? false
         /// High contrast mode.

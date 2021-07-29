@@ -17,7 +17,7 @@ struct ImagePicker: UIViewControllerRepresentable {
     @Binding var recognizedText: String
     /// Returns if the scan contains a minimum number of words.
     @Binding var validScan : ValidScanType
-
+    
     func makeUIViewController(context: UIViewControllerRepresentableContext<ImagePicker>) -> UIImagePickerController {
         let imagePicker = UIImagePickerController()
         imagePicker.allowsEditing = false
@@ -33,7 +33,6 @@ struct ImagePicker: UIViewControllerRepresentable {
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
-    
     
     final class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
         
