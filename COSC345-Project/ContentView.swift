@@ -227,7 +227,7 @@ struct SearchBar: View {
     @Binding var favorites: Bool
     
     var body: some View {
-        let folderExists = folderExists()
+        let folderExists = folderDoesExist()
         VStack {
             HStack {
                 RoundedRectangle(cornerRadius: 18)
@@ -274,7 +274,7 @@ struct SearchBar: View {
     }
     
     func getColor(title: String) -> String {
-        if folderExists() {
+        if folderDoesExist() {
             return Folder.getColor(title: title)
         } else {
             return "accent"
@@ -282,13 +282,13 @@ struct SearchBar: View {
     }
     
     func textColor(title: String) -> String {
-        if folderExists() {
+        if folderDoesExist() {
             return "background"
         } else {
             return "text"
         }
     }
-    func folderExists() -> Bool {
+    func folderDoesExist() -> Bool {
         return Folder.folderExists(title: userSearch)
     }
 }
@@ -297,7 +297,7 @@ struct SearchBar: View {
 struct TagView: View {
     @ObservedObject var folder: Folder
     var body: some View {
-        let color: String = Folder.getColor(title: folder.title ?? "default")
+        //let color: String = Folder.getColor(title: folder.title ?? "default")
         RoundedRectangle(cornerRadius: 15)
             .fill(Color(Folder.getColor(title: folder.title ?? "default")))
             .overlay(

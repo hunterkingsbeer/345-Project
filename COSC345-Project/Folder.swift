@@ -92,7 +92,6 @@ extension Folder {
             viewContext.delete(folder)
             save()
         }
-        
     }
     
     /// Deletes an input folder if empty.
