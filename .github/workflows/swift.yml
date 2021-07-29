@@ -1,5 +1,4 @@
-name: Swift
-
+name: Codecov/Tests
 on:
   push:
     branches: [ main ]
@@ -21,16 +20,4 @@ jobs:
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1.2.1
       
-#     - name: Archive code coverage results
-#     - uses: actions/upload-artifact@v2
-#       with:
-#           name: code-coverage-report
-#           path: /Users/runner/Library/Developer/Xcode/DerivedData/COSC345-Project-fbgeqhdeqvqzbsfydxlorjctniwm/Logs/Test/Test-COSC345-ProjectTests-2021.07.29_00-01-33-+0000.xcresult
-          
-#     - name: install swiftLint
-#       run: brew install swiftlint
-#       run: swiftlint
-#     - name: Upload coverage to Codacy
-#       run: bash <(curl -Ls https://coverage.codacy.com/get.sh);
-  
 
