@@ -39,8 +39,8 @@ struct ShrinkingButton: ButtonStyle {
 struct CustomTextField: View {
     var placeholder: Text
     @Binding var text: String
-    var editingChanged: (Bool)->() = { _ in }
-    var commit: ()->() = { }
+    var editingChanged: (Bool)->Void = { _ in }
+    var commit: ()->Void = { }
 
     var body: some View {
         ZStack(alignment: .leading) {
