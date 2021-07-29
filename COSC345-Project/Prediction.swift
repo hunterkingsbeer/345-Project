@@ -24,12 +24,10 @@ struct Prediction {
         // Holds the index of the prediction with most matches. Format =(count, index)
         var bestPrediction = (title: "Default", matches: 0)
         
-        for prediction in predictedTypes {
-            if prediction.matches > bestPrediction.matches {
-                // if current prediction has higher num of matches, becomes new highest index
-                bestPrediction.title = prediction.title.capitalized
-                bestPrediction.matches = prediction.matches
-            }
+        for prediction in predictedTypes where prediction.matches > bestPrediction.matches {
+            // if current prediction has higher num of matches, becomes new highest index
+            bestPrediction.title = prediction.title.capitalized
+            bestPrediction.matches = prediction.matches
         }
         // return prediction with highest num of matches
         print("Final Prediction: \(bestPrediction.title)")

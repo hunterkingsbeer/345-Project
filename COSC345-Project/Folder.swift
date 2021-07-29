@@ -7,6 +7,29 @@
 
 import Foundation
 import CoreData
+import SwiftUI
+
+/// Tag/Folder
+struct TagView: View {
+    @ObservedObject var folder: Folder
+    var body: some View {
+        //let color: String = Folder.getColor(title: folder.title ?? "default")
+        RoundedRectangle(cornerRadius: 15)
+            .fill(Color(Folder.getColor(title: folder.title ?? "default")))
+            .overlay(
+                HStack {
+                    Image(systemName: folder.icon ?? "folder")
+                    Text("\(folder.receiptCount) \(folder.title ?? " Default")")
+                    Spacer()
+                }.font(.system(size: 16, weight: .bold, design: .rounded))
+                .foregroundColor(Color("background"))
+                .padding(.horizontal, 10)
+                .minimumScaleFactor(0.8).lineLimit(1)
+            )
+            .frame(minWidth: UIScreen.screenWidth * 0.4)
+            .frame(height: UIScreen.screenHeight*0.05)
+    }
+}
 
 /// Extension of the Folder object
 extension Folder {
@@ -18,30 +41,24 @@ extension Folder {
     
     /// Retreives the icon of a folder based on it's title.
     static func getIcon(title: String) -> String {
-        for match in folderMatch {
-            if match.title.lowercased() == title.lowercased() {
-                return match.icon.lowercased()
-            }
+        for match in folderMatch where match.title.lowercased() == title.lowercased(){
+            return match.icon.lowercased()
         }
         return "folder".lowercased()
     }
     
     /// Retreives the colour of a folder based on it's title.
     static func getColor(title: String) -> String {
-        for match in folderMatch {
-            if match.title.lowercased() == title.lowercased() {
-                return match.color.lowercased()
-            }
+        for match in folderMatch where match.title.lowercased() == title.lowercased(){
+            return match.color.lowercased()
         }
         return "text"
     }
     
     /// Boolean true if folder exists, false if not.
     static func folderExists(title: String) -> Bool {
-        for match in folderMatch {
-            if match.title.lowercased() == title.lowercased(){
-                return true
-            }
+        for match in folderMatch where match.title.lowercased() == title.lowercased() {
+            return true
         }
         return false
     }
@@ -62,10 +79,8 @@ extension Folder {
     
     /// Returns the folder matching the input title
     static func getFolder(folderTitle: String) -> Folder {
-        for folder in getFolders() {
-            if folder.title == folderTitle.capitalized {
-                return folder
-            }
+        for folder in getFolders() where folder.title == folderTitle.capitalized {
+            return folder
         }
         return Folder()
     }
@@ -115,10 +130,8 @@ extension Folder {
     /// Returns true if a folder with the input title exists.
     static func folderExists(folderTitle: String) -> Bool {
         let folders = Folder.getFolders()
-        for folder in folders {
-            if folder.title?.capitalized == folderTitle.capitalized {
-                return true
-            }
+        for folder in folders where folder.title?.capitalized == folderTitle.capitalized {
+            return true
         }
         return false
     }
