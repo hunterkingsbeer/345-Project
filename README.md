@@ -13,9 +13,7 @@ To use the camera or gallery, you must have a physical phone.
 Start the app using the Xcode simulator running an iOS phone.
 To generate random receipts, tap the settings icon and press the "generate receipts" button to generate 10 receipts. Tapping the settings button again will bring you back to the home page, where you can now view the entries.
 
-### [Documentation](https://hunterkingsbeer.github.io/345-Project/index.html)
-
-### Team members:
+### Our Team:
 Hunter Kingsbeer - Engineering and Team Lead.
 
 Tane Carney-Stirling - Testing and Technical Director.
@@ -23,3 +21,5 @@ Tane Carney-Stirling - Testing and Technical Director.
 Caitlin Jillybelle - Design and Research Director.
 
 Rhys Davie - Administration and Content Coordinator.
+
+### [Documentation](https://hunterkingsbeer.github.io/345-Project/index.html)
