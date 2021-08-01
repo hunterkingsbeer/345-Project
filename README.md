@@ -18,7 +18,7 @@ Hunter Kingsbeer - Engineering and Team Lead.
 
 Tane Carney-Stirling - Testing and Technical Director.
 
-Caitlin Jellybelle - Design and Research Director.
+Caitlin Jillybelle - Design and Research Director.
 
 Rhys Davie - Administration and Content Coordinator.
 
