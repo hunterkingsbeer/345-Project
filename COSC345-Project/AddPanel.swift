@@ -110,15 +110,7 @@ struct AddPanelHomepageView: View {
     }
 }
 
-/// ValidScanType holds the different cases for handling the input of a scan.
-enum ValidScanType {
-    /// no scan has been input.
-    case noScan
-    /// A valid scan has been input.
-    case validScan
-    /// An invalid scan has been input.
-    case invalidScan
-}
+
 
 /// AddPanelDetailView shows the expanded Add Panel with respect to the AddPanelState
 /// - Main Parent: AddPanel
@@ -140,8 +132,7 @@ struct AddPanelDetailView: View {
                     .font(.system(.title, design: .rounded))
                     .padding(.bottom, 5)
                 if !UIDevice.current.isSimulator {
-                    ScanDocumentView(recognizedText: self.$recognizedText,
-                                     validScan: $validScan)
+                    ScanDocumentView(recognizedText: self.$recognizedText, validScan: $validScan)
                     .cornerRadius(18)
                     .animation(.spring())
                 } else {

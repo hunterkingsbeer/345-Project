@@ -14,8 +14,6 @@ import CoreData
 struct DashboardPanelParent: View {
     /// DashPanelState maintains and updates the dashboards view state.
     @Binding var dashPanelState: DashPanelType
-    /// Settings imports the UserSettings
-    @EnvironmentObject var settings: UserSettings
     
     var body: some View {
         RoundedRectangle(cornerRadius: 25)
@@ -169,7 +167,7 @@ struct SearchBar: View {
                             CustomTextField(placeholder: Text("Search..."), text: $userSearch)
                                 .ignoresSafeArea(.keyboard)
                             Spacer()
-                            if userSearch.count > 0 {
+                            if userSearch != "" {
                                 Button(action: {
                                     userSearch = ""
                                 }){
@@ -220,67 +218,5 @@ struct SearchBar: View {
     }
     func folderDoesExist() -> Bool {
         return Folder.folderExists(title: userSearch)
-    }
-}
-
-/// SettingsView displays the settings menu
-/// - Main Parent: DashboardHomePageView
-struct SettingsView: View  {
-    /// Fetches Receipt entities in CoreData sorting by the NSSortDescriptor.
-    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)], animation: .spring())
-    /// Stores the fetched results as an array of Receipt objects.
-    var receipts: FetchedResults<Receipt>
-    /// Settings imports the UserSettings
-    @EnvironmentObject var settings: UserSettings
-   
-    var body: some View {
-        ScrollView(showsIndicators: false){
-            VStack (alignment: .leading){
-                VStack{
-                    Toggle("Dark Mode", isOn: $settings.darkMode)
-                    .contentShape(Rectangle())
-                    Divider()
-                    
-                    Toggle("Minimal Mode", isOn: $settings.minimal)
-                    .contentShape(Rectangle())
-                    Divider()
-                    
-                    Toggle("Contrast Mode", isOn: $settings.contrast)
-                    .contentShape(Rectangle())
-                    Divider()
-                    
-                    Picker("Background Color", selection: $settings.style) {
-                        ForEach(0..<Color.getColors().count){ color in
-                            Text("Style \(color+1)").tag(color)
-                        }
-                    }.pickerStyle(SegmentedPickerStyle())
-                    Divider()
-                }
-                
-                Button(action: {
-                    Receipt.generateRandomReceipts()
-                }){
-                    Text("Generate Receipts")
-                        .padding(.vertical, 10)
-                        .frame(minWidth: 0, maxWidth: .infinity)
-                        .background(Color("accent"))
-                        .cornerRadius(10)
-                }.buttonStyle(ShrinkingButton())
-                Divider()
-                
-                Button(action: {
-                    Receipt.deleteAll(receipts: receipts)
-                }){
-                    Text("Delete All")
-                        .padding(.vertical, 10)
-                        .frame(minWidth: 0, maxWidth: .infinity)
-                        .background(Color("accent"))
-                        .cornerRadius(10)
-                }.buttonStyle(ShrinkingButton())
-                Divider()
-                
-                Spacer()
-            }.frame(minWidth: 0, maxWidth: .infinity).padding()
-        }
     }
 }
