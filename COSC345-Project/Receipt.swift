@@ -43,8 +43,8 @@ struct ReceiptView: View {
             }).onChange(of: pendingDelete, perform: { _ in
                 withAnimation(.spring()){
                     if pendingDelete == true {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            pendingDelete = false // turns off delete button after 2 secs
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                            pendingDelete = false // turns off delete button after 3 secs
                         }
                     }
                 }
@@ -57,7 +57,7 @@ struct ReceiptView: View {
                             Circle()
                                 .fill(Color.red)
                                 .overlay(Image(systemName: "xmark")
-                                            .foregroundColor(Color("object"))
+                                            .foregroundColor(Color("background"))
                                             .font(.system(size: 15, weight: .bold, design: .rounded)))
                                            
                                 .frame(width: UIScreen.screenHeight*0.035,

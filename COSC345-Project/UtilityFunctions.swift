@@ -34,6 +34,12 @@ struct ShrinkingButton: ButtonStyle {
     }
 }
 
+extension UIApplication {
+    func endEditing() {
+        sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+}
+
 // Normal TextField doesn't allow colored placeholder text, this does. SOLUTION FOUND AT THIS LINK https://stackoverflow.com/questions/57688242/swiftui-how-to-change-the-placeholder-color-of-the-textfield
 /// Workaround to allow for coloured placeholder text.
 struct CustomTextField: View {
@@ -62,9 +68,4 @@ extension Color {
                          
                          (top1: Color("object"), top2: Color("text"),
                           bottom1: Color("object"), bottom2: Color("text"))]
-    
-    /// Returns the defined colours
-    static func getColors() -> [(top1: Color, top2: Color, bottom1: Color, bottom2: Color)] {
-        return colors
-    }
 }

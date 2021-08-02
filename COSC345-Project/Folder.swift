@@ -85,6 +85,10 @@ extension Folder {
         return Folder()
     }
     
+    static func getCount(title: String) -> Int {
+        return Int(getFolder(folderTitle: title).receiptCount)
+    }
+    
     /// Adds a folder to the database with the specified title and icon.
     static func addFolder(title: String, icon: String){
         let viewContext = PersistenceController.shared.getContext()

@@ -131,10 +131,10 @@
 				5AB20BC7265FC3F50055D2AD /* UtilityFunctions.swift */,
 				5A07749D2660BA4F008E3909 /* Prediction.swift */,
 				5AC3EA1A266107D100891542 /* UserSettings.swift */,
+				5A827F9E26B2A431001A3E2D /* Dashboard.swift */,
 				5A827F9826AFD958001A3E2D /* Folder.swift */,
 				5A827F9A26AFD98A001A3E2D /* Receipt.swift */,
 				5A827F9C26B190B9001A3E2D /* Folder.swift */,
-				5A827F9E26B2A431001A3E2D /* Dashboard.swift */,
 				5A827FA026B2A499001A3E2D /* AddPanel.swift */,
 			);
 			path = "COSC345-Project";
