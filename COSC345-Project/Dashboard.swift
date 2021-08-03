@@ -9,6 +9,26 @@ import Foundation
 import SwiftUI
 import CoreData
 
+/// AddPanelType holds the various states for the Add panel.
+enum AddPanelType {
+    /// Displays the standard homepage view for the add panel. Two option, add from gallery or camera.
+    case homepage
+    /// Displays the panel's add from camera view
+    case camera
+    /// Displays the panel's add from gallery view
+    case gallery
+}
+
+/// DashPanelType holds the various states for the dashboard panel.
+enum DashPanelType {
+    /// Displays the standard homepage view for the Dashpanel. Showing the Receipts, folders, settings and notifcations.
+    case homepage
+    /// Displays the
+    case expanded
+    /// Displays the settings view
+    case settings
+}
+
 /// DashboardPanelParent handles the view states for the dashboard panel
 /// - Main Parent: ContentView
 struct DashboardPanelParent: View {

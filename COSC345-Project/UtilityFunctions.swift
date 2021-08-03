@@ -30,7 +30,7 @@ struct ShrinkingButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .scaleEffect(configuration.isPressed ? 0.99 : 1)
-            .animation(.spring())
+            //.animation(.spring())
     }
 }
 
@@ -60,12 +60,9 @@ struct CustomTextField: View {
 /// Extension of the Color object
 extension Color {
     /// Define all gradient schemes for the background colours. Two colours each gradient, top and bottom.
-    static let colors = [(top1: Color("purple"), top2: Color("orange"),
-                          bottom1: Color("cyan"), bottom2: Color("purple")),
-                         
-                         (top1: Color("green"), top2: Color("cyan"),
-                          bottom1: Color("cyan"), bottom2: Color("blue")),
-                         
-                         (top1: Color("object"), top2: Color("text"),
-                          bottom1: Color("object"), bottom2: Color("text"))]
+    static let colors = [(leading: Color("blue"), trailing: Color("lightBlue"), text: Color("blue")),
+                         (leading: Color("lightPink"), trailing: Color("purple"), text: Color("lightPink")),
+                         (leading: Color("green"), trailing: Color("grass"), text: Color("green")),
+                         (leading: Color("text"), trailing: Color("backgroundContrast"), text: Color("text")),
+                         (leading: Color("object"), trailing: Color("accent"), text: Color("text"))]
 }

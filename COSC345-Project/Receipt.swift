@@ -31,11 +31,16 @@ struct ReceiptView: View {
                             Text(receipt.store ?? "")
                                 .font(.system(size: 16, weight: .bold, design: .rounded))
                         }
+                        if selected {
+                            ScrollView {
+                                Text(receipt.body ?? "")
+                            }
+                        }
                         Spacer()
                     }
                     Spacer()
                 }.padding(10)
-            ).frame(height: UIScreen.screenHeight * 0.08)
+            ).frame(height: UIScreen.screenHeight * (selected ? 0.4 : 0.08))
             .onTapGesture {
                 selected.toggle()
             }.onLongPressGesture(minimumDuration: 0.25, maximumDistance: 2, perform: {

@@ -28,60 +28,35 @@ enum TabPage: Int {
 
 /// ContentView is the main content view that is called when starting the app.
 struct ContentView: View {
-    /// TODO: THIS TAB SELECTION ISNT WORKING
     @State var tabSelection: TabPage = .home
-    @State var recognizedText: String = ""
     /// Settings imports the UserSettings
     @EnvironmentObject var settings: UserSettings
+    @State var colors = Color.colors
     
     var body: some View {
-        TabView (selection: $tabSelection){
-            HomeView()
-                .tabItem { Label("Home", systemImage: "text.justify") }
-                .tag(0)
-            ScanView(recognizedText: $recognizedText, tabSelection: $tabSelection)
-                .tabItem { Label("Scan", systemImage: "camera.viewfinder") }
-                .tag(1)
-            SettingsView()
-                .tabItem { Label("Settings", systemImage: "gearshape.fill") }
-                .tag(2)
+        ZStack {
+            TabView (){
+                HomeView()
+                    .tabItem { Label("Home", systemImage: "text.justify") }
+                    .tag(0)
+                ScanView()
+                    .tabItem { Label("Scan", systemImage: "camera.viewfinder") }
+                    .tag(1)
+                SettingsView()
+                    .tabItem { Label("Settings", systemImage: "gearshape.fill").foregroundColor(Color("text")) }
+                    .tag(2)
+            }.accentColor(settings.minimal ? Color("text") : Color.colors[settings.style].text)
+            .transition(.slide)
+            .colorScheme(settings.darkMode ? .dark : .light)
+            
         }
-        .animation(.spring()).transition(.slide)
-        .colorScheme(settings.darkMode ? .dark : .light)
     }
-}
-
-
-
-/// AddPanelType holds the various states for the Add panel.
-enum AddPanelType {
-    /// Displays the standard homepage view for the add panel. Two option, add from gallery or camera.
-    case homepage
-    /// Displays the panel's add from camera view
-    case camera
-    /// Displays the panel's add from gallery view
-    case gallery
-}
-
-/// DashPanelType holds the various states for the dashboard panel.
-enum DashPanelType {
-    /// Displays the standard homepage view for the Dashpanel. Showing the Receipts, folders, settings and notifcations.
-    case homepage
-    /// Displays the
-    case expanded
-    /// Displays the settings view
-    case settings
 }
 
 /// ContentView is the main content view that is called when starting the app.
 struct HomeView: View {
-    /// AddPanelType maintains and updates the add panels view state.
-    @State var addPanelState: AddPanelType = .homepage // need to make these global vars
-    /// DashPanelState maintains and updates the dashboards view state.
-    @State var dashPanelState: DashPanelType = .homepage
     /// Settings imports the UserSettings
     @EnvironmentObject var settings: UserSettings
-    
     /// Fetches Receipt entities in CoreData sorting by the NSSortDescriptor.
     @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)], animation: .spring())
     /// Stores the fetched results as an array of Receipt objects.
@@ -127,10 +102,12 @@ struct HomeView: View {
                 ).padding(.horizontal)
                 .ignoresSafeArea(.keyboard)
                 
+                // FOLDERS
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack {
                         ForEach(folders) { folder in
                             Button(action: {
+                                // action for tapping the folder
                             }){
                                 TagView(folder: folder)
                             }.buttonStyle(ShrinkingButton())
@@ -138,7 +115,7 @@ struct HomeView: View {
                     }.padding(.horizontal)
                 }
                 
-                // receipts
+                // RECEIPTS
                 ScrollView(showsIndicators: false) {
                     ForEach(receipts.filter({ userSearch.count > 0 ?
                                                 $0.body!.localizedCaseInsensitiveContains(userSearch) ||
@@ -146,7 +123,7 @@ struct HomeView: View {
                                                 $0.store!.localizedCaseInsensitiveContains(userSearch) :
                                                 $0.body!.count > 0 })){ receipt in
                         ReceiptView(receipt: receipt).transition(.opacity)
-                    }
+                    }.padding(.bottom)
                 }
                 .cornerRadius(15).padding(.horizontal)
                 .toolbar {
@@ -180,78 +157,84 @@ enum ValidScanType {
 }
 
 struct ScanView: View {
-    @Binding var recognizedText: String
-    @Binding var tabSelection: TabPage
+    @EnvironmentObject var settings: UserSettings
+    let inSimulator: Bool = UIDevice.current.isSimulator
+    
     @State var scanSelection: ScanSelection = .none
     @State var validImage: ValidScanType = .noScan
     @State var validAlert: Bool = false
-    let inSimulator: Bool = UIDevice.current.isSimulator
+    @State var isRecognizing: Bool = false
+    @ObservedObject var recognizedContent = RecognizedContent()
     
     var body: some View {
         ZStack {
             BackgroundView()
             
             VStack{
-                if scanSelection != .camera {
-                    Spacer()
-                    Button(action: {
-                        scanSelection = scanSelection == .gallery ? .none : .gallery
-                    }){
-                        VStack {
-                            Text("Add from Gallery")
-                                .font(.system(.title, design: .rounded))
-                            if scanSelection == .none {
-                                Image(systemName: "photo.fill")
-                                    .font(.system(.largeTitle, design: .rounded))
-                                    .padding()
-                            }
-                        }
-                    }.buttonStyle(ShrinkingButton())
-                    
-                    if scanSelection == .gallery {
-                        ImagePicker(recognizedText: self.$recognizedText, validScan: $validImage)
+                TitleText(title: "scan")
+                    .padding(.horizontal)
+                Spacer()
+                
+                if !isRecognizing {
+                    // default "gallery or camera" screen
+                    if scanSelection == .none {
+                        
+                        Button(action: {
+                            scanSelection = scanSelection == .gallery ? .none : .gallery
+                        }){
+                            VStack {
+                                if scanSelection == .none {
+                                    Image(systemName: "photo.fill")
+                                        .font(.system(.largeTitle, design: .rounded))
+                                        .padding()
+                                    Text("Add from Gallery")
+                                        .font(.system(.title, design: .rounded))
+                                }
+                            }.contentShape(Rectangle())
+                        }.buttonStyle(ShrinkingButton())
+                        
+                        Spacer()
+                        Divider()
+                        Spacer()
+                        
+                        Button(action:{
+                            scanSelection = scanSelection == .camera ? .none : .camera
+                        }){
+                            VStack {
+                                if scanSelection == .none {
+                                    Text("Add from Camera")
+                                        .font(.system(.title, design: .rounded))
+                                    Image(systemName: "camera.fill")
+                                        .font(.system(.largeTitle, design: .rounded))
+                                        .padding()
+                                        .transition(.opacity)
+                                }
+                            }.contentShape(Rectangle())
+                        }.buttonStyle(ShrinkingButton())
+                        
+                        Spacer()
                     }
-                    Spacer()
-                }
-                Divider()
-                if scanSelection != .gallery {
-                    Spacer()
-                    Button(action:{
-                        scanSelection = scanSelection == .camera ? .none : .camera
-                    }){
-                        VStack {
-                            Text("Add from Camera")
-                                .font(.system(.title, design: .rounded))
-                            if scanSelection == .none {
-                                Image(systemName: "camera.fill")
-                                    .font(.system(.largeTitle, design: .rounded))
-                                    .padding()
-                                    .transition(.opacity)
-                            }
-                        }
-                    }.buttonStyle(ShrinkingButton())
                     
-                    if scanSelection == .camera {
-                        if !UIDevice.current.isSimulator {
-                            ScanDocumentView(recognizedText: self.$recognizedText, validScan: $validImage)
-                        } else {
-                            Text("Not supported in the simulator!\n\nPlease use a physical device.")
-                                .font(.system(.title, design: .rounded))
-                                .padding()
-                        }
+                    if scanSelection == .gallery { // scan via gallery
+                        //ImagePicker(recognizedText: self.$recognizedText, validScan: $validImage)
+                        
+                    } else if scanSelection == .camera { // scan via camera
+                        DocumentScannerView(scanSelection: $scanSelection, isRecognizing: $isRecognizing, recognizedContent: recognizedContent)
                     }
+                } else {
+                    Text("Saving...")
+                        .font(.system(.title, design: .rounded))
+                    ProgressView()
+                        .font(.largeTitle)
+                        .progressViewStyle(CircularProgressViewStyle(tint: Color("text")))
+                        .padding(.bottom, 20)
                     Spacer()
                 }
             }.animation(.spring())
-        }.onChange(of: recognizedText, perform: { _ in
+        }/*.onChange(of: recognizedText, perform: { _ in
             validAlert = validImage == .invalidScan ? true : false
             if validImage == .validScan { // IMPROVE THIS! Go to a "is this correct?" screen
                 Receipt.saveScan(recognizedText: recognizedText)
-                tabSelection = .home // NOT UPDATING I DONT KNOW WHY
-                scanSelection = .none
-            }
-        }).onChange(of: tabSelection, perform: { selectedTab in
-            if selectedTab == .home {
                 scanSelection = .none
             }
         }).alert(isPresented: $validAlert) {
@@ -260,7 +243,7 @@ struct ScanView: View {
                 message: Text("This image is not valid. Try something else."),
                 dismissButton: .default(Text("Okay"))
             )
-        }
+        }*/
     }
 }
 
@@ -285,15 +268,21 @@ struct SettingsView: View  {
                     VStack (alignment: .leading){
                         VStack{
                             Toggle("Dark Mode", isOn: $settings.darkMode)
-                            .contentShape(Rectangle())
+                                .contentShape(Rectangle())
                             Divider()
                             
-                            Picker("Background Color", selection: $settings.style) {
-                                ForEach(0..<Color.colors.count){ color in
-                                    Text("Style \(color+1)").tag(color)
-                                }
-                            }.pickerStyle(SegmentedPickerStyle())
+                            Toggle("Minimal Color Mode", isOn: $settings.minimal)
+                                .contentShape(Rectangle())
                             Divider()
+                            
+                            if !settings.minimal {
+                                Picker("Background Color", selection: $settings.style) {
+                                    ForEach(0..<Color.colors.count){ color in
+                                        Text("Style \(color+1)").tag(color)
+                                    }
+                                }.pickerStyle(SegmentedPickerStyle())
+                                Divider()
+                            }
                         }.padding(.horizontal, 2)
                         
                         Button(action: {
@@ -316,41 +305,13 @@ struct SettingsView: View  {
                                 .background(Color("accent"))
                                 .cornerRadius(10)
                         }.buttonStyle(ShrinkingButton())
-                        Divider()
-                        
                         Spacer()
-                    }.frame(minWidth: 0, maxWidth: .infinity)
+                    }.frame(minWidth: 0, maxWidth: .infinity).animation(.spring())
                 }
             }.padding(.horizontal)
         }
     }
 }
-
-
-/*
-// COMPANY TITLE ------------------
-VStack {
-    // DASHBOARD (UPPER) ------------------
-    if addPanelState == .homepage {
-        DashboardPanelParent(dashPanelState: $dashPanelState)
-            .padding(.bottom, dashPanelState != .expanded ? 12 : 0)
-            .transition(AnyTransition.opacity
-                            .combined(with: .scale(scale: 0.75)))
-            
-    }
-    
-    // ADD RECEIPT (LOWER) ------------------
-    if dashPanelState != .expanded {
-        AddPanelParent(addPanelState: $addPanelState)
-            .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.75)))
-            .animation(.spring())
-        Spacer()
-    }
-}.ignoresSafeArea(.keyboard) // broken code, find fix
-.padding(.horizontal, addPanelState == .homepage ? 15 : 0)
-}
-}*/
-
 
 /// Background view is the background of the application
 /// - Main Parent: ContentView
@@ -362,37 +323,31 @@ struct BackgroundView: View {
     var body: some View {
         ZStack {
             Color("background").ignoresSafeArea(.all)
-            /*VStack {
-                RoundedRectangle(cornerRadius: 25)
-                    .fill(LinearGradient(gradient: Gradient(colors: [colors[settings.style].bottom1, colors[settings.style].bottom2]), startPoint: .leading, endPoint: .trailing))
-                    .frame(height: UIScreen.screenHeight * 0.1)
-                    .padding(.top, -75)
-                Spacer()
-            }*/
             
-            /*
             VStack{
-                Circle()
-                    .fill(LinearGradient(gradient: Gradient(colors: [colors[settings.style].bottom1, colors[settings.style].bottom2]), startPoint: .leading, endPoint: .trailing))
-                    .scaleEffect(x: 1.5) // gives it that clean stretched out look
-                    .padding(.top, -UIScreen.screenHeight)
-                    //.padding(.top, -UIScreen.screenHeight * (dashPanelState != .expanded ? 0.5 : 0.38))
-                    .animation(.spring())
-                Spacer()
+                if !settings.minimal{
+                    RoundedRectangle(cornerRadius: 15)
+                        .fill(LinearGradient(gradient: Gradient(colors: [colors[settings.style].leading, colors[settings.style].trailing]), startPoint: .leading, endPoint: .trailing))
+                        //.fill(LinearGradient(gradient: Gradient(colors: [Color("green"), Color("grass")]), startPoint: .leading, endPoint: .trailing))
+                        .frame(height: UIScreen.screenHeight * 0.14)
+                    
+                    Spacer()
+                }
             }.ignoresSafeArea()
-            RoundedRectangle(cornerRadius: 25)
-                .fill(Color("background"))*/
         }
     }
 }
 
 struct TitleText: View {
+    @EnvironmentObject var settings: UserSettings
+    
     let title: String
     var body: some View {
         HStack {
             Text("\(title.capitalized).")
                 .font(.system(.largeTitle)).bold()
+                .foregroundColor(Color(settings.style == 4 || settings.minimal ? "text" : "background"))
             Spacer()
-        }.padding(.bottom, 1).padding(.top, 20)
+        }.padding(.bottom, 10).padding(.top, 20)
     }
 }
