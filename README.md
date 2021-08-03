@@ -16,10 +16,10 @@ To generate random receipts, tap the settings icon and press the "generate recei
 ### Our Team:
 Hunter Kingsbeer - Engineering and Team Lead.
 
-Tane Carney-Stirling - Testing and Technical Director.
+Tane Carney-Stirling - Testing and Technical.
 
-Caitlin Jillybelle - Design and Research Director.
+Caitlin Jillybelle - Design and Research.
 
-Rhys Davie - Administration and Content Coordinator.
+Rhys Davie - Administration and Content.
 
 ### [Documentation](https://hunterkingsbeer.github.io/345-Project/index.html)
