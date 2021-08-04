@@ -12,12 +12,8 @@ import Foundation
 
 // needs to be identifiable due to multiple pages 
 class TextItem: Identifiable {
-    var id: String
+    var id: UUID = UUID()
     var text: String = ""
-    
-    init() {
-        id = UUID().uuidString
-    }
 }
 
 class RecognizedContent: ObservableObject {

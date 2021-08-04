@@ -157,7 +157,6 @@ struct ScanView: View {
     
     @State var scanSelection: ScanSelection = .none
     @State var isRecognizing: Bool = false
-    @ObservedObject var recognizedContent = RecognizedContent()
     
     var body: some View {
         ZStack {
@@ -210,13 +209,11 @@ struct ScanView: View {
                     
                     if scanSelection == .gallery { // scan via gallery
                         GalleryScannerView(scanSelection: $scanSelection,
-                                           isRecognizing: $isRecognizing,
-                                           recognizedContent: recognizedContent)
+                                           isRecognizing: $isRecognizing)
                         
                     } else if scanSelection == .camera { // scan via camera
                         DocumentScannerView(scanSelection: $scanSelection,
-                                            isRecognizing: $isRecognizing,
-                                            recognizedContent: recognizedContent)
+                                            isRecognizing: $isRecognizing)
                     }
                 } else {
                     Text("Saving...")
@@ -311,7 +308,7 @@ struct BackgroundView: View {
             
             VStack{
                 if !settings.minimal {
-                    RoundedRectangle(cornerRadius: 20)
+                    RoundedRectangle(cornerRadius: 0)
                         .fill(LinearGradient(gradient: Gradient(colors: [colors[settings.style].leading, colors[settings.style].trailing]), startPoint: .leading, endPoint: .trailing))
                         //.fill(LinearGradient(gradient: Gradient(colors: [Color("green"), Color("grass")]), startPoint: .leading, endPoint: .trailing))
                         .frame(height: UIScreen.screenHeight * 0.14)

@@ -14,7 +14,7 @@ import Vision
 struct GalleryScannerView: View {
     @Binding var scanSelection: ScanSelection
     @Binding var isRecognizing: Bool
-    @ObservedObject var recognizedContent: RecognizedContent
+    @ObservedObject var recognizedContent: RecognizedContent = RecognizedContent()
     
     var body: some View {
         ImagePicker { result in
@@ -95,7 +95,7 @@ struct ImagePicker: UIViewControllerRepresentable {
 struct DocumentScannerView: View {
     @Binding var scanSelection: ScanSelection
     @Binding var isRecognizing: Bool
-    @ObservedObject var recognizedContent: RecognizedContent
+    @ObservedObject var recognizedContent: RecognizedContent  = RecognizedContent()
     
     var body: some View {
         if !UIDevice.current.isSimulator { // if device is physical (supports camera)
