@@ -55,20 +55,19 @@ struct ContentView: View {
 
 /// ContentView is the main content view that is called when starting the app.
 struct HomeView: View {
-    /// Settings imports the UserSettings
-    @EnvironmentObject var settings: UserSettings
     /// Fetches Receipt entities in CoreData sorting by the NSSortDescriptor.
     @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)], animation: .spring())
     /// Stores the fetched results as an array of Receipt objects.
     var receipts: FetchedResults<Receipt>
-    
+    /// Fetches Folder entities in CoreData sorting by the NSSortDescriptor.
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Folder.receiptCount, ascending: false),
-                          NSSortDescriptor(keyPath: \Folder.title, ascending: true)],
-        animation: .spring())
+                          NSSortDescriptor(keyPath: \Folder.title, ascending: true)], animation: .spring())
     /// Stores the fetched results as an array of Folder objects.
     var folders: FetchedResults<Folder>
     
+    /// Settings imports the UserSettings
+    @EnvironmentObject var settings: UserSettings
     @State var userSearch: String = ""
 
     var body: some View {

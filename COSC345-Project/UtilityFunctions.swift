@@ -30,7 +30,7 @@ struct ShrinkingButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .scaleEffect(configuration.isPressed ? 0.99 : 1)
-            //.animation(.spring())
+            .animation(.spring())
     }
 }
 
