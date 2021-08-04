@@ -149,20 +149,14 @@ enum ScanSelection {
     case camera
     case gallery
 }
-/// ValidScanType holds the different cases for handling the input of a scan.
-enum ValidScanType {
-    case noScan /// no scan has been input.
-    case validScan /// A valid scan has been input.
-    case invalidScan /// An invalid scan has been input.
-}
 
+// TODO: THE DOC SCANNER doesnt work. I think the recognizedcontent isnt wiping itself. Each receipt is re-added.
+// TODO: image scanner needs to be updated to the doc scanner processes
 struct ScanView: View {
     @EnvironmentObject var settings: UserSettings
     let inSimulator: Bool = UIDevice.current.isSimulator
     
     @State var scanSelection: ScanSelection = .none
-    @State var validImage: ValidScanType = .noScan
-    @State var validAlert: Bool = false
     @State var isRecognizing: Bool = false
     @ObservedObject var recognizedContent = RecognizedContent()
     
@@ -216,10 +210,14 @@ struct ScanView: View {
                     }
                     
                     if scanSelection == .gallery { // scan via gallery
-                        //ImagePicker(recognizedText: self.$recognizedText, validScan: $validImage)
+                        GalleryScannerView(scanSelection: $scanSelection,
+                                           isRecognizing: $isRecognizing,
+                                           recognizedContent: recognizedContent)
                         
                     } else if scanSelection == .camera { // scan via camera
-                        DocumentScannerView(scanSelection: $scanSelection, isRecognizing: $isRecognizing, recognizedContent: recognizedContent)
+                        DocumentScannerView(scanSelection: $scanSelection,
+                                            isRecognizing: $isRecognizing,
+                                            recognizedContent: recognizedContent)
                     }
                 } else {
                     Text("Saving...")
@@ -231,19 +229,7 @@ struct ScanView: View {
                     Spacer()
                 }
             }.animation(.spring())
-        }/*.onChange(of: recognizedText, perform: { _ in
-            validAlert = validImage == .invalidScan ? true : false
-            if validImage == .validScan { // IMPROVE THIS! Go to a "is this correct?" screen
-                Receipt.saveScan(recognizedText: recognizedText)
-                scanSelection = .none
-            }
-        }).alert(isPresented: $validAlert) {
-            Alert(
-                title: Text("Receipt Not Saved!"),
-                message: Text("This image is not valid. Try something else."),
-                dismissButton: .default(Text("Okay"))
-            )
-        }*/
+        }
     }
 }
 
@@ -325,8 +311,8 @@ struct BackgroundView: View {
             Color("background").ignoresSafeArea(.all)
             
             VStack{
-                if !settings.minimal{
-                    RoundedRectangle(cornerRadius: 15)
+                if !settings.minimal {
+                    RoundedRectangle(cornerRadius: 20)
                         .fill(LinearGradient(gradient: Gradient(colors: [colors[settings.style].leading, colors[settings.style].trailing]), startPoint: .leading, endPoint: .trailing))
                         //.fill(LinearGradient(gradient: Gradient(colors: [Color("green"), Color("grass")]), startPoint: .leading, endPoint: .trailing))
                         .frame(height: UIScreen.screenHeight * 0.14)

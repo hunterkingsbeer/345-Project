@@ -66,6 +66,8 @@ struct Prediction {
     
     /// Collections of keywords associated with each category.
     /// Format : [("TitleOfCategory1", ["key", "words"]), ("TitleOfCategory2", ["key", "words"])]
+    
+    // TODO: rework these into overshadowing categories and then into subcategories
     static let categoryKeywords = [(title: "groceries",
                                     keywords: ["grocer", "grocery", "supermarket", "market",
                                               "grcoeries", "new world", "countdown", "veggie boys",
@@ -85,12 +87,47 @@ struct Prediction {
                                                 "jb", "hi-fi", "the warehouse", "the ware house",
                                                 "hifi", "department", "furniture", "tech",
                                                 "technology", "smiths", "smiths city", "mall",
-                                                "stationery", "farmers", "gift", "gifts", "souvenirs",
-                                                "eletronics", "beds", "sport", "sports", "trade",
-                                                "flooring", "bathrooms", "bed", "bedding", "outlet",
-                                                "post", "world", "craft", "crafts", "supply",
-                                                "garden", "stihl", "appliance", "headphone", "phone",
-                                                "computer", "laptop", "watch"]),
+                                                "souvenirs", "eletronics", "beds", "sport",
+                                                "sports", "trade", "flooring", "bathrooms",
+                                                "bed", "bedding", "outlet", "post", "world",
+                                                "craft", "crafts", "supply", "garden", "stihl",
+                                                "appliance", "headphone", "phone", "computer",
+                                                "laptop", "watch"]),
+                                   
+                                   (title: "furniture",
+                                    keywords: ["mckenzie & willis", "mckenzie and willis",
+                                               "harvey norman", "my mate johns", "my mate john's",
+                                               "big save furniture", "early settler",
+                                               "smiths city", "smith city", "hunter home",
+                                               "bedpost", "bedsrus", "farmers", "table", "desk",
+                                               "chair", "stool", "recliner", "couch", "sofa",
+                                               "ottoman", "bed", "drawer", "drawers", "cabinet"]),
+                                   
+                                   (title: "technology",
+                                    keywords: ["jb hi-fi", "jb hifi", "cello", "noel leeming",
+                                              "jaycar", "smiths city", "smith city", "computer",
+                                              "laptop", "phone", "tablet", "monitor", "screen",
+                                              "speaker", "speakers", "headphones", "headset",
+                                              "earphones", "ear buds", "mouse", "keyboard",
+                                              "controller", "router"]),
+                                   
+                                   (title: "hardware",
+                                    keywords: ["mitre 10", "bunnings", "placemakers", "tool",
+                                              "saw", "drill", "knife", "axe", "hammer",
+                                              "screwdriver", "pliers", "wrench", "trowel",
+                                              "rivet", "nail", "glue", "shovel", "chisel",
+                                              "clamp", "file", "spanner", "level", "measuring tape",
+                                              "tape measure", "level", "wire cutters", "tape",
+                                              "ladder"]),
+                                   
+                                   (title: "appliance",
+                                    keywords: ["smyths living", "kitchen things", "noel leeming",
+                                              "quality appliances", "appliance king", "briscoes",
+                                              "harvey norman", "jb hi-fi", "jb hifi", "the warehouse",
+                                              "dishwasher", "washing machine", "dryer", "oven",
+                                              "microwave", "refridgerator", "fridge", "freezer",
+                                              "stove", "juicer", "mixer", "fryer", "food processor",
+                                              "blender"]),
                                
                                    (title: "clothing",
                                     keywords: ["clothing", "toff's", "toffs", "second hand",
