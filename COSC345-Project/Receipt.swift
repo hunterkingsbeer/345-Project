@@ -9,6 +9,30 @@ import Foundation
 import CoreData
 import SwiftUI
 
+struct ReceiptDetailView: View  {
+    /// An induvidual receipt entity that the view will be based on
+    @State var receipt: Receipt
+    
+    @EnvironmentObject var settings: UserSettings
+    
+    var body: some View {
+        //ScrollView(showsIndicators: false) {
+            VStack (alignment: .leading){
+                Text("\(receipt.store ?? "").")
+                    .font(.system(.title))
+                Text("\(receipt.date ?? Date())")
+                    .font(.caption)
+                Divider()
+                Text(receipt.body ?? "")
+                Spacer()
+            }.padding()
+            .background(Color("object"))
+            .colorScheme(settings.darkMode ? .dark : .light)
+            .ignoresSafeArea(edges: /*@START_MENU_TOKEN@*/.bottom/*@END_MENU_TOKEN@*/)
+        //}.colorScheme(settings.darkMode ? .dark : .light)
+    }
+}
+
 /// Receipt view is the template receipt design, that starts minimized then after interaction expands to full size
 /// - Main Parent: ReceiptCollectionView
 struct ReceiptView: View {
@@ -18,6 +42,8 @@ struct ReceiptView: View {
     @State var selected: Bool = false
     /// Whether the user has held down the receipt (performed the delete action), and is pending delete
     @State var pendingDelete = false
+    
+    @EnvironmentObject var settings: UserSettings
     
     var body: some View {
         RoundedRectangle(cornerRadius: 18)
@@ -40,12 +66,15 @@ struct ReceiptView: View {
                     }
                     Spacer()
                 }.padding(10)
-            ).frame(height: UIScreen.screenHeight * (selected ? 0.4 : 0.08))
+            )
+            .frame(height: UIScreen.screenHeight * 0.08)
             .onTapGesture {
                 selected.toggle()
-            }.onLongPressGesture(minimumDuration: 0.25, maximumDistance: 2, perform: {
+            }
+            .onLongPressGesture(minimumDuration: 0.25, maximumDistance: 2, perform: {
                 pendingDelete.toggle()
-            }).onChange(of: pendingDelete, perform: { _ in
+            })
+            .onChange(of: pendingDelete, perform: { _ in
                 withAnimation(.spring()){
                     if pendingDelete == true {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
@@ -64,7 +93,6 @@ struct ReceiptView: View {
                                 .overlay(Image(systemName: "xmark")
                                             .foregroundColor(Color("background"))
                                             .font(.system(size: 15, weight: .bold, design: .rounded)))
-                                           
                                 .frame(width: UIScreen.screenHeight*0.035,
                                        height: UIScreen.screenHeight*0.035)
                                 .padding(8)
@@ -75,7 +103,7 @@ struct ReceiptView: View {
                         Spacer()
                     }
                 }
-            )
+            ).sheet(isPresented: $selected) { ReceiptDetailView(receipt: receipt) }
     }
 }
 

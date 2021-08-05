@@ -43,7 +43,7 @@ struct PersistenceController {
         let newFolder3 = Folder(context: viewContext)
         newFolder3.title = "default".capitalized
         newFolder3.color = "white"
-        newFolder3.icon = "folder"
+        newFolder3.icon = "doc.plaintext"
         newFolder3.id = UUID()
         newFolder3.favorite = false
         

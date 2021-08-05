@@ -48,183 +48,6 @@ struct ContentView: View {
             }.accentColor(settings.minimal ? Color("text") : Color.colors[settings.style].text)
             .transition(.slide)
             .colorScheme(settings.darkMode ? .dark : .light)
-            
-        }
-    }
-}
-
-/// ContentView is the main content view that is called when starting the app.
-struct HomeView: View {
-    /// Fetches Receipt entities in CoreData sorting by the NSSortDescriptor.
-    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)], animation: .spring())
-    /// Stores the fetched results as an array of Receipt objects.
-    var receipts: FetchedResults<Receipt>
-    /// Fetches Folder entities in CoreData sorting by the NSSortDescriptor.
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Folder.receiptCount, ascending: false),
-                          NSSortDescriptor(keyPath: \Folder.title, ascending: true)], animation: .spring())
-    /// Stores the fetched results as an array of Folder objects.
-    var folders: FetchedResults<Folder>
-    
-    /// Settings imports the UserSettings
-    @EnvironmentObject var settings: UserSettings
-    @State var userSearch: String = ""
-
-    var body: some View {
-        ZStack {
-            BackgroundView()
-            
-            VStack {
-                TitleText(title: "receipted")
-                    .padding(.horizontal)
-                
-                // search bar
-                HStack {
-                    Image(systemName: "magnifyingglass")
-                    CustomTextField(placeholder: Text("Search"), text: $userSearch)
-                    if userSearch != "" {
-                        Button(action: {
-                            userSearch = ""
-                            UIApplication.shared.endEditing()
-                        }){
-                            Image(systemName: "xmark")
-                                .font(.system(size: 19, weight: .bold, design: .rounded))
-                                .foregroundColor(Color("text"))
-                        }
-                    }
-                    Spacer()
-                }.padding(.leading, 12)
-                .frame(height: UIScreen.screenHeight*0.05)
-                .background(
-                    RoundedRectangle(cornerRadius: 15)
-                        .fill(Color("accent"))
-                ).padding(.horizontal)
-                .ignoresSafeArea(.keyboard)
-                
-                // FOLDERS
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack {
-                        ForEach(folders) { folder in
-                            Button(action: {
-                                // action for tapping the folder
-                            }){
-                                TagView(folder: folder)
-                            }.buttonStyle(ShrinkingButton())
-                        }
-                    }.padding(.horizontal)
-                }
-                
-                // RECEIPTS
-                ScrollView(showsIndicators: false) {
-                    ForEach(receipts.filter({ userSearch.count > 0 ?
-                                                $0.body!.localizedCaseInsensitiveContains(userSearch) ||
-                                                $0.folder!.localizedCaseInsensitiveContains(userSearch)  ||
-                                                $0.store!.localizedCaseInsensitiveContains(userSearch) :
-                                                $0.body!.count > 0 })){ receipt in
-                        ReceiptView(receipt: receipt).transition(.opacity)
-                    }.padding(.bottom)
-                }
-                .cornerRadius(15).padding(.horizontal)
-                .toolbar {
-                    
-                    ToolbarItem(placement: .bottomBar) {
-                        Image(systemName: "gearshape.fill")
-                    }
-                    ToolbarItem(placement: .bottomBar) {
-                        Image(systemName: "house")
-                    }
-                    
-                    ToolbarItem(placement: .bottomBar) {
-                        Image(systemName: "plus")
-                    }
-                }.navigationBarTitle("Receipted.")
-            }.navigationViewStyle(DoubleColumnNavigationViewStyle())
-        }//.colorScheme(settings.darkMode ? .dark : .light)
-    }
-}
-
-enum ScanSelection {
-    case none
-    case camera
-    case gallery
-}
-
-// TODO: THE DOC SCANNER doesnt work. I think the recognizedcontent isnt wiping itself. Each receipt is re-added.
-// TODO: image scanner needs to be updated to the doc scanner processes
-struct ScanView: View {
-    @EnvironmentObject var settings: UserSettings
-    let inSimulator: Bool = UIDevice.current.isSimulator
-    
-    @State var scanSelection: ScanSelection = .none
-    @State var isRecognizing: Bool = false
-    
-    var body: some View {
-        ZStack {
-            BackgroundView()
-            
-            VStack{
-                TitleText(title: "scan")
-                    .padding(.horizontal)
-                Spacer()
-                
-                if !isRecognizing {
-                    // default "gallery or camera" screen
-                    if scanSelection == .none {
-                        
-                        Button(action: {
-                            scanSelection = scanSelection == .gallery ? .none : .gallery
-                        }){
-                            VStack {
-                                if scanSelection == .none {
-                                    Image(systemName: "photo.fill")
-                                        .font(.system(.largeTitle, design: .rounded))
-                                        .padding()
-                                    Text("Add from Gallery")
-                                        .font(.system(.title, design: .rounded))
-                                }
-                            }.contentShape(Rectangle())
-                        }.buttonStyle(ShrinkingButton())
-                        
-                        Spacer()
-                        Divider()
-                        Spacer()
-                        
-                        Button(action:{
-                            scanSelection = scanSelection == .camera ? .none : .camera
-                        }){
-                            VStack {
-                                if scanSelection == .none {
-                                    Text("Add from Camera")
-                                        .font(.system(.title, design: .rounded))
-                                    Image(systemName: "camera.fill")
-                                        .font(.system(.largeTitle, design: .rounded))
-                                        .padding()
-                                        .transition(.opacity)
-                                }
-                            }.contentShape(Rectangle())
-                        }.buttonStyle(ShrinkingButton())
-                        
-                        Spacer()
-                    }
-                    
-                    if scanSelection == .gallery { // scan via gallery
-                        GalleryScannerView(scanSelection: $scanSelection,
-                                           isRecognizing: $isRecognizing)
-                        
-                    } else if scanSelection == .camera { // scan via camera
-                        DocumentScannerView(scanSelection: $scanSelection,
-                                            isRecognizing: $isRecognizing)
-                    }
-                } else {
-                    Text("Saving...")
-                        .font(.system(.title, design: .rounded))
-                    ProgressView()
-                        .font(.largeTitle)
-                        .progressViewStyle(CircularProgressViewStyle(tint: Color("text")))
-                        .padding(.bottom, 20)
-                    Spacer()
-                }
-            }.animation(.spring())
         }
     }
 }
@@ -249,12 +72,24 @@ struct SettingsView: View  {
                 ScrollView(showsIndicators: false){
                     VStack (alignment: .leading){
                         VStack{
-                            Toggle("Dark Mode", isOn: $settings.darkMode)
+                            Toggle("", isOn: $settings.darkMode)
                                 .contentShape(Rectangle())
+                                .overlay( // Testing taps text instead of toggle, text is put in usual toggle text field. Therefore overlay of text is required for testing.
+                                    HStack{
+                                        Text("Dark Mode")
+                                        Spacer()
+                                    }
+                                )
                             Divider()
                             
-                            Toggle("Minimal Color Mode", isOn: $settings.minimal)
+                            Toggle("", isOn: $settings.minimal)
                                 .contentShape(Rectangle())
+                                .overlay(
+                                    HStack{
+                                        Text("Minimal Color Mode")
+                                        Spacer()
+                                    }
+                                )
                             Divider()
                             
                             if !settings.minimal {

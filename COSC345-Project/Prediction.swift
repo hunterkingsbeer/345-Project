@@ -17,7 +17,7 @@ struct Prediction {
         // NEEDS TO BE STREAMLINED TO FIRST VIEW MINIMAL KEY WORDS
         // IF MATCHES MINIMAL KEY WORDS IN CATEGORY, ONLY SEARCH CATEGORIES THAT IT MATCHS
             // ELSE SEARCH ALL CATEGORIES
-        // THIS SHOULD CUT DOWN ON SEARCHING ALL CATEGORY KEYWORDS WHEN UNNEEDED
+        // THIS SHOULD CUT DOWN ON SEARCHING ALL CATEGORY KEYWORDS WHEN UN-NEEDED
         
         // Gets the possible predicted categories based on keywords
         let predictedTypes: [(title: String, matches: Int)] = predictedCategories(text: text)
@@ -57,7 +57,7 @@ struct Prediction {
         var count = 0
         for keyword in keywords {
             if input.lowercased().contains(keyword){
-                print("\nMatched word '\(keyword)'")
+                //print("\nMatched word '\(keyword)'")
                 count += 1
             }
         }

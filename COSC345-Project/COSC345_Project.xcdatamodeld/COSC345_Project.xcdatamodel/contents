@@ -13,6 +13,7 @@
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="folder" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="image" optional="YES" attributeType="Binary"/>
         <attribute name="store" optional="YES" attributeType="String"/>
         <attribute name="tags" optional="YES" attributeType="String"/>
         <attribute name="total" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
@@ -20,6 +21,6 @@
     </entity>
     <elements>
         <element name="Folder" positionX="-63" positionY="36" width="128" height="119"/>
-        <element name="Receipt" positionX="-63" positionY="-18" width="128" height="149"/>
+        <element name="Receipt" positionX="-63" positionY="-18" width="128" height="164"/>
     </elements>
 </model>

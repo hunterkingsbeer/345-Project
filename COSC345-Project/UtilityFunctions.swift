@@ -19,6 +19,19 @@ extension UIScreen {
    static let screenSize = UIScreen.main.bounds.size
 }
 
+extension UIView {
+    /// Rounds specific corners of a view.
+    /// USAGE: view.roundCorners([.topLeft, .bottomRight], radius: 10)
+    func roundCorners(_ corners: UIRectCorner, radius: CGFloat) {
+         let path = UIBezierPath(roundedRect: self.bounds,
+                                 byRoundingCorners: corners,
+                                 cornerRadii: CGSize(width: radius, height: radius))
+         let mask = CAShapeLayer()
+         mask.path = path.cgPath
+         self.layer.mask = mask
+    }
+
+}
 extension UIDevice {
     var isSimulator: Bool {
         return TARGET_OS_SIMULATOR != 0
