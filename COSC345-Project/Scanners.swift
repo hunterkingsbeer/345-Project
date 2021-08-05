@@ -18,46 +18,48 @@ struct DocumentScannerView: View {
     @ObservedObject var recognizedContent: RecognizedContent  = RecognizedContent()
     
     var body: some View {
-        if !UIDevice.current.isSimulator { // if device is physical (supports camera)
-            DocumentScanner { result in
-                switch result {
-                    case .success(let scannedImages):
-                        isRecognizing = true
-                        print(recognizedContent.items.count)
-                        TextRecognition(scannedImages: scannedImages, recognizedContent: recognizedContent) {
-                            if saveReceipt(){ // if save receipt returns true (valid scan), exit the scanner
-                                scanSelection = .none
-                            } else { // else stay in the scanner and alert them to scan again
-                                invalidAlert = true
-                            }
-                            isRecognizing = false // Text recognition is finished, hide the progress indicator.
-                        }.recognizeText()
-                    case .failure(let error):
-                        print(error.localizedDescription)
+        VStack {
+            if !UIDevice.current.isSimulator { // if device is physical (supports camera)
+                DocumentScanner { result in
+                    switch result {
+                        case .success(let scannedImages):
+                            isRecognizing = true
+                            print(recognizedContent.items.count)
+                            TextRecognition(scannedImages: scannedImages, recognizedContent: recognizedContent) {
+                                if saveReceipt(){ // if save receipt returns true (valid scan), exit the scanner
+                                    scanSelection = .none
+                                } else { // else stay in the scanner and alert them to scan again
+                                    invalidAlert = true
+                                }
+                                isRecognizing = false // Text recognition is finished, hide the progress indicator.
+                            }.recognizeText()
+                        case .failure(let error):
+                            print(error.localizedDescription)
+                    }
+                } didCancelScanning: {
+                    // Dismiss the scanner
+                    scanSelection = .none
+                }.alert(isPresented: $invalidAlert) {
+                    Alert(
+                        title: Text("Receipt Not Saved!"),
+                        message: Text("This image is not valid. Try again."),
+                        dismissButton: .default(Text("Okay"))
+                    )
                 }
-            } didCancelScanning: {
-                // Dismiss the scanner
-                scanSelection = .none
-            }.alert(isPresented: $invalidAlert) {
-                Alert(
-                    title: Text("Receipt Not Saved!"),
-                    message: Text("This image is not valid. Try again."),
-                    dismissButton: .default(Text("Okay"))
-                )
-            }
-        } else { // else if its in the simulator (no camera)
-            Text("Camera not supported in the simulator!\n\nPlease use a physical device.")
-                .font(.system(.title, design: .rounded))
-                .padding()
-            Button(action: {
-                scanSelection = .none
-            }){
-                Text("BACK")
-                    .padding().padding(.horizontal)
-                    .background(RoundedRectangle(cornerRadius: 25).fill(Color("object")))
+            } else { // else if its in the simulator (no camera)
+                Text("Camera not supported in the simulator!\n\nPlease use a physical device.")
+                    .font(.system(.title, design: .rounded))
                     .padding()
-            }.buttonStyle(ShrinkingButton())
-            Spacer()
+                Button(action: {
+                    scanSelection = .none
+                }){
+                    Text("BACK")
+                        .padding().padding(.horizontal)
+                        .background(RoundedRectangle(cornerRadius: 25).fill(Color("object")))
+                        .padding()
+                }.buttonStyle(ShrinkingButton())
+                Spacer()
+            }
         }
     }
     
@@ -88,31 +90,33 @@ struct GalleryScannerView: View {
     @ObservedObject var recognizedContent: RecognizedContent  = RecognizedContent()
     
     var body: some View {
-        ImagePicker { result in
-            switch result {
-                case .success(let scannedImages):
-                    isRecognizing = true
-                    print(recognizedContent.items.count)
-                    TextRecognition(scannedImages: scannedImages, recognizedContent: recognizedContent) {
-                        if saveReceipt(){ // if save receipt returns true (valid scan), exit the scanner
-                            scanSelection = .none
-                        } else { // else stay in the scanner and alert them to scan again
-                            invalidAlert = true
-                        }
-                        isRecognizing = false // Text recognition is finished, hide the progress indicator.
-                    }.recognizeText()
-                case .failure(let error):
-                    print(error.localizedDescription)
+        VStack {
+            ImagePicker { result in
+                switch result {
+                    case .success(let scannedImages):
+                        isRecognizing = true
+                        print(recognizedContent.items.count)
+                        TextRecognition(scannedImages: scannedImages, recognizedContent: recognizedContent) {
+                            if saveReceipt(){ // if save receipt returns true (valid scan), exit the scanner
+                                scanSelection = .none
+                            } else { // else stay in the scanner and alert them to scan again
+                                invalidAlert = true
+                            }
+                            isRecognizing = false // Text recognition is finished, hide the progress indicator.
+                        }.recognizeText()
+                    case .failure(let error):
+                        print(error.localizedDescription)
+                }
+            } didCancelScanning: {
+                // Dismiss the scanner
+                scanSelection = .none
+            }.alert(isPresented: $invalidAlert) {
+                Alert(
+                    title: Text("Receipt Not Saved!"),
+                    message: Text("This image is not valid. Try again."),
+                    dismissButton: .default(Text("Okay"))
+                )
             }
-        } didCancelScanning: {
-            // Dismiss the scanner
-            scanSelection = .none
-        }.alert(isPresented: $invalidAlert) {
-            Alert(
-                title: Text("Receipt Not Saved!"),
-                message: Text("This image is not valid. Try again."),
-                dismissButton: .default(Text("Okay"))
-            )
         }
     }
     

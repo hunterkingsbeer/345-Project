@@ -43,8 +43,8 @@ struct ScanView: View {
                                            isRecognizing: $isRecognizing)
                         
                     } else if scanSelection == .camera { // scan via camera
-                        /*DocumentScannerView(scanSelection: $scanSelection,
-                                            isRecognizing: $isRecognizing)*/
+                        DocumentScannerView(scanSelection: $scanSelection,
+                                            isRecognizing: $isRecognizing)
                     }
                 } else {
                     Spacer()
