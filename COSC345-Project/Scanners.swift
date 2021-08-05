@@ -18,8 +18,8 @@ struct DocumentScannerView: View {
     @ObservedObject var recognizedContent: RecognizedContent  = RecognizedContent()
     
     var body: some View {
-        VStack {
-            if !UIDevice.current.isSimulator { // if device is physical (supports camera)
+        if !UIDevice.current.isSimulator { // if device is physical (supports camera)
+            VStack {
                 DocumentScanner { result in
                     switch result {
                         case .success(let scannedImages):
@@ -46,20 +46,20 @@ struct DocumentScannerView: View {
                         dismissButton: .default(Text("Okay"))
                     )
                 }
-            } else { // else if its in the simulator (no camera)
-                Text("Camera not supported in the simulator!\n\nPlease use a physical device.")
-                    .font(.system(.title, design: .rounded))
-                    .padding()
-                Button(action: {
-                    scanSelection = .none
-                }){
-                    Text("BACK")
-                        .padding().padding(.horizontal)
-                        .background(RoundedRectangle(cornerRadius: 25).fill(Color("object")))
-                        .padding()
-                }.buttonStyle(ShrinkingButton())
-                Spacer()
             }
+        } else { // else if its in the simulator (no camera)
+            Text("Camera not supported in the simulator!\n\nPlease use a physical device.")
+                .font(.system(.title, design: .rounded))
+                .padding()
+            Button(action: {
+                scanSelection = .none
+            }){
+                Text("BACK")
+                    .padding().padding(.horizontal)
+                    .background(RoundedRectangle(cornerRadius: 25).fill(Color("object")))
+                    .padding()
+            }.buttonStyle(ShrinkingButton())
+            Spacer()
         }
     }
     

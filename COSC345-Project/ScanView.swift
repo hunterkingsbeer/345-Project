@@ -38,7 +38,7 @@ struct ScanView: View {
                         ScannerSelectView(scanSelection: $scanSelection)
                             .transition(.scale(scale: 0.8).combined(with: .opacity).combined(with: .move(edge: .bottom)))
                         
-                    }else if scanSelection == .gallery { // scan via gallery
+                    } else if scanSelection == .gallery { // scan via gallery
                         GalleryScannerView(scanSelection: $scanSelection,
                                            isRecognizing: $isRecognizing)
                         
