@@ -40,13 +40,13 @@ struct DocumentScannerView: View {
             } didCancelScanning: {
                 // Dismiss the scanner
                 scanSelection = .none
-            }.alert(isPresented: $invalidAlert) {
+            }/*.alert(isPresented: $invalidAlert) {
                 Alert(
                     title: Text("Receipt Not Saved!"),
                     message: Text("This image is not valid. Try again."),
                     dismissButton: .default(Text("Okay"))
                 )
-            }
+            }*/
         } else { // else if its in the simulator (no camera)
             Text("Camera not supported in the simulator!\n\nPlease use a physical device.")
                 .font(.system(.title, design: .rounded))
@@ -111,13 +111,13 @@ struct GalleryScannerView: View {
         } didCancelScanning: {
             // Dismiss the scanner
             scanSelection = .none
-        }.alert(isPresented: $invalidAlert) {
+        }/*.alert(isPresented: $invalidAlert) {
             Alert(
                 title: Text("Receipt Not Saved!"),
                 message: Text("This image is not valid. Try again."),
                 dismissButton: .default(Text("Okay"))
             )
-        }
+        }*/
     }
     
     /* i would put saveReceipt() in a separate function since its duplicated in both scanners,
