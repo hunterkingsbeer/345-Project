@@ -43,7 +43,7 @@ struct ScanView: View {
                                             isRecognizing: $isRecognizing)
                     } else { // default "gallery or camera" screen
                         ScannerSelectView(scanSelection: $scanSelection)
-                            .transition(.scale(scale: 0.8).combined(with: .opacity).combined(with: .move(edge: .bottom)))
+                            .transition(AnyTransition.scale(scale: 0.8).combined(with: .opacity).combined(with: .move(edge: .bottom)))
                     }
                 } else {
                     Spacer()
