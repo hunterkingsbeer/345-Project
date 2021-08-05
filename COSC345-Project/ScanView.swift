@@ -33,6 +33,7 @@ struct ScanView: View {
                     .padding(.horizontal)
                 
                 if !isRecognizing {
+                    /*
                     // default "gallery or camera" screen
                     if scanSelection == .none {
                         ScannerSelectView(scanSelection: $scanSelection)
@@ -46,6 +47,7 @@ struct ScanView: View {
                         DocumentScannerView(scanSelection: $scanSelection,
                                             isRecognizing: $isRecognizing)
                     }
+                     */
                 } else {
                     Spacer()
                     Text("Saving...")
