@@ -33,18 +33,17 @@ struct ScanView: View {
                     .padding(.horizontal)
                 
                 if !isRecognizing {
-                    // default "gallery or camera" screen
-                    if scanSelection == .none {
-                        ScannerSelectView(scanSelection: $scanSelection)
-                            .transition(.scale(scale: 0.8).combined(with: .opacity).combined(with: .move(edge: .bottom)))
-                        
-                    } else if scanSelection == .gallery { // scan via gallery
-                        /*GalleryScannerView(scanSelection: $scanSelection,
-                                           isRecognizing: $isRecognizing)*/
+                    
+                    if scanSelection == .gallery { // scan via gallery
+                        GalleryScannerView(scanSelection: $scanSelection,
+                                           isRecognizing: $isRecognizing)
                         
                     } else if scanSelection == .camera { // scan via camera
                         DocumentScannerView(scanSelection: $scanSelection,
                                             isRecognizing: $isRecognizing)
+                    } else { // default "gallery or camera" screen
+                        ScannerSelectView(scanSelection: $scanSelection)
+                            .transition(.scale(scale: 0.8).combined(with: .opacity).combined(with: .move(edge: .bottom)))
                     }
                 } else {
                     Spacer()
