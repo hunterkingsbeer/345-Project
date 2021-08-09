@@ -69,9 +69,10 @@ struct ReceiptDetailView: View  {
                                     }
                                         
                                 }.padding()
-                            }.padding().frame(height: UIScreen.screenHeight * 0.1)
+                            }.padding(.vertical)
+                            .frame(height: UIScreen.screenHeight * 0.1)
                         }.buttonStyle(ShrinkingButton())
-                        .transition(.move(edge: .leading))
+                        .transition(.offset(x: -150))
                     }
                     
                     Button(action: {
@@ -83,16 +84,17 @@ struct ReceiptDetailView: View  {
                                 .fill(Color("object"))
                             VStack {
                                 if detailState == .image && !UIDevice.current.isSimulator {
-                                    (Image(data: receipt.image) ?? Image("")) // find some way to not use !, causes crashes by forcing a view with an optional variable (which is nil)
+                                    (Image(data: receipt.image) ?? Image(""))
                                         .resizable()
                                         .aspectRatio(contentMode: .fit)
                                         .transition(AnyTransition.scale(scale: 0.1).combined(with: .opacity))
-                                        //.animation(Animation.linear(duration: 0.2))
+                                        
                                 } else {
                                     Image(systemName: "photo")
                                 }
                             }
-                        }.padding().frame(height: UIScreen.screenHeight * (detailState == .image ? 0.6 : 0.1))//.fixedSize()
+                        }.padding(.vertical)
+                        .frame(height: UIScreen.screenHeight * (detailState == .image ? 0.6 : 0.1))//.fixedSize()
                     }.buttonStyle(ShrinkingButton())
                     
                     if detailState != .image {
@@ -105,7 +107,7 @@ struct ReceiptDetailView: View  {
                                     .fill(Color(detailState == .editing ? "green" : "object"))
                                 VStack {
                                     if detailState == .image && !UIDevice.current.isSimulator {
-                                        Image(data: receipt.image)! // find some way to not use !, causes crashes by forcing a view with an optional variable (which is nil)
+                                        (Image(data: receipt.image) ?? Image(""))
                                             .resizable()
                                             .aspectRatio(contentMode: .fit)
                                     } else {
@@ -113,15 +115,15 @@ struct ReceiptDetailView: View  {
                                     }
                                         
                                 }.padding()
-                            }.padding().frame(height: UIScreen.screenHeight * 0.1)
+                            }.padding(.vertical)
+                            .frame(height: UIScreen.screenHeight * 0.1)
                         }.buttonStyle(ShrinkingButton())
-                        .transition(.move(edge: .trailing))
+                        .transition(.offset(x: 150))
                     }
                 }.padding(.horizontal)
             }
         }.padding(.bottom)
         .background(Color("background"))
-        .colorScheme(settings.darkMode ? .dark : .light)
         .ignoresSafeArea(edges: /*@START_MENU_TOKEN@*/.bottom/*@END_MENU_TOKEN@*/)
         .colorScheme(settings.darkMode ? .dark : .light)
     }
