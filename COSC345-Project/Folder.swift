@@ -14,7 +14,7 @@ struct TagView: View {
     @ObservedObject var folder: Folder
     var body: some View {
         //let color: String = Folder.getColor(title: folder.title ?? "default")
-        RoundedRectangle(cornerRadius: 15)
+        RoundedRectangle(cornerRadius: 12)
             .fill(Color(Folder.getColor(title: folder.title ?? "default")))
             .overlay(
                 HStack {

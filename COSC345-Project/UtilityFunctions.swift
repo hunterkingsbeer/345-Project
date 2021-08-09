@@ -32,6 +32,17 @@ extension UIView {
     }
 
 }
+
+extension Image {
+    public init?(data: Data?) {
+        guard let data = data,
+            let uiImage = UIImage(data: data) else {
+                return nil
+        }
+        self = Image(uiImage: uiImage)
+    }
+}
+
 extension UIDevice {
     var isSimulator: Bool {
         return TARGET_OS_SIMULATOR != 0

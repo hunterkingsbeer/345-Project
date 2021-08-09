@@ -9,27 +9,121 @@ import Foundation
 import CoreData
 import SwiftUI
 
+enum DetailState {
+    case none
+    case image
+    case deleting
+    case editing
+}
+
 struct ReceiptDetailView: View  {
     /// An induvidual receipt entity that the view will be based on
     @State var receipt: Receipt
+    @State var detailState: DetailState = .none
+    /*@State var showingImage: Bool = false
+    @State var editing: Bool = false
+    @State var pendingDelete: Bool = false*/
     
     @EnvironmentObject var settings: UserSettings
     
     var body: some View {
-        //ScrollView(showsIndicators: false) {
-            VStack (alignment: .leading){
-                Text("\(receipt.store ?? "").")
-                    .font(.system(.title))
-                Text("\(receipt.date ?? Date())")
-                    .font(.caption)
-                Divider()
-                Text(receipt.body ?? "")
+        ZStack {
+            ScrollView(showsIndicators: false) {
+            
+                VStack (alignment: .leading){
+                    Text("\(receipt.store ?? "").")
+                        .font(.system(.title))
+                    Text("\(receipt.date ?? Date())")
+                        .font(.caption)
+                    Divider()
+                    Text(receipt.body ?? "")
+                    Spacer()
+                }.padding(.horizontal).padding(.bottom, 50).padding(.top, 20)
+            }
+            
+            VStack {
                 Spacer()
-            }.padding()
-            .background(Color("object"))
-            .colorScheme(settings.darkMode ? .dark : .light)
-            .ignoresSafeArea(edges: /*@START_MENU_TOKEN@*/.bottom/*@END_MENU_TOKEN@*/)
-        //}.colorScheme(settings.darkMode ? .dark : .light)
+                
+                HStack {
+                    if detailState != .image {
+                        Button(action: {
+                            if detailState == .deleting {
+                                Receipt.delete(receipt: receipt)
+                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                            } else {
+                                detailState = .deleting
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            }
+                        }){
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 15)
+                                    .fill(Color(detailState == .deleting ? "red" : "object"))
+                                    .animation(.easeInOut)
+                                VStack {
+                                    if detailState == .image && !UIDevice.current.isSimulator {
+                                        Image(data: receipt.image)! // find some way to not use !, causes crashes by forcing a view with an optional variable (which is nil)
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fit)
+                                    } else {
+                                        Image(systemName: "trash")
+                                    }
+                                        
+                                }.padding()
+                            }.padding().frame(height: UIScreen.screenHeight * 0.1)
+                        }.buttonStyle(ShrinkingButton())
+                        .transition(.move(edge: .leading))
+                    }
+                    
+                    Button(action: {
+                        detailState = detailState == .image ? .none : .image
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    }){
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 15)
+                                .fill(Color("object"))
+                            VStack {
+                                if detailState == .image && !UIDevice.current.isSimulator {
+                                    (Image(data: receipt.image) ?? Image("")) // find some way to not use !, causes crashes by forcing a view with an optional variable (which is nil)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .transition(AnyTransition.scale(scale: 0.1).combined(with: .opacity))
+                                        //.animation(Animation.linear(duration: 0.2))
+                                } else {
+                                    Image(systemName: "photo")
+                                }
+                            }
+                        }.padding().frame(height: UIScreen.screenHeight * (detailState == .image ? 0.6 : 0.1))//.fixedSize()
+                    }.buttonStyle(ShrinkingButton())
+                    
+                    if detailState != .image {
+                        Button(action: {
+                            detailState = detailState == .editing ? .none : .editing
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        }){
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 15)
+                                    .fill(Color(detailState == .editing ? "green" : "object"))
+                                VStack {
+                                    if detailState == .image && !UIDevice.current.isSimulator {
+                                        Image(data: receipt.image)! // find some way to not use !, causes crashes by forcing a view with an optional variable (which is nil)
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fit)
+                                    } else {
+                                        Image(systemName: "pencil")
+                                    }
+                                        
+                                }.padding()
+                            }.padding().frame(height: UIScreen.screenHeight * 0.1)
+                        }.buttonStyle(ShrinkingButton())
+                        .transition(.move(edge: .trailing))
+                    }
+                }.padding(.horizontal)
+            }
+        }.padding(.bottom)
+        .background(Color("background"))
+        .colorScheme(settings.darkMode ? .dark : .light)
+        .ignoresSafeArea(edges: /*@START_MENU_TOKEN@*/.bottom/*@END_MENU_TOKEN@*/)
+        .colorScheme(settings.darkMode ? .dark : .light)
     }
 }
 
@@ -46,26 +140,33 @@ struct ReceiptView: View {
     @EnvironmentObject var settings: UserSettings
     
     var body: some View {
-        RoundedRectangle(cornerRadius: 18)
+        
+        
+        RoundedRectangle(cornerRadius: 12)
             .fill(Color("accent"))
             .overlay(
                 // the title and body
-                HStack {
+                HStack (alignment: .center){
+                    Image(systemName: Folder.getIcon(title: receipt.folder ?? "doc.plaintext"))
                     VStack(alignment: .leading) {
-                        HStack {
-                            Image(systemName: Folder.getIcon(title: receipt.folder ?? "doc.plaintext"))
-                            Text(receipt.store ?? "")
-                                .font(.system(size: 16, weight: .bold, design: .rounded))
-                        }
-                        if selected {
-                            ScrollView {
-                                Text(receipt.body ?? "")
-                            }
-                        }
-                        Spacer()
+                        Text(receipt.store ?? "")
+                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                        Text("\(getDate())")
+                            .font(.system(size: 14, weight: .regular, design: .rounded))
                     }
                     Spacer()
-                }.padding(10)
+                    if pendingDelete == true {
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(Color.red)
+                            .overlay(Image(systemName: "xmark")
+                                        .foregroundColor(Color("background"))
+                                        .font(.system(size: 15, weight: .bold, design: .rounded)))
+                            .frame(width: UIScreen.screenHeight*0.05).padding(.vertical, 2)
+                            .onTapGesture {
+                                Receipt.delete(receipt: receipt)
+                            }.transition(.scale(scale: 0.0).combined(with: .opacity))
+                    }
+                }.padding(10).animation(.spring())
             )
             .frame(height: UIScreen.screenHeight * 0.08)
             .onTapGesture {
@@ -83,34 +184,20 @@ struct ReceiptView: View {
                     }
                 }
             })
-            .overlay( // the delete button
-                VStack {
-                    if pendingDelete == true {
-                        HStack {
-                            Spacer()
-                            Circle()
-                                .fill(Color.red)
-                                .overlay(Image(systemName: "xmark")
-                                            .foregroundColor(Color("background"))
-                                            .font(.system(size: 15, weight: .bold, design: .rounded)))
-                                .frame(width: UIScreen.screenHeight*0.035,
-                                       height: UIScreen.screenHeight*0.035)
-                                .padding(8)
-                                .onTapGesture {
-                                    Receipt.delete(receipt: receipt)
-                                }
-                        }
-                        Spacer()
-                    }
-                }
-            ).sheet(isPresented: $selected) { ReceiptDetailView(receipt: receipt) }
+            .sheet(isPresented: $selected) { ReceiptDetailView(receipt: receipt) }
+    }
+    
+    func getDate() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEEE, d MMM yyyy."
+        return formatter.string(from: receipt.date ?? Date())
     }
 }
 
 /// Extension of the Receipt object.
 extension Receipt {
     /// Converts scanned text into a new Receipt object.
-    static func saveScan(recognizedText: String){
+    static func saveScan(recognizedText: String, image: UIImage = UIImage()){
         let viewContext = PersistenceController.shared.getContext()
         
         let newReceipt = Receipt(context: viewContext)
@@ -119,6 +206,7 @@ extension Receipt {
         newReceipt.id = UUID()
         newReceipt.store = title
         newReceipt.body = String(recognizedText.dropFirst((newReceipt.store ?? "").count)).capitalized
+        newReceipt.image = image == nil ? UIImage().jpegData(compressionQuality: 0.5) : image.jpegData(compressionQuality: 0.5) // warning is incorrect, this is only true when a default value is applied. Valid images are passed.
         newReceipt.date = Date()
         newReceipt.folder = Prediction.pointPrediction(text: (title + (newReceipt.body ?? "")))
         Folder.verifyFolder(folderTitle: newReceipt.folder ?? "Default")

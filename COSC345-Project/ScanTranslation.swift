@@ -10,17 +10,7 @@ import SwiftUI
 import Vision
 import Foundation
 
-// needs to be identifiable due to multiple pages 
-class TextItem: Identifiable {
-    var id: UUID = UUID()
-    var text: String = ""
-}
-
-class RecognizedContent: ObservableObject {
-    @Published var items = [TextItem]()
-}
-
-struct TextRecognition {
+struct ScanTranslation {
     var scannedImages: [UIImage]
     @ObservedObject var recognizedContent: RecognizedContent
     var didFinishRecognition: () -> Void
@@ -34,11 +24,13 @@ struct TextRecognition {
                 let requestHandler = VNImageRequestHandler(cgImage: cgImage, options: [:])
                 
                 do {
-                    let textItem = TextItem()
-                    try requestHandler.perform([getTextRecognitionRequest(with: textItem)])
+                    let receiptItem = ReceiptItem()
+                    receiptItem.image = image
+                    try requestHandler.perform([getTextRecognitionRequest(with: receiptItem)])
+                    try requestHandler.perform([getTextRecognitionRequest(with: receiptItem)])
                     
                     DispatchQueue.main.async {
-                        recognizedContent.items.append(textItem)
+                        recognizedContent.items.append(receiptItem)
                     }
                 } catch {
                     print(error.localizedDescription)
@@ -51,7 +43,7 @@ struct TextRecognition {
         }
     }
     
-    private func getTextRecognitionRequest(with textItem: TextItem) -> VNRecognizeTextRequest {
+    private func getTextRecognitionRequest(with receiptItem: ReceiptItem) -> VNRecognizeTextRequest {
         let request = VNRecognizeTextRequest { request, error in
             if let error = error {
                 print(error.localizedDescription)
@@ -62,8 +54,8 @@ struct TextRecognition {
             
             observations.forEach { observation in
                 guard let recognizedText = observation.topCandidates(1).first else { return }
-                textItem.text += recognizedText.string
-                textItem.text += "\n"
+                receiptItem.text += recognizedText.string
+                receiptItem.text += "\n"
             }
         }
         

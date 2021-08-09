@@ -79,7 +79,9 @@ struct SettingsView: View  {
                                         Text("Dark Mode")
                                         Spacer()
                                     }
-                                )
+                                ).onChange(of: settings.darkMode, perform: { _ in
+                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                })
                             Divider()
                             
                             Toggle("", isOn: $settings.minimal)
@@ -89,7 +91,9 @@ struct SettingsView: View  {
                                         Text("Minimal Color Mode")
                                         Spacer()
                                     }
-                                )
+                                ).onChange(of: settings.minimal, perform: { _ in
+                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                })
                             Divider()
                             
                             if !settings.minimal {
@@ -98,12 +102,16 @@ struct SettingsView: View  {
                                         Text("Style \(color+1)").tag(color)
                                     }
                                 }.pickerStyle(SegmentedPickerStyle())
+                                .onChange(of: settings.style, perform: { _ in
+                                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                                })
                                 Divider()
                             }
                         }.padding(.horizontal, 2)
                         
                         Button(action: {
                             Receipt.generateRandomReceipts()
+                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                         }){
                             Text("Generate Receipts")
                                 .padding(.vertical, 10)
@@ -115,6 +123,7 @@ struct SettingsView: View  {
                         
                         Button(action: {
                             Receipt.deleteAll(receipts: receipts)
+                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                         }){
                             Text("Delete All")
                                 .padding(.vertical, 10)

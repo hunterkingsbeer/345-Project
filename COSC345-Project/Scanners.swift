@@ -10,7 +10,182 @@ import SwiftUI
 import VisionKit
 import Vision
 
-// CAMERA SCANNER
+class RecognizedContent: ObservableObject {
+    @Published var items = [ReceiptItem]()
+    @Published var images = [UIImage]()
+}
+
+class ReceiptItem: Identifiable {
+    var id: UUID = UUID()
+    var text: String = ""
+    var image: UIImage = UIImage()
+}
+
+enum ScanSelection {
+    case none
+    case camera
+    case gallery
+}
+
+// TODO: when adding multiple images the doc scanner will duplicate previous images in the respective scan
+    // e.g. Scanning receipt 1 & 2. Saving them results in Receipt 1 saved, then receipt 1 (dupe) and receipt 2 saved.
+
+/// Parent View for the scanners.
+/// Controls the background, and visibility of the gallery, document camera, and selection screen used in scanning receipts.
+struct ScanView: View {
+    @EnvironmentObject var settings: UserSettings
+    let inSimulator: Bool = UIDevice.current.isSimulator
+    
+    @State var scanSelection: ScanSelection = .none
+    @State var isRecognizing: Bool = false
+    @State var isConfirming: Bool = false
+    
+    var body: some View {
+        ZStack {
+            BackgroundView()
+            
+            VStack {
+                TitleText(title: "scan")
+                    .padding(.horizontal)
+                
+                if !isRecognizing {
+                    if scanSelection == .gallery { // scan via gallery
+                        GalleryScannerView(scanSelection: $scanSelection,
+                                           isRecognizing: $isRecognizing)
+                        
+                    } else if scanSelection == .camera { // scan via camera
+                        DocumentScannerView(scanSelection: $scanSelection,
+                                            isRecognizing: $isRecognizing)
+                    } else { // default "gallery or camera" screen
+                        ScannerSelectView(scanSelection: $scanSelection)
+                            .transition(AnyTransition.scale(scale: 0.8).combined(with: .opacity).combined(with: .move(edge: .bottom)))
+                    }
+                } else {
+                    Spacer()
+                    Text("Saving...")
+                        .font(.system(.title, design: .rounded))
+                    ProgressView()
+                        .font(.largeTitle)
+                        .progressViewStyle(CircularProgressViewStyle(tint: Color("text")))
+                        .padding(.bottom, 20)
+                    Spacer()
+                }
+            }.animation(.spring())
+        }
+    }
+}
+
+/// Selection screen for picking either Gallery or Document Scanner to input a receipt to scan.
+/// Controls the selection by altering the @Binding scanSelection passed to it from the parent view.
+struct ScannerSelectView: View {
+    @Binding var scanSelection: ScanSelection
+    
+    var body: some View {
+        VStack {
+            Spacer()
+            Button(action: {
+                scanSelection = scanSelection == .gallery ? .none : .gallery
+            }){
+                VStack {
+                    if scanSelection == .none {
+                        Image(systemName: "photo.fill")
+                            .font(.system(.largeTitle, design: .rounded))
+                            .padding()
+                        Text("Add from Gallery")
+                            .font(.system(.title, design: .rounded))
+                    }
+                }.contentShape(Rectangle())
+            }.buttonStyle(ShrinkingButton())
+            
+            Spacer()
+            Divider()
+            Spacer()
+            
+            Button(action:{
+                scanSelection = scanSelection == .camera ? .none : .camera
+            }){
+                VStack {
+                    if scanSelection == .none {
+                        Text("Add from Camera")
+                            .font(.system(.title, design: .rounded))
+                        Image(systemName: "camera.fill")
+                            .font(.system(.largeTitle, design: .rounded))
+                            .padding()
+                            .transition(.opacity)
+                    }
+                }.contentShape(Rectangle())
+            }.buttonStyle(ShrinkingButton())
+            Spacer()
+        }
+    }
+}
+
+/// Confirmation view displays the receipt before saving the receipt. Allows user to confirm, edit, and delete the receipt along with providing the image of the receipt for reference.
+struct ConfirmationView: View {
+    @ObservedObject var recognizedContent: RecognizedContent = RecognizedContent()
+    
+    var body: some View {
+        VStack {
+            TitleText(title: "Confirm")
+            ScrollView(showsIndicators: false) {
+                //ForEach(recognizedContent.items){ receipt in
+                    VStack (alignment: .leading){
+                        Text("Title")
+                            .font(.system(.title))
+                        Text("15/10/2021")
+                            .font(.caption)
+                        Divider()
+                        Text("body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text")
+                    }.padding()
+                    .background(Color("object")).cornerRadius(15)
+                    .padding()
+                    .frame(width: UIScreen.screenWidth * 0.85)
+                //}
+            }
+            HStack {
+                let buttonHeight = UIScreen.screenHeight * 0.06
+                Button(action:{
+                    // cancel scan
+                }){
+                    RoundedRectangle(cornerRadius: 15)
+                        .foregroundColor(Color("object"))
+                        .frame(height: buttonHeight)
+                        .overlay(Image(systemName: "xmark"))
+                }.buttonStyle(ShrinkingButton())
+                
+                Button(action:{
+                    // view image of scan
+                }){
+                    RoundedRectangle(cornerRadius: 15)
+                        .foregroundColor(Color("object"))
+                        .frame(height: buttonHeight)
+                        .overlay(Image(systemName: "photo"))
+                }.buttonStyle(ShrinkingButton())
+                
+                Button(action:{
+                    // edit scan
+                }){
+                    RoundedRectangle(cornerRadius: 15)
+                        .foregroundColor(Color("object"))
+                        .frame(height: buttonHeight)
+                        .overlay(Image(systemName: "pencil"))
+                }.buttonStyle(ShrinkingButton())
+                
+                Button(action:{
+                    // confirm scan
+                }){
+                    RoundedRectangle(cornerRadius: 15)
+                        .foregroundColor(Color("object"))
+                        .frame(height: buttonHeight)
+                        .overlay(Image(systemName: "checkmark"))
+                }.buttonStyle(ShrinkingButton())
+            }
+        }.padding(.horizontal)
+    }
+}
+
+/// Document Camera used for scanning receipts to save.
+/// Controls the DocumentScanner which is used to get a array of images. The images are passed to TextRecognition to extract the text and create a recognizedContent variable, which is saved as a receipt.
 struct DocumentScannerView: View {
     @State var invalidAlert: Bool = false
     @Binding var scanSelection: ScanSelection
@@ -22,10 +197,9 @@ struct DocumentScannerView: View {
             DocumentScanner { result in
                 switch result {
                     case .success(let scannedImages):
-                        print("github please just give me the 'passing' badge")
-                        /*isRecognizing = true
+                        isRecognizing = true
                         print(recognizedContent.items.count)
-                        TextRecognition(scannedImages: scannedImages,
+                        ScanTranslation(scannedImages: scannedImages,
                                         recognizedContent: recognizedContent) {
                             if saveReceipt(){ // if save receipt returns true (valid scan), exit the scanner
                                 scanSelection = .none
@@ -33,20 +207,20 @@ struct DocumentScannerView: View {
                                 invalidAlert = true
                             }
                             isRecognizing = false // Text recognition is finished, hide the progress indicator.
-                        }.recognizeText()*/
+                        }.recognizeText()
                     case .failure(let error):
                         print(error.localizedDescription)
                 }
             } didCancelScanning: {
                 // Dismiss the scanner
                 scanSelection = .none
-            }/*.alert(isPresented: $invalidAlert) {
+            }.alert(isPresented: $invalidAlert) {
                 Alert(
                     title: Text("Receipt Not Saved!"),
                     message: Text("This image is not valid. Try again."),
                     dismissButton: .default(Text("Okay"))
                 )
-            }*/
+            }
         } else { // else if its in the simulator (no camera)
             Text("Camera not supported in the simulator!\n\nPlease use a physical device.")
                 .font(.system(.title, design: .rounded))
@@ -72,7 +246,7 @@ struct DocumentScannerView: View {
                 if receipt.text.count < 2 {
                     return false
                 } else {
-                    Receipt.saveScan(recognizedText: receipt.text)
+                    Receipt.saveScan(recognizedText: receipt.text, image: receipt.image)
                     return true
                 }
             }
@@ -82,7 +256,8 @@ struct DocumentScannerView: View {
     }
 }
 
-// GALLERY SCANNER
+/// Gallery Scanner used for scanning receipts to save.
+/// Controls the ImagePicker (gallery) which is used to get a array of images. The images are passed to TextRecognition to extract the text and create a recognizedContent variable, which is saved as a receipt.
 struct GalleryScannerView: View {
     @State var invalidAlert: Bool = false
     @Binding var scanSelection: ScanSelection
@@ -94,9 +269,9 @@ struct GalleryScannerView: View {
             switch result {
                 case .success(let scannedImages):
                     print("github please just give me the 'passing' badge")
-                    /*isRecognizing = true
+                    isRecognizing = true
                     print(recognizedContent.items.count)
-                    TextRecognition(scannedImages: scannedImages,
+                    ScanTranslation(scannedImages: scannedImages,
                                     recognizedContent: recognizedContent) {
                         if saveReceipt(){ // if save receipt returns true (valid scan), exit the scanner
                             scanSelection = .none
@@ -104,20 +279,20 @@ struct GalleryScannerView: View {
                             invalidAlert = true
                         }
                         isRecognizing = false // Text recognition is finished, hide the progress indicator.
-                    }.recognizeText()*/
+                    }.recognizeText()
                 case .failure(let error):
                     print(error.localizedDescription)
             }
         } didCancelScanning: {
             // Dismiss the scanner
             scanSelection = .none
-        }/*.alert(isPresented: $invalidAlert) {
+        }.alert(isPresented: $invalidAlert) {
             Alert(
                 title: Text("Receipt Not Saved!"),
                 message: Text("This image is not valid. Try again."),
                 dismissButton: .default(Text("Okay"))
             )
-        }*/
+        }
     }
     
     /* i would put saveReceipt() in a separate function since its duplicated in both scanners,
@@ -139,7 +314,7 @@ struct GalleryScannerView: View {
     }
 }
 
-/// ImagePicker handles the gallery importing of images to be read.
+/// ImagePicker handles the gallery importing of images to be stored.
 struct ImagePicker: UIViewControllerRepresentable {
     var didFinishScanning: ((_ result: Result<[UIImage], Error>) -> Void)
     var didCancelScanning: () -> Void
@@ -182,6 +357,7 @@ struct ImagePicker: UIViewControllerRepresentable {
     }
 }
 
+/// DocumentScanner handles the camera importing of images to be stored.
 struct DocumentScanner: UIViewControllerRepresentable {
     var didFinishScanning: ((_ result: Result<[UIImage], Error>) -> Void)
     var didCancelScanning: () -> Void

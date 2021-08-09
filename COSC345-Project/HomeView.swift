@@ -51,7 +51,7 @@ struct HomeView: View {
                 }.padding(.leading, 12)
                 .frame(height: UIScreen.screenHeight*0.05)
                 .background(
-                    RoundedRectangle(cornerRadius: 15)
+                    RoundedRectangle(cornerRadius: 12)
                         .fill(Color("accent"))
                 ).padding(.horizontal)
                 .ignoresSafeArea(.keyboard)
@@ -85,7 +85,7 @@ struct HomeView: View {
                         noReceiptsView()
                     }
                 }
-                .cornerRadius(true ? 0 : 15)
+                .cornerRadius(true ? 0 : 12)
                 .padding(.horizontal)
                 .toolbar {
                     ToolbarItem(placement: .bottomBar) {
