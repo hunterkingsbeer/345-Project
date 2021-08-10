@@ -4,7 +4,7 @@
 
 Receipted is a receipt scanning application that intuitively categorizes receipts based on the body text within. 
 Made for COSC345's full year project. 
-CURRENTLY IN THE PROCESS OF BETA DEVELOPMENT. FEATURES MAY NOT FUNCTION AS EXPECTED.
+Active Branch: UI Redesign.
 
 ### Running the application:
 This app has been developed using an iPhone 11 Pro, however it should run on any device running iOS 7 and above.
@@ -16,10 +16,10 @@ To generate random receipts, tap the settings icon and press the "generate recei
 ### Our Team:
 Hunter Kingsbeer - Engineering and Team Lead.
 
-Tane Carney-Stirling - Testing and Technical Director.
+Tane Carney-Stirling - Testing and Technical.
 
-Caitlin Jillybelle - Design and Research Director.
+Caitlin Jillybelle - Design and Research.
 
-Rhys Davie - Administration and Content Coordinator.
+Rhys Davie - Administration and Content.
 
 ### [Documentation](https://hunterkingsbeer.github.io/345-Project/index.html)
