@@ -153,7 +153,7 @@ struct BackgroundView: View {
             VStack{
                 if !settings.minimal {
                     RoundedRectangle(cornerRadius: 0)
-                        .fill(LinearGradient(gradient: Gradient(colors: [colors[settings.style].leading, colors[settings.style].trailing]), startPoint: .leading, endPoint: .trailing))
+                        .fill(LinearGradient(gradient: Gradient(colors: [colors[settings.style].leading, colors[settings.style].trailing]), startPoint: .topLeading, endPoint: .bottomTrailing))
                         //.fill(LinearGradient(gradient: Gradient(colors: [Color("green"), Color("grass")]), startPoint: .leading, endPoint: .trailing))
                         .frame(height: UIScreen.screenHeight * 0.14)
                     

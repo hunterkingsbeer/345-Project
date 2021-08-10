@@ -30,7 +30,6 @@ extension UIView {
          mask.path = path.cgPath
          self.layer.mask = mask
     }
-
 }
 
 extension Image {
@@ -49,7 +48,7 @@ extension UIDevice {
     }
 }
 
-/// Shrinking a=nimation for the UI buttons.
+/// Shrinking animation for the UI buttons.
 struct ShrinkingButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label

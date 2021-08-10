@@ -24,6 +24,7 @@ struct HomeView: View {
     /// Settings imports the UserSettings
     @EnvironmentObject var settings: UserSettings
     @State var userSearch: String = ""
+    @State var selectedFolder: String = ""
 
     var body: some View {
         ZStack {
@@ -33,38 +34,62 @@ struct HomeView: View {
                 TitleText(title: "receipted")
                     .padding(.horizontal)
                 
-                // search bar
-                HStack {
-                    Image(systemName: "magnifyingglass")
-                    CustomTextField(placeholder: Text("Search"), text: $userSearch)
-                    if userSearch != "" {
-                        Button(action: {
-                            userSearch = ""
-                            UIApplication.shared.endEditing()
-                        }){
-                            Image(systemName: "xmark")
-                                .font(.system(size: 19, weight: .bold, design: .rounded))
-                                .foregroundColor(Color("text"))
+                ZStack {
+                    // search bar
+                    if selectedFolder == "" {
+                        SearchBar(userSearch: $userSearch)
+                            .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.9))).animation(.spring())
+                    } else {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(Folder.getColor(title: selectedFolder)))
+                            HStack {
+                                Image(systemName: Folder.getIcon(title: selectedFolder))
+                                Text("\(Folder.getCount(title: selectedFolder)) \(selectedFolder)")
+                                Spacer()
+                            }.font(.system(size: 16, weight: .bold, design: .rounded))
+                            .foregroundColor(Color("background"))
+                            .padding(10)
+                        }.frame(height: UIScreen.screenHeight*0.05)
+                        .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.9))).animation(.spring())
+                    }
+                    HStack {
+                        Spacer()
+                        if userSearch != "" {
+                            Button(action: {
+                                withAnimation(.spring()){
+                                    userSearch = ""
+                                    selectedFolder = ""
+                                }
+                                UIApplication.shared.endEditing()
+                            }){
+                                Image(systemName: "xmark")
+                                    .font(.system(size: 19, weight: .bold, design: .rounded))
+                                    .foregroundColor(Color(selectedFolder != "" ? "background" : "text"))
+                            }.padding(.trailing)
+                            .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.9))).animation(.spring())
                         }
                     }
-                    Spacer()
-                }.padding(.leading, 12)
-                .frame(height: UIScreen.screenHeight*0.05)
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Color("accent"))
-                ).padding(.horizontal)
-                .ignoresSafeArea(.keyboard)
+                }.transition(.slide).animation(.spring()).padding(.horizontal)
                 
                 // FOLDERS
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack {
                         ForEach(folders) { folder in
-                            Button(action: {
-                                // action for tapping the folder
-                            }){
-                                TagView(folder: folder)
-                            }.buttonStyle(ShrinkingButton())
+                            if selectedFolder != folder.title {
+                                Button(action: {
+                                    withAnimation(.spring()){
+                                        selectedFolder = folder.title ?? "Default"
+                                    }
+                                }){
+                                    TagView(folder: folder)
+                                }.buttonStyle(ShrinkingButton())
+                                .onChange(of: selectedFolder){ _ in
+                                    userSearch = selectedFolder
+                                }
+                                .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.9))).animation(.spring())
+                                
+                            }
                         }
                     }.padding(.horizontal)
                 }
@@ -85,7 +110,7 @@ struct HomeView: View {
                         noReceiptsView()
                     }
                 }
-                .cornerRadius(true ? 0 : 12)
+                .cornerRadius(false ? 0 : 12)
                 .padding(.horizontal)
                 .toolbar {
                     ToolbarItem(placement: .bottomBar) {
@@ -121,5 +146,22 @@ struct noReceiptsView: View {
                     Spacer()
                 }.padding(10)
             ).frame(height: UIScreen.screenHeight * 0.08)
+    }
+}
+
+struct SearchBar: View {
+    @Binding var userSearch: String
+    var body: some View {
+        HStack {
+            Image(systemName: "magnifyingglass")
+            CustomTextField(placeholder: Text("Search"), text: $userSearch)
+            Spacer()
+        }.padding(.leading, 12)
+        .frame(height: UIScreen.screenHeight*0.05)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color("accent"))
+        )
+        .ignoresSafeArea(.keyboard)
     }
 }

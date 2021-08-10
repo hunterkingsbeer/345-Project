@@ -14,20 +14,19 @@ struct TagView: View {
     @ObservedObject var folder: Folder
     var body: some View {
         //let color: String = Folder.getColor(title: folder.title ?? "default")
-        RoundedRectangle(cornerRadius: 12)
-            .fill(Color(Folder.getColor(title: folder.title ?? "default")))
-            .overlay(
-                HStack {
-                    Image(systemName: folder.icon ?? "folder")
-                    Text("\(folder.receiptCount) \(folder.title ?? " Default")")
-                    Spacer()
-                }.font(.system(size: 16, weight: .bold, design: .rounded))
-                .foregroundColor(Color("background"))
-                .padding(.horizontal, 10)
-                .minimumScaleFactor(0.8).lineLimit(1)
-            )
-            .frame(minWidth: UIScreen.screenWidth * 0.4)
-            .frame(height: UIScreen.screenHeight*0.05)
+        ZStack {
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(Folder.getColor(title: folder.title ?? "default")))
+                //.frame(minWidth: UIScreen.screenWidth * 0.4)
+                //.frame(height: UIScreen.screenHeight*0.05)
+            HStack {
+                Image(systemName: folder.icon ?? "folder")
+                Text("\(folder.receiptCount) \(folder.title ?? " Default")")
+                Spacer()
+            }.font(.system(size: 16, weight: .bold, design: .rounded))
+            .foregroundColor(Color("background"))
+            .padding(10)
+        }.fixedSize()
     }
 }
 
@@ -40,24 +39,24 @@ extension Folder {
                               (title: "Clothing", icon: "bag", color: "pink")]
     
     /// Retreives the icon of a folder based on it's title.
-    static func getIcon(title: String) -> String {
-        for match in folderMatch where match.title.lowercased() == title.lowercased(){
+    static func getIcon(title: String?) -> String {
+        for match in folderMatch where match.title.lowercased() == title?.lowercased(){
             return match.icon.lowercased()
         }
         return "folder".lowercased()
     }
     
     /// Retreives the colour of a folder based on it's title.
-    static func getColor(title: String) -> String {
-        for match in folderMatch where match.title.lowercased() == title.lowercased(){
+    static func getColor(title: String?) -> String {
+        for match in folderMatch where match.title.lowercased() == title?.lowercased(){
             return match.color.lowercased()
         }
         return "text"
     }
     
     /// Boolean true if folder exists, false if not.
-    static func folderExists(title: String) -> Bool {
-        for match in folderMatch where match.title.lowercased() == title.lowercased() {
+    static func folderExists(title: String?) -> Bool {
+        for match in folderMatch where match.title.lowercased() == title?.lowercased() {
             return true
         }
         return false
@@ -78,14 +77,14 @@ extension Folder {
     }
     
     /// Returns the folder matching the input title
-    static func getFolder(folderTitle: String) -> Folder {
-        for folder in getFolders() where folder.title == folderTitle.capitalized {
+    static func getFolder(folderTitle: String?) -> Folder {
+        for folder in getFolders() where folder.title == folderTitle?.capitalized {
             return folder
         }
         return Folder()
     }
     
-    static func getCount(title: String) -> Int {
+    static func getCount(title: String?) -> Int {
         return Int(getFolder(folderTitle: title).receiptCount)
     }
     

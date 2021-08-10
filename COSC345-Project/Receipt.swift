@@ -67,8 +67,7 @@ struct ReceiptDetailView: View  {
                                     } else {
                                         Image(systemName: "trash")
                                     }
-                                        
-                                }.padding()
+                                }
                             }.padding(.vertical)
                             .frame(height: UIScreen.screenHeight * 0.1)
                         }.buttonStyle(ShrinkingButton())
@@ -94,7 +93,7 @@ struct ReceiptDetailView: View  {
                                 }
                             }
                         }.padding(.vertical)
-                        .frame(height: UIScreen.screenHeight * (detailState == .image ? 0.6 : 0.1))//.fixedSize()
+                        .frame(height: UIScreen.screenHeight * (detailState == .image ? 0.6 : 0.1))
                     }.buttonStyle(ShrinkingButton())
                     
                     if detailState != .image {
@@ -113,7 +112,6 @@ struct ReceiptDetailView: View  {
                                     } else {
                                         Image(systemName: "pencil")
                                     }
-                                        
                                 }.padding()
                             }.padding(.vertical)
                             .frame(height: UIScreen.screenHeight * 0.1)
@@ -138,12 +136,9 @@ struct ReceiptView: View {
     @State var selected: Bool = false
     /// Whether the user has held down the receipt (performed the delete action), and is pending delete
     @State var pendingDelete = false
-    
     @EnvironmentObject var settings: UserSettings
     
     var body: some View {
-        
-        
         RoundedRectangle(cornerRadius: 12)
             .fill(Color("accent"))
             .overlay(
@@ -168,9 +163,10 @@ struct ReceiptView: View {
                                 Receipt.delete(receipt: receipt)
                             }.transition(.scale(scale: 0.0).combined(with: .opacity))
                     }
-                }.padding(10).animation(.spring())
-            )
+                }.padding(10)
+            ).animation(.spring())
             .frame(height: UIScreen.screenHeight * 0.08)
+            .sheet(isPresented: $selected) { ReceiptDetailView(receipt: receipt) }
             .onTapGesture {
                 selected.toggle()
             }
@@ -186,7 +182,6 @@ struct ReceiptView: View {
                     }
                 }
             })
-            .sheet(isPresented: $selected) { ReceiptDetailView(receipt: receipt) }
     }
     
     func getDate() -> String {
