@@ -23,12 +23,6 @@ class UserSettings: ObservableObject {
         }
     }
     
-    @Published var contrast: Bool {
-        didSet {
-            UserDefaults.standard.set(contrast, forKey: "contrast")
-        }
-    }
-    
     @Published var style: Int {
         didSet {
             UserDefaults.standard.set(style, forKey: "style")
@@ -41,8 +35,6 @@ class UserSettings: ObservableObject {
         self.darkMode = UserDefaults.standard.object(forKey: "darkMode") as? Bool ?? true
         /// Mimimal mode.
         self.minimal = UserDefaults.standard.object(forKey: "minimal") as? Bool ?? false
-        /// High contrast mode.
-        self.contrast = UserDefaults.standard.object(forKey: "contrast") as? Bool ?? false
         /// Colour scheme for background gradients.
         self.style = UserDefaults.standard.object(forKey: "style") as? Int ?? 0
     }

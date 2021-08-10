@@ -14,7 +14,7 @@ struct TagView: View {
     @ObservedObject var folder: Folder
     var body: some View {
         //let color: String = Folder.getColor(title: folder.title ?? "default")
-        RoundedRectangle(cornerRadius: 15)
+        RoundedRectangle(cornerRadius: 12)
             .fill(Color(Folder.getColor(title: folder.title ?? "default")))
             .overlay(
                 HStack {
@@ -34,7 +34,7 @@ struct TagView: View {
 /// Extension of the Folder object
 extension Folder {
     /// Defines the folders utilized, with their respective icons and colours.
-    static let folderMatch = [(title: "Default", icon: "folder", color: "text"),
+    static let folderMatch = [(title: "Default", icon: "doc.plaintext", color: "text"),
                               (title: "Retail", icon: "tag", color: "blue"),
                               (title: "Groceries", icon: "cart", color: "green"),
                               (title: "Clothing", icon: "bag", color: "pink")]
@@ -83,6 +83,10 @@ extension Folder {
             return folder
         }
         return Folder()
+    }
+    
+    static func getCount(title: String) -> Int {
+        return Int(getFolder(folderTitle: title).receiptCount)
     }
     
     /// Adds a folder to the database with the specified title and icon.

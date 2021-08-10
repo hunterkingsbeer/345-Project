@@ -20,95 +20,160 @@ struct ContentView_Previews: PreviewProvider {
 
 // -------------------------------------------------------------------------- VIEWS
 
-/// AddPanelType holds the various states for the Add panel.
-enum AddPanelType {
-    /// Displays the standard homepage view for the add panel. Two option, add from gallery or camera.
-    case homepage
-    /// Displays the panel's add from camera view
-    case camera
-    /// Displays the panel's add from gallery view
-    case gallery
-}
-
-/// DashPanelType holds the various states for the dashboard panel.
-enum DashPanelType {
-    /// Displays the standard homepage view for the Dashpanel. Showing the Receipts, folders, settings and notifcations.
-    case homepage
-    /// Displays the
-    case expanded
-    /// Displays the settings view
-    case settings
+enum TabPage: Int {
+    case home = 0
+    case scan = 1
+    case settings = 2
 }
 
 /// ContentView is the main content view that is called when starting the app.
 struct ContentView: View {
-    /// AddPanelType maintains and updates the add panels view state.
-    @State var addPanelState: AddPanelType = .homepage // need to make these global vars
-    /// DashPanelState maintains and updates the dashboards view state.
-    @State var dashPanelState: DashPanelType = .homepage
+    @State var tabSelection: TabPage = .home
     /// Settings imports the UserSettings
     @EnvironmentObject var settings: UserSettings
-
+    @State var colors = Color.colors
+    
     var body: some View {
-        ZStack(alignment: .top) {
-            // BACKGROUND BLOBS ------------------
-            BackgroundView(addPanelState: addPanelState,
-                           dashPanelState: dashPanelState)
+        ZStack {
+            TabView (){
+                HomeView()
+                    .tabItem { Label("Home", systemImage: "text.justify") }
+                    .tag(0)
+                ScanView()
+                    .tabItem { Label("Scan", systemImage: "camera.viewfinder") }
+                    .tag(1)
+                SettingsView()
+                    .tabItem { Label("Settings", systemImage: "gearshape.fill").foregroundColor(Color("text")) }
+                    .tag(2)
+            }.accentColor(settings.minimal ? Color("text") : Color.colors[settings.style].text)
+            .transition(.slide)
+            .colorScheme(settings.darkMode ? .dark : .light)
+        }
+    }
+}
+
+/// SettingsView displays the settings menu
+/// - Main Parent: DashboardHomePageView
+struct SettingsView: View  {
+    /// Fetches Receipt entities in CoreData sorting by the NSSortDescriptor.
+    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)], animation: .spring())
+    /// Stores the fetched results as an array of Receipt objects.
+    var receipts: FetchedResults<Receipt>
+    /// Settings imports the UserSettings
+    @EnvironmentObject var settings: UserSettings
+   
+    var body: some View {
+        ZStack {
+            BackgroundView()
             
-            // COMPANY TITLE ------------------
             VStack {
-                // DASHBOARD (UPPER) ------------------
-                if addPanelState == .homepage {
-                    DashboardPanelParent(dashPanelState: $dashPanelState)
-                        .padding(.bottom, dashPanelState != .expanded ? 12 : 0)
-                        .transition(AnyTransition.opacity
-                                        .combined(with: .scale(scale: 0.75)))
-                        
-                }
+                TitleText(title: "settings")
                 
-                // ADD RECEIPT (LOWER) ------------------
-                if dashPanelState != .expanded {
-                    AddPanelParent(addPanelState: $addPanelState)
-                        .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.75)))
-                        .animation(.spring())
-                    Spacer()
+                ScrollView(showsIndicators: false){
+                    VStack (alignment: .leading){
+                        VStack{
+                            Toggle("", isOn: $settings.darkMode)
+                                .contentShape(Rectangle())
+                                .overlay( // Testing taps text instead of toggle, text is put in usual toggle text field. Therefore overlay of text is required for testing.
+                                    HStack{
+                                        Text("Dark Mode")
+                                        Spacer()
+                                    }
+                                ).onChange(of: settings.darkMode, perform: { _ in
+                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                })
+                            Divider()
+                            
+                            Toggle("", isOn: $settings.minimal)
+                                .contentShape(Rectangle())
+                                .overlay(
+                                    HStack{
+                                        Text("Minimal Color Mode")
+                                        Spacer()
+                                    }
+                                ).onChange(of: settings.minimal, perform: { _ in
+                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                })
+                            Divider()
+                            
+                            if !settings.minimal {
+                                Picker("Background Color", selection: $settings.style) {
+                                    ForEach(0..<Color.colors.count){ color in
+                                        Text("Style \(color+1)").tag(color)
+                                    }
+                                }.pickerStyle(SegmentedPickerStyle())
+                                .onChange(of: settings.style, perform: { _ in
+                                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                                })
+                                Divider()
+                            }
+                        }.padding(.horizontal, 2)
+                        
+                        Button(action: {
+                            Receipt.generateRandomReceipts()
+                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                        }){
+                            Text("Generate Receipts")
+                                .padding(.vertical, 10)
+                                .frame(minWidth: 0, maxWidth: .infinity)
+                                .background(Color("accent"))
+                                .cornerRadius(10)
+                        }.buttonStyle(ShrinkingButton())
+                        Divider()
+                        
+                        Button(action: {
+                            Receipt.deleteAll(receipts: receipts)
+                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                        }){
+                            Text("Delete All")
+                                .padding(.vertical, 10)
+                                .frame(minWidth: 0, maxWidth: .infinity)
+                                .background(Color("accent"))
+                                .cornerRadius(10)
+                        }.buttonStyle(ShrinkingButton())
+                        Spacer()
+                    }.frame(minWidth: 0, maxWidth: .infinity).animation(.spring())
                 }
-            }.ignoresSafeArea(.keyboard) // broken code, find fix
-            .padding(.horizontal, addPanelState == .homepage ? 15 : 0)
-        }.colorScheme(settings.darkMode ? .dark : .light)
+            }.padding(.horizontal)
+        }
     }
 }
 
 /// Background view is the background of the application
 /// - Main Parent: ContentView
 struct BackgroundView: View {
-    /// AddPanelType maintains and updates the add panels view state.
-    var addPanelState: AddPanelType
-    /// DashPanelState maintains and updates the dashboards view state.
-    var dashPanelState: DashPanelType
     /// Settings imports the UserSettings
     @EnvironmentObject var settings: UserSettings
-    @State var colors = Color.getColors()
+    @State var colors = Color.colors
     
     var body: some View {
         ZStack {
-            Color(settings.contrast ? "backgroundContrast" : "background").ignoresSafeArea(.all)
-            if !settings.minimal {
-                VStack {
-                    Circle()
-                        .fill(LinearGradient(gradient: Gradient(colors: [colors[settings.style].top1, colors[settings.style].top2]), startPoint: .top, endPoint: .bottom))
-                        .scaleEffect(x: 1.5) // gives it that clean stretched out look
-                        .padding(.top, -UIScreen.screenHeight * 0.55)
-                        //.padding(.top, -UIScreen.screenHeight * (dashPanelState != .expanded ? 0.5 : 0.38))
-                        .animation(.spring())
+            Color("background").ignoresSafeArea(.all)
+            
+            VStack{
+                if !settings.minimal {
+                    RoundedRectangle(cornerRadius: 0)
+                        .fill(LinearGradient(gradient: Gradient(colors: [colors[settings.style].leading, colors[settings.style].trailing]), startPoint: .leading, endPoint: .trailing))
+                        //.fill(LinearGradient(gradient: Gradient(colors: [Color("green"), Color("grass")]), startPoint: .leading, endPoint: .trailing))
+                        .frame(height: UIScreen.screenHeight * 0.14)
+                    
                     Spacer()
-                    Circle()
-                        .fill(LinearGradient(gradient: Gradient(colors: [colors[settings.style].bottom1, colors[settings.style].bottom2]), startPoint: .top, endPoint: .bottom))
-                        .scaleEffect(x: 1.5)
-                        .padding(.bottom, -UIScreen.screenHeight * (addPanelState == .homepage ? 0.6 : 0.38))
-                        .animation(.spring())
                 }
-            }
-        }.animation(.easeInOut)
+            }.ignoresSafeArea()
+        }
+    }
+}
+
+struct TitleText: View {
+    @EnvironmentObject var settings: UserSettings
+    
+    let title: String
+    var body: some View {
+        HStack {
+            Text("\(title.capitalized).")
+                .font(.system(.largeTitle)).bold()
+                .foregroundColor(Color(settings.style == 4 || settings.minimal ? "text" : "background"))
+            Spacer()
+        }.padding(.bottom, 10).padding(.top, 20)
     }
 }
