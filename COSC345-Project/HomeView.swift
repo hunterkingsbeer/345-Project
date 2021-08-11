@@ -70,10 +70,10 @@ struct HomeView: View {
                                     } else {
                                         Rectangle()
                                             .fill(Color(Folder.getColor(title: selectedFolder)))
+                                            .transition(AnyTransition.offset(y: -150).combined(with: .opacity))
                                     }
                                 }
                                 .scaleEffect(x: 1.5)
-                                .transition(AnyTransition.offset(y: -150).combined(with: .opacity))
                                 .animation(.easeOut(duration: 0.3))
                                 .ignoresSafeArea(edges: .top)
                             }
