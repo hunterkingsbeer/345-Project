@@ -1,4 +1,4 @@
-name: Codecov/Tests
+name: SwiftUI & Codecov Tests
 on:
   push:
     branches: [ main ]

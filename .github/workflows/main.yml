@@ -1,4 +1,4 @@
-name: PublishDocumentation
+name: Documentation Publisher
 on:
   schedule:
   - cron: "0 0 * * *"
