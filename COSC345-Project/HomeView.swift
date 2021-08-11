@@ -49,12 +49,13 @@ struct HomeView: View {
                             .font(.system(size: 40, weight: .regular))
                         } else {
                             HStack {
-                                Image(Folder.getIcon(title: selectedFolder))
+                                Image(systemName: Folder.getIcon(title: selectedFolder))
+                                    .font(.system(size: 30, weight: .semibold))
                                 Text("\(selectedFolder).")
                                     .font(.system(size: 40, weight: .semibold))
-                                    .foregroundColor(Color(selectedFolder.isEmpty || settings.minimal ? "text" : "background"))
-                                    .transition(AnyTransition.opacity.combined(with: .offset(y: -100)))
                             }
+                            .foregroundColor(Color(selectedFolder.isEmpty || settings.minimal ? "text" : "background"))
+                            .transition(AnyTransition.opacity.combined(with: .offset(y: -100)))
                         }
                         
                         Spacer()
@@ -76,12 +77,15 @@ struct HomeView: View {
                                 .animation(.easeOut(duration: 0.3))
                                 .ignoresSafeArea(edges: .top)
                             }
-                            VStack {
-                                Spacer()
-                                Rectangle()
-                                    .frame(height: 2)
-                                    .foregroundColor(Color("object"))
-                            }.padding(.bottom, 14)
+                            if selectedFolder.isEmpty {
+                                VStack {
+                                    Spacer()
+                                    Rectangle()
+                                        .frame(height: 2)
+                                        .foregroundColor(Color("object"))
+                                }.padding(.bottom, 14)
+                                .transition(AnyTransition.opacity.combined(with: .move(edge: .bottom)))
+                            }
                         }
                     )
                     
