@@ -21,8 +21,7 @@ class COSC345_ProjectUITests: XCTestCase {
         app.launch()
         buttons["Scan"].tap()
         // xct enum for camera state
-        buttons["Add from Camera"].tap()
-        buttons["Add from Camera"].tap()
+        buttons["Add from Camera"].forceTap()
         // assert for camera view
         sleep(3)
         let cameraText = app.staticTexts["CameraSimCheck"]// checking if its in the sim or not
@@ -34,8 +33,8 @@ class COSC345_ProjectUITests: XCTestCase {
     func testMainSettings() throws {
         app.terminate()
         app.launch()
-        app.buttons["Settings"].tap()
-        app.switches["DarkModeToggle"].tap()
+        app.buttons["Settings"].forceTap()
+        app.switches["DarkModeToggle"].forceTap()
         sleep(2)
         //XCTAssert(switches["DarkModeToggle"].value as? Int != temp as? Int)
         //dark mode toggle assert
@@ -70,5 +69,11 @@ class COSC345_ProjectUITests: XCTestCase {
 
   
 
+}
+
+extension XCUIElement {
+    func forceTap() {
+        coordinate(withNormalizedOffset: CGVector(dx:0.5, dy:0.5)).tap()
+    }
 }
 
