@@ -37,6 +37,7 @@ struct HomeView: View {
                 HStack {
                     Image(systemName: "magnifyingglass")
                     CustomTextField(placeholder: Text("Search"), text: $userSearch)
+                        .accessibility(identifier: "SearchBar")
                     if userSearch != "" {
                         Button(action: {
                             userSearch = ""

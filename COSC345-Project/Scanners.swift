@@ -96,6 +96,7 @@ struct ScannerSelectView: View {
                     }
                 }.contentShape(Rectangle())
             }.buttonStyle(ShrinkingButton())
+            .accessibility(identifier: "Add from Gallery")
             
             Spacer()
             Divider()
@@ -115,6 +116,7 @@ struct ScannerSelectView: View {
                     }
                 }.contentShape(Rectangle())
             }.buttonStyle(ShrinkingButton())
+            .accessibility(identifier: "Add from Camera")
             Spacer()
         }
     }
@@ -225,6 +227,7 @@ struct DocumentScannerView: View {
             Text("Camera not supported in the simulator!\n\nPlease use a physical device.")
                 .font(.system(.title, design: .rounded))
                 .padding()
+                .accessibility(identifier: "CameraSimCheck")
             Button(action: {
                 scanSelection = .none
             }){
@@ -233,6 +236,7 @@ struct DocumentScannerView: View {
                     .background(RoundedRectangle(cornerRadius: 25).fill(Color("object")))
                     .padding()
             }.buttonStyle(ShrinkingButton())
+            .accessibility(identifier: "BackButtonCamera")
             Spacer()
         }
     }
