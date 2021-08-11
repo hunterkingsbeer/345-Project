@@ -36,38 +36,20 @@ class COSC345_ProjectUITests: XCTestCase {
         app.buttons["Settings"].forceTap()
         app.switches["DarkModeToggle"].forceTap()
         sleep(2)
-        //XCTAssert(switches["DarkModeToggle"].value as? Int != temp as? Int)
         //dark mode toggle assert
         
 
     }
     
-//    func testMainView() throws {
-//        app.launch()
-//        self.load(urlString: "https://th.bing.com/th/id/R.337b44db5d3df726ce00b185c9373c59?rik=AAtf2NG4m90OsQ&riu=http%3a%2f%2fwww.angryasianman.com%2fimages%2fangry%2fbebe_yokoono01.jpg&ehk=fd5IonSO0pSqQy4mpynFUtFhW8CHqSWWRgf1n9t06TI%3d&risl=&pid=ImgRaw&r=0")
-//        let image: UIImageView = UIImageView(image: image)
-//    }
+    func testMainScene() throws {
+        app.launch()
+        
+    }
 
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
     
-    func load(urlString : String) {
-        guard let url = URL(string: urlString)else {
-            return
-        }
-        DispatchQueue.global().async { [weak self] in
-            if let data = try? Data(contentsOf: url) {
-                if let image = UIImage(data: data) {
-                    DispatchQueue.main.async {
-                        self?.image = image
-                    }
-                }
-            }
-        }
-    }
-
-  
 
 }
 

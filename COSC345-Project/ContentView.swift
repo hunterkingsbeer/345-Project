@@ -73,6 +73,7 @@ struct SettingsView: View  {
                     VStack (alignment: .leading){
                         VStack{
                             Toggle("", isOn: $settings.darkMode)
+                                .accessibility(identifier: "DarkModeToggle")
                                 .contentShape(Rectangle())
                                 .overlay( // Testing taps text instead of toggle, text is put in usual toggle text field. Therefore overlay of text is required for testing.
                                     HStack{
