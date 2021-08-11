@@ -57,7 +57,7 @@ struct Prediction {
         var count = 0
         for keyword in keywords {
             if input.lowercased().contains(keyword){
-                //print("\nMatched word '\(keyword)'")
+                print("\nMatched word '\(keyword)'")
                 count += 1
             }
         }

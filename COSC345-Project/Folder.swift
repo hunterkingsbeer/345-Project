@@ -12,35 +12,63 @@ import SwiftUI
 /// Tag/Folder
 struct TagView: View {
     @ObservedObject var folder: Folder
+    @State var selected: Bool = false
+    @Binding var selectedFolder: String
+    
+    @EnvironmentObject var settings: UserSettings
+    
     var body: some View {
-        //let color: String = Folder.getColor(title: folder.title ?? "default")
-        ZStack {
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(Folder.getColor(title: folder.title ?? "default")))
-                //.frame(minWidth: UIScreen.screenWidth * 0.4)
-                //.frame(height: UIScreen.screenHeight*0.05)
-            HStack {
-                Image(systemName: folder.icon ?? "folder")
-                Text("\(folder.receiptCount) \(folder.title ?? " Default")")
-                Spacer()
-            }.font(.system(size: 16, weight: .bold, design: .rounded))
-            .foregroundColor(Color("background"))
-            .padding(10)
-        }.fixedSize()
+        Button(action: {
+            withAnimation(.spring()){
+                selectedFolder = selectedFolder == folder.title ? "" : folder.title ?? "Default"
+            }
+        }){
+            if settings.thinFolders {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color(Folder.getColor(title: folder.title ?? "default")))
+                    
+                    HStack {
+                        Image(systemName: folder.icon ?? "folder")
+                        Text("\(folder.receiptCount) \(folder.title ?? " Default")")
+                        Spacer()
+                    }.font(.system(size: 16, weight: .bold))
+                    .foregroundColor(Color("background"))
+                    .padding(10)
+                }.fixedSize()
+            } else {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color(Folder.getColor(title: folder.title ?? "default")))
+                    
+                    VStack {
+                        HStack {
+                            Image(systemName: folder.icon ?? "folder")
+                            Spacer()
+                            Text("\(folder.receiptCount)")
+                        }.padding(.horizontal, 10)
+                        Text("\(folder.title ?? " Default")")
+                    }.padding(10)
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(Color("background"))
+                }.fixedSize()
+            }
+        }.buttonStyle(ShrinkingButton())
     }
 }
 
 /// Extension of the Folder object
 extension Folder {
     /// Defines the folders utilized, with their respective icons and colours.
-    static let folderMatch = [(title: "Default", icon: "doc.plaintext", color: "text"),
-                              (title: "Retail", icon: "tag", color: "blue"),
+    static let folders = [(title: "Default", icon: "doc.plaintext", color: "text"),
+                              (title: "Retail", icon: "tag", color: "lightYellow"),
                               (title: "Groceries", icon: "cart", color: "green"),
+                              (title: "Technology", icon: "desktopcomputer", color: "blue"),
                               (title: "Clothing", icon: "bag", color: "pink")]
     
     /// Retreives the icon of a folder based on it's title.
     static func getIcon(title: String?) -> String {
-        for match in folderMatch where match.title.lowercased() == title?.lowercased(){
+        for match in folders where match.title.lowercased() == title?.lowercased(){
             return match.icon.lowercased()
         }
         return "folder".lowercased()
@@ -48,15 +76,15 @@ extension Folder {
     
     /// Retreives the colour of a folder based on it's title.
     static func getColor(title: String?) -> String {
-        for match in folderMatch where match.title.lowercased() == title?.lowercased(){
-            return match.color.lowercased()
+        for match in folders where match.title.lowercased() == title?.lowercased(){
+            return match.color
         }
         return "text"
     }
     
     /// Boolean true if folder exists, false if not.
     static func folderExists(title: String?) -> Bool {
-        for match in folderMatch where match.title.lowercased() == title?.lowercased() {
+        for match in folders where match.title.lowercased() == title?.lowercased() {
             return true
         }
         return false

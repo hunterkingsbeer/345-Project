@@ -15,15 +15,11 @@ enum DetailState {
     case deleting
     case editing
 }
-
+ 
 struct ReceiptDetailView: View  {
     /// An induvidual receipt entity that the view will be based on
     @State var receipt: Receipt
     @State var detailState: DetailState = .none
-    /*@State var showingImage: Bool = false
-    @State var editing: Bool = false
-    @State var pendingDelete: Bool = false*/
-    
     @EnvironmentObject var settings: UserSettings
     
     var body: some View {
@@ -86,12 +82,12 @@ struct ReceiptDetailView: View  {
                                     (Image(data: receipt.image) ?? Image(""))
                                         .resizable()
                                         .aspectRatio(contentMode: .fit)
-                                        .transition(AnyTransition.scale(scale: 0.1).combined(with: .opacity))
-                                        
                                 } else {
                                     Image(systemName: "photo")
+                                        .padding()
                                 }
-                            }
+                            }.transition(AnyTransition.scale(scale: 0.1).combined(with: .opacity))
+                            .cornerRadius(12)
                         }.padding(.vertical)
                         .frame(height: UIScreen.screenHeight * (detailState == .image ? 0.6 : 0.1))
                     }.buttonStyle(ShrinkingButton())
@@ -123,7 +119,6 @@ struct ReceiptDetailView: View  {
         }.padding(.bottom)
         .background(Color("background"))
         .ignoresSafeArea(edges: /*@START_MENU_TOKEN@*/.bottom/*@END_MENU_TOKEN@*/)
-        .colorScheme(settings.darkMode ? .dark : .light)
     }
 }
 

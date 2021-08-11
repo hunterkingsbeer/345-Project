@@ -25,69 +25,100 @@ struct HomeView: View {
     @EnvironmentObject var settings: UserSettings
     @State var userSearch: String = ""
     @State var selectedFolder: String = ""
+    @State var colors = Color.colors
 
     var body: some View {
         ZStack {
             BackgroundView()
             
             VStack {
-                TitleText(title: "receipted")
-                    .padding(.horizontal)
-                
-                ZStack {
-                    // search bar
-                    if selectedFolder == "" {
-                        SearchBar(userSearch: $userSearch)
-                            .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.9))).animation(.spring())
-                    } else {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color(Folder.getColor(title: selectedFolder)))
-                            HStack {
-                                Image(systemName: Folder.getIcon(title: selectedFolder))
-                                Text("\(Folder.getCount(title: selectedFolder)) \(selectedFolder)")
-                                Spacer()
-                            }.font(.system(size: 16, weight: .bold, design: .rounded))
-                            .foregroundColor(Color("background"))
-                            .padding(10)
-                        }.frame(height: UIScreen.screenHeight*0.05)
-                        .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.9))).animation(.spring())
-                    }
+                HStack {
                     HStack {
+                        if selectedFolder.isEmpty {
+                            ZStack(alignment: .leading) {
+                                if userSearch.isEmpty {
+                                    Text("Receipted.")
+                                        .font(.system(size: 40, weight: .semibold))
+                                        .transition(AnyTransition.opacity.combined(with: .move(edge: .bottom)))
+                                }
+                                TextField("", text: $userSearch)
+                                    .animation(.easeInOut(duration: 0.3))
+                            }
+                            .transition(AnyTransition.opacity.combined(with: .move(edge: .bottom)))
+                            .foregroundColor(Color(selectedFolder.isEmpty || settings.minimal ? "text" : "background"))
+                            .font(.system(size: 40, weight: .regular))
+                        } else {
+                            HStack {
+                                Image(Folder.getIcon(title: selectedFolder))
+                                Text("\(selectedFolder).")
+                                    .font(.system(size: 40, weight: .semibold))
+                                    .foregroundColor(Color(selectedFolder.isEmpty || settings.minimal ? "text" : "background"))
+                                    .transition(AnyTransition.opacity.combined(with: .offset(y: -100)))
+                            }
+                        }
+                        
                         Spacer()
-                        if userSearch != "" {
+                    }.padding(.bottom, 10).padding(.top, 20)
+                    .background(
+                        ZStack{
+                            if !settings.minimal {
+                                VStack {
+                                    if selectedFolder.isEmpty {
+                                        Rectangle()
+                                            .fill(Color.clear)
+                                    } else {
+                                        Rectangle()
+                                            .fill(Color(Folder.getColor(title: selectedFolder)))
+                                    }
+                                }
+                                .scaleEffect(x: 1.5)
+                                .transition(AnyTransition.offset(y: -150).combined(with: .opacity))
+                                .animation(.easeOut(duration: 0.3))
+                                .ignoresSafeArea(edges: .top)
+                            }
+                            VStack {
+                                Spacer()
+                                Rectangle()
+                                    .frame(height: 2)
+                                    .foregroundColor(Color("object"))
+                            }.padding(.bottom, 14)
+                        }
+                    )
+                    
+                    ZStack{
+                        if userSearch.isEmpty && selectedFolder.isEmpty {
+                            Image(systemName: "magnifyingglass")
+                        } else {
+                            // make a down arrow
                             Button(action: {
-                                withAnimation(.spring()){
+                                withAnimation(.easeInOut(duration: 0.3)){
                                     userSearch = ""
                                     selectedFolder = ""
                                 }
                                 UIApplication.shared.endEditing()
                             }){
-                                Image(systemName: "xmark")
-                                    .font(.system(size: 19, weight: .bold, design: .rounded))
-                                    .foregroundColor(Color(selectedFolder != "" ? "background" : "text"))
-                            }.padding(.trailing)
-                            .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.9))).animation(.spring())
+                                if !selectedFolder.isEmpty { // if selecting a folder
+                                    Image(systemName: "chevron.down")
+                                        .transition(AnyTransition.opacity.combined(with: .offset(y: -100)))
+                                } else if !userSearch.isEmpty { // if typing text
+                                    Image(systemName: "xmark")
+                                }
+                            }
                         }
                     }
-                }.transition(.slide).animation(.spring()).padding(.horizontal)
+                    .font(.system(size: 19, weight: .bold, design: .rounded))
+                    .foregroundColor(Color(selectedFolder.isEmpty || settings.minimal ? "text" : "background"))
+                    .padding(.horizontal)
+                    .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.9)))//.animation(.spring())
+                }.padding(.horizontal)
                 
                 // FOLDERS
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack {
                         ForEach(folders) { folder in
                             if selectedFolder != folder.title {
-                                Button(action: {
-                                    withAnimation(.spring()){
-                                        selectedFolder = folder.title ?? "Default"
-                                    }
-                                }){
-                                    TagView(folder: folder)
-                                }.buttonStyle(ShrinkingButton())
-                                .onChange(of: selectedFolder){ _ in
-                                    userSearch = selectedFolder
-                                }
-                                .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.9))).animation(.spring())
+                                TagView(folder: folder, selectedFolder: $selectedFolder)
+                                        .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.9))).animation(.spring())
                                 
                             }
                         }
@@ -98,10 +129,15 @@ struct HomeView: View {
                 ScrollView(showsIndicators: false) {
                     if receipts.count > 0 {
                         VStack {
-                            ForEach(receipts.filter({ userSearch.count > 0 ?
-                                                        $0.body!.localizedCaseInsensitiveContains(userSearch) ||
-                                                        $0.folder!.localizedCaseInsensitiveContains(userSearch)  ||
-                                                        $0.store!.localizedCaseInsensitiveContains(userSearch) :
+                            // If selectedFolder contains something, use it to show receipts in the folder.
+                            // Else If userSearch contains something, use it to check for receipts.
+                                // Else show receipts that have any body text (all receipts).
+                            ForEach(receipts.filter({ !selectedFolder.isEmpty ?
+                                                        $0.folder!.localizedCaseInsensitiveContains("\(selectedFolder)") :
+                                                      !userSearch.isEmpty ?
+                                                        $0.body!.localizedCaseInsensitiveContains("\(userSearch)") ||
+                                                        $0.folder!.localizedCaseInsensitiveContains("\(userSearch)")  ||
+                                                        $0.store!.localizedCaseInsensitiveContains("\(userSearch)") :
                                                         $0.body!.count > 0 })){ receipt in
                                 ReceiptView(receipt: receipt).transition(.opacity)
                             }
@@ -112,19 +148,24 @@ struct HomeView: View {
                 }
                 .cornerRadius(false ? 0 : 12)
                 .padding(.horizontal)
-                .toolbar {
-                    ToolbarItem(placement: .bottomBar) {
-                        Image(systemName: "gearshape.fill")
-                    }
-                    ToolbarItem(placement: .bottomBar) {
-                        Image(systemName: "house")
-                    }
-                    
-                    ToolbarItem(placement: .bottomBar) {
-                        Image(systemName: "plus")
-                    }
-                }.navigationBarTitle("Receipted.")
-            }.navigationViewStyle(DoubleColumnNavigationViewStyle())
+            }
+        }
+    }
+    
+    func getColorBlock() -> LinearGradient {
+        if selectedFolder.isEmpty {
+            return LinearGradient(gradient: Gradient(colors:[Color.clear]),
+                                  startPoint: .topLeading, endPoint: .bottomTrailing)
+        } else if !selectedFolder.isEmpty {
+            let color = Color(Folder.getColor(title: selectedFolder))
+            return LinearGradient(gradient: Gradient(colors:[(color)]),
+                                   startPoint: .topLeading, endPoint: .bottomTrailing)
+                
+                
+        } else {
+            return LinearGradient(gradient: Gradient(colors:[(colors[settings.style].leading),
+                                                            (colors[settings.style].trailing)]),
+                                  startPoint: .topLeading, endPoint: .bottomTrailing)
         }
     }
 }

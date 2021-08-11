@@ -28,6 +28,12 @@ class UserSettings: ObservableObject {
             UserDefaults.standard.set(style, forKey: "style")
         }
     }
+    
+    @Published var thinFolders: Bool {
+        didSet {
+            UserDefaults.standard.set(thinFolders, forKey: "thinFolders")
+        }
+    }
 
     /// Default settings.
     init() {
@@ -37,5 +43,7 @@ class UserSettings: ObservableObject {
         self.minimal = UserDefaults.standard.object(forKey: "minimal") as? Bool ?? false
         /// Colour scheme for background gradients.
         self.style = UserDefaults.standard.object(forKey: "style") as? Int ?? 0
+        
+        self.thinFolders = UserDefaults.standard.object(forKey: "thinFolders") as? Bool ?? false
     }
 }

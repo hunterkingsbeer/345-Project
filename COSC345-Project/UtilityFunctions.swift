@@ -32,6 +32,15 @@ extension UIView {
     }
 }
 
+extension View {
+    func underlineTextField() -> some View {
+        self
+            .padding(.vertical, 10)
+            .overlay(Rectangle().frame(height: 2).padding(.top, 45))
+            .padding(10)
+    }
+}
+
 extension Image {
     public init?(data: Data?) {
         guard let data = data,
@@ -68,6 +77,7 @@ extension UIApplication {
 struct CustomTextField: View {
     var placeholder: Text
     @Binding var text: String
+    var font: Font = .body
     var editingChanged: (Bool) -> Void = { _ in }
     var commit: () -> Void = { }
 
@@ -75,7 +85,7 @@ struct CustomTextField: View {
         ZStack(alignment: .leading) {
             if text.isEmpty { placeholder }
             TextField("", text: $text, onEditingChanged: editingChanged, onCommit: commit)
-        }
+        }.font(font)
     }
 }
 

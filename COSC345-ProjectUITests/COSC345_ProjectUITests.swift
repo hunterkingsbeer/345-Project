@@ -6,6 +6,7 @@
 //
 
 import XCTest
+@testable import COSC345_Project
 
 class COSC345_ProjectUITests: XCTestCase {
 
