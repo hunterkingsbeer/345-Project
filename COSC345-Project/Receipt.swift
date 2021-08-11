@@ -156,7 +156,7 @@ struct ReceiptView: View {
                             .frame(width: UIScreen.screenHeight*0.05).padding(.vertical, 2)
                             .onTapGesture {
                                 Receipt.delete(receipt: receipt)
-                            }.transition(.scale(scale: 0.0).combined(with: .opacity))
+                            }.transition(AnyTransition.scale(scale: 0.0).combined(with: .opacity))
                     }
                 }.padding(10)
             ).animation(.spring())

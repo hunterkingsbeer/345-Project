@@ -146,7 +146,7 @@ struct HomeView: View {
                         noReceiptsView()
                     }
                 }
-                .cornerRadius(false ? 0 : 12)
+                .cornerRadius(12)
                 .padding(.horizontal)
             }
         }
