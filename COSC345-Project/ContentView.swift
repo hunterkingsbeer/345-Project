@@ -96,6 +96,18 @@ struct SettingsView: View  {
                                 })
                             Divider()
                             
+                            Toggle("", isOn: $settings.thinFolders)
+                                .contentShape(Rectangle())
+                                .overlay(
+                                    HStack {
+                                        Text("Thin Folders")
+                                        Spacer()
+                                    }
+                                ).onChange(of: settings.thinFolders, perform: { _ in
+                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                })
+                            Divider()
+                            
                             if !settings.minimal {
                                 Picker("Background Color", selection: $settings.style) {
                                     ForEach(0..<Color.colors.count){ color in
@@ -151,12 +163,11 @@ struct BackgroundView: View {
             Color("background").ignoresSafeArea(.all)
             
             VStack{
-                if !settings.minimal {
+                if !settings.minimal && false {
                     RoundedRectangle(cornerRadius: 0)
-                        .fill(LinearGradient(gradient: Gradient(colors: [colors[settings.style].leading, colors[settings.style].trailing]), startPoint: .leading, endPoint: .trailing))
-                        //.fill(LinearGradient(gradient: Gradient(colors: [Color("green"), Color("grass")]), startPoint: .leading, endPoint: .trailing))
-                        .frame(height: UIScreen.screenHeight * 0.14)
-                    
+                        .fill(LinearGradient(gradient: Gradient(colors: [colors[settings.style].leading, colors[settings.style].trailing]), startPoint: .topLeading, endPoint: .bottomTrailing))
+                        //.fill(LinearGradient(gradient: Gradient(colors: [Color("green"), Color("grass")]), startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .frame(height: UIScreen.screenHeight * 0.16)
                     Spacer()
                 }
             }.ignoresSafeArea()
@@ -166,14 +177,32 @@ struct BackgroundView: View {
 
 struct TitleText: View {
     @EnvironmentObject var settings: UserSettings
+    @State var colors = Color.colors
     
     let title: String
     var body: some View {
         HStack {
             Text("\(title.capitalized).")
-                .font(.system(.largeTitle)).bold()
+                .font(.system(size: 40, weight: .semibold))
                 .foregroundColor(Color(settings.style == 4 || settings.minimal ? "text" : "background"))
             Spacer()
         }.padding(.bottom, 10).padding(.top, 20)
+        .background(
+            ZStack{
+                if !settings.minimal {
+                    Rectangle()
+                        .fill(LinearGradient(gradient: Gradient(colors: [colors[settings.style].leading, colors[settings.style].trailing]), startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .scaleEffect(x: 1.2)
+                        .ignoresSafeArea(edges: .top)
+                }
+                // underline
+                /*VStack {
+                    Spacer()
+                    Rectangle()
+                        .frame(height: 2)
+                        .foregroundColor(Color("object"))
+                }.padding(.bottom, 14)*/
+            }
+        )
     }
 }

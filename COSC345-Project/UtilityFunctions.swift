@@ -30,7 +30,15 @@ extension UIView {
          mask.path = path.cgPath
          self.layer.mask = mask
     }
+}
 
+extension View {
+    func underlineTextField() -> some View {
+        self
+            .padding(.vertical, 10)
+            .overlay(Rectangle().frame(height: 2).padding(.top, 45))
+            .padding(10)
+    }
 }
 
 extension Image {
@@ -49,7 +57,7 @@ extension UIDevice {
     }
 }
 
-/// Shrinking a=nimation for the UI buttons.
+/// Shrinking animation for the UI buttons.
 struct ShrinkingButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
@@ -69,6 +77,7 @@ extension UIApplication {
 struct CustomTextField: View {
     var placeholder: Text
     @Binding var text: String
+    var font: Font = .body
     var editingChanged: (Bool) -> Void = { _ in }
     var commit: () -> Void = { }
 
@@ -76,7 +85,7 @@ struct CustomTextField: View {
         ZStack(alignment: .leading) {
             if text.isEmpty { placeholder }
             TextField("", text: $text, onEditingChanged: editingChanged, onCommit: commit)
-        }
+        }.font(font)
     }
 }
 

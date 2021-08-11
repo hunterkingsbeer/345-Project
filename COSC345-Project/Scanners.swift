@@ -53,6 +53,7 @@ struct ScanView: View {
                         GalleryScannerView(scanSelection: $scanSelection,
                                            isRecognizing: $isRecognizing)
                         
+                        
                     } else if scanSelection == .camera { // scan via camera
                         DocumentScannerView(scanSelection: $scanSelection,
                                             isRecognizing: $isRecognizing)

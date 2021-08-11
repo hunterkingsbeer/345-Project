@@ -15,15 +15,11 @@ enum DetailState {
     case deleting
     case editing
 }
-
+ 
 struct ReceiptDetailView: View  {
     /// An induvidual receipt entity that the view will be based on
     @State var receipt: Receipt
     @State var detailState: DetailState = .none
-    /*@State var showingImage: Bool = false
-    @State var editing: Bool = false
-    @State var pendingDelete: Bool = false*/
-    
     @EnvironmentObject var settings: UserSettings
     
     var body: some View {
@@ -67,8 +63,7 @@ struct ReceiptDetailView: View  {
                                     } else {
                                         Image(systemName: "trash")
                                     }
-                                        
-                                }.padding()
+                                }
                             }.padding(.vertical)
                             .frame(height: UIScreen.screenHeight * 0.1)
                         }.buttonStyle(ShrinkingButton())
@@ -87,14 +82,14 @@ struct ReceiptDetailView: View  {
                                     (Image(data: receipt.image) ?? Image(""))
                                         .resizable()
                                         .aspectRatio(contentMode: .fit)
-                                        .transition(AnyTransition.scale(scale: 0.1).combined(with: .opacity))
-                                        
                                 } else {
                                     Image(systemName: "photo")
+                                        .padding()
                                 }
-                            }
+                            }.transition(AnyTransition.scale(scale: 0.1).combined(with: .opacity))
+                            .cornerRadius(12)
                         }.padding(.vertical)
-                        .frame(height: UIScreen.screenHeight * (detailState == .image ? 0.6 : 0.1))//.fixedSize()
+                        .frame(height: UIScreen.screenHeight * (detailState == .image ? 0.6 : 0.1))
                     }.buttonStyle(ShrinkingButton())
                     
                     if detailState != .image {
@@ -113,7 +108,6 @@ struct ReceiptDetailView: View  {
                                     } else {
                                         Image(systemName: "pencil")
                                     }
-                                        
                                 }.padding()
                             }.padding(.vertical)
                             .frame(height: UIScreen.screenHeight * 0.1)
@@ -125,7 +119,6 @@ struct ReceiptDetailView: View  {
         }.padding(.bottom)
         .background(Color("background"))
         .ignoresSafeArea(edges: /*@START_MENU_TOKEN@*/.bottom/*@END_MENU_TOKEN@*/)
-        .colorScheme(settings.darkMode ? .dark : .light)
     }
 }
 
@@ -138,12 +131,9 @@ struct ReceiptView: View {
     @State var selected: Bool = false
     /// Whether the user has held down the receipt (performed the delete action), and is pending delete
     @State var pendingDelete = false
-    
     @EnvironmentObject var settings: UserSettings
     
     var body: some View {
-        
-        
         RoundedRectangle(cornerRadius: 12)
             .fill(Color("accent"))
             .overlay(
@@ -168,9 +158,10 @@ struct ReceiptView: View {
                                 Receipt.delete(receipt: receipt)
                             }.transition(.scale(scale: 0.0).combined(with: .opacity))
                     }
-                }.padding(10).animation(.spring())
-            )
+                }.padding(10)
+            ).animation(.spring())
             .frame(height: UIScreen.screenHeight * 0.08)
+            .sheet(isPresented: $selected) { ReceiptDetailView(receipt: receipt) }
             .onTapGesture {
                 selected.toggle()
             }
@@ -186,7 +177,6 @@ struct ReceiptView: View {
                     }
                 }
             })
-            .sheet(isPresented: $selected) { ReceiptDetailView(receipt: receipt) }
     }
     
     func getDate() -> String {
