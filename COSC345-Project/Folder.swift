@@ -24,6 +24,7 @@ struct TagView: View {
             }
         }){
             if settings.thinFolders {
+                // Original Thin Folders
                 ZStack {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(Color(Folder.getColor(title: folder.title ?? "default")))
@@ -37,16 +38,18 @@ struct TagView: View {
                     .padding(10)
                 }.fixedSize()
             } else {
+                // New Bigger Folders
                 ZStack {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(Color(Folder.getColor(title: folder.title ?? "default")))
+                        .dropShadow(on: settings.shadows, opacity: 0.1, radius: 10)
                     
                     VStack {
                         HStack {
                             Image(systemName: folder.icon ?? "folder")
                             Spacer()
                             Text("\(folder.receiptCount)")
-                        }.padding(.horizontal, 10)
+                        }.padding(.trailing, 8)
                         Text("\(folder.title ?? " Default")")
                     }.padding(10)
                     .font(.system(size: 16, weight: .bold))

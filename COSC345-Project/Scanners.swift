@@ -45,7 +45,7 @@ struct ScanView: View {
             BackgroundView()
             
             VStack {
-                TitleText(title: "scan")
+                TitleText(title: "scan", icon: "plus")
                     .padding(.horizontal)
                 
                 if !isRecognizing {
@@ -65,10 +65,11 @@ struct ScanView: View {
                     Spacer()
                     Text("Saving...")
                         .font(.system(.title, design: .rounded))
-                    ProgressView()
+                    Loading()
+                    /*ProgressView()
                         .font(.largeTitle)
                         .progressViewStyle(CircularProgressViewStyle(tint: Color("text")))
-                        .padding(.bottom, 20)
+                        .padding(.bottom, 20)*/
                     Spacer()
                 }
             }.animation(.spring())
@@ -90,10 +91,10 @@ struct ScannerSelectView: View {
                 VStack {
                     if scanSelection == .none {
                         Image(systemName: "photo.fill")
-                            .font(.system(.largeTitle, design: .rounded))
+                            .font(.system(size: 60, design: .rounded))
                             .padding()
-                        Text("Add from Gallery")
-                            .font(.system(.title, design: .rounded))
+                        /*Text("Add from Gallery")
+                            .font(.system(.title, design: .rounded))*/
                     }
                 }.contentShape(Rectangle())
             }.buttonStyle(ShrinkingButton())
@@ -108,12 +109,12 @@ struct ScannerSelectView: View {
             }){
                 VStack {
                     if scanSelection == .none {
-                        Text("Add from Camera")
-                            .font(.system(.title, design: .rounded))
+                        /*Text("Add from Camera")
+                            .font(.system(.title, design: .rounded))*/
+                        
                         Image(systemName: "camera.fill")
-                            .font(.system(.largeTitle, design: .rounded))
+                            .font(.system(size: 60, design: .rounded))
                             .padding()
-                            .transition(.opacity)
                     }
                 }.contentShape(Rectangle())
             }.buttonStyle(ShrinkingButton())
@@ -129,7 +130,7 @@ struct ConfirmationView: View {
     
     var body: some View {
         VStack {
-            TitleText(title: "Confirm")
+            TitleText(title: "Confirm", icon: "confirm")
             ScrollView(showsIndicators: false) {
                 //ForEach(recognizedContent.items){ receipt in
                     VStack (alignment: .leading){
@@ -273,7 +274,6 @@ struct GalleryScannerView: View {
         ImagePicker { result in
             switch result {
                 case .success(let scannedImages):
-                    print("github please just give me the 'passing' badge")
                     isRecognizing = true
                     print(recognizedContent.items.count)
                     ScanTranslation(scannedImages: scannedImages,

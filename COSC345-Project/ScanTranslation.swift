@@ -54,8 +54,11 @@ struct ScanTranslation {
             
             observations.forEach { observation in
                 guard let recognizedText = observation.topCandidates(1).first else { return }
+                receiptItem.text += "\(recognizedText.string)\n"
+                
+                /*guard let recognizedText = observation.topCandidates(1).first else { return }
                 receiptItem.text += recognizedText.string
-                receiptItem.text += "\n"
+                receiptItem.text += "\n"*/
             }
         }
         

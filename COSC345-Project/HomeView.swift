@@ -57,7 +57,6 @@ struct HomeView: View {
                             .foregroundColor(Color(selectedFolder.isEmpty || settings.minimal ? "text" : "background"))
                             .transition(AnyTransition.opacity.combined(with: .offset(y: -100)))
                         }
-                        
                         Spacer()
                     }.padding(.bottom, 10).padding(.top, 20)
                     .background(
@@ -122,7 +121,8 @@ struct HomeView: View {
                         ForEach(folders) { folder in
                             if selectedFolder != folder.title {
                                 TagView(folder: folder, selectedFolder: $selectedFolder)
-                                        .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.9))).animation(.spring())
+                                    .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.9)))
+                                    .animation(.spring())
                                 
                             }
                         }
@@ -141,17 +141,19 @@ struct HomeView: View {
                                                       !userSearch.isEmpty ?
                                                         $0.body!.localizedCaseInsensitiveContains("\(userSearch)") ||
                                                         $0.folder!.localizedCaseInsensitiveContains("\(userSearch)")  ||
-                                                        $0.store!.localizedCaseInsensitiveContains("\(userSearch)") :
+                                                        $0.title!.localizedCaseInsensitiveContains("\(userSearch)") :
                                                         $0.body!.count > 0 })){ receipt in
-                                ReceiptView(receipt: receipt).transition(.opacity)
+                                ReceiptView(receipt: receipt)
+                                    .transition(.opacity)
+                                    .padding(.horizontal)
+                                    .padding(.bottom, 5)
                             }
-                        }.padding(.bottom)
+                        }.padding(.top, 10)
                     } else {
                         noReceiptsView()
                     }
                 }
-                .cornerRadius(12)
-                .padding(.horizontal)
+                .cornerRadius(0)
             }
         }
     }

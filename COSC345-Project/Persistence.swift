@@ -34,11 +34,8 @@ struct PersistenceController {
             newReceipt.body = "BODY TEXT EXAMPLE"
             newReceipt.date = Date()
             newReceipt.id = UUID()
-            newReceipt.store = "Example Store"
-            newReceipt.folder = Prediction.pointPrediction(text: ((newReceipt.store ?? "") + (newReceipt.body ?? "")))
-            newReceipt.tags = "tag1,tag2,tag3,tag4"
-            newReceipt.warrenty = ""
-            newReceipt.total = Double(index)
+            newReceipt.title = "Example Store"
+            newReceipt.folder = Prediction.pointPrediction(text: ((newReceipt.title ?? "") + (newReceipt.body ?? "")))
         }
                 
         save(viewContext: viewContext)
