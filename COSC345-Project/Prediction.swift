@@ -111,7 +111,7 @@ struct Prediction {
                                               "earphones", "ear buds", "mouse", "keyboard",
                                               "controller", "router"]),
                                    
-                                   (title: "hardware",
+                                   (title: "hardware & ",
                                     keywords: ["mitre 10", "bunnings", "placemakers", "tool",
                                               "saw", "drill", "knife", "axe", "hammer",
                                               "screwdriver", "pliers", "wrench", "trowel",
@@ -163,9 +163,6 @@ struct Prediction {
                                               "ride on case", "packs", "dry box", "messenger bags",
                                               "garment bags"]),
                                    
-                                   (title: "food & drink",
-                                    keywords: []),
-                                   
                                    (title: "health & beauty",
                                     keywords: ["soap", "shampoo", "conditioner", "deodorant",
                                               "throat lozenge", "face mask", "thermometer",
@@ -187,7 +184,7 @@ struct Prediction {
                                               "makeup remover", "blush", "setting spray"]),
                                    
                                    (title: "home & garden",
-                                    keywords: []),
+                                    keywords: [""]),
                                    
                                    (title: "office supplies",
                                     keywords: ["stapler", "staples", "paper", "printer", "pens",
@@ -209,12 +206,7 @@ struct Prediction {
                                               "safety pin", "watch"]),
                                    
                                    (title: "arts & entertainment",
-                                    keywords: []),
-                                   
-                                   /* Don't think we need this one
-                                   (title: "media",
-                                    keywords: ["book", "dvd", "cd", "]),
-                                   */
+                                    keywords: [""]),
                                    
                                    (title: "software",
                                     keywords: ["ide", "integrated development environment", "app",
@@ -251,11 +243,6 @@ struct Prediction {
                                               "brakes", "brake pads", "brake calipers", "brake discs",
                                               "catalytic converter", "muffler", "turbocharger",
                                               "supercharger", "intake", "tyres", "tires"]),
-                                   
-                                   (title: "business & industrial",
-                                    keywords:[]),
-                                   
-                                   
                                    
     ]
     

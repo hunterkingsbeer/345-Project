@@ -237,7 +237,7 @@ struct DocumentScannerView: View {
     /* i would put saveReceipt() in a separate function since its duplicated in both scanners,
     but scanSelection keeps saying "im a let tho, you cant change me"
     despite me assigning it as a Binding<ScanSelection> in the function params :( */
-    func saveReceipt() -> Bool{
+    func saveReceipt() -> Bool { 
         if recognizedContent.items.count > 0 {
             for receipt in recognizedContent.items {
                 if receipt.text.count < 2 {

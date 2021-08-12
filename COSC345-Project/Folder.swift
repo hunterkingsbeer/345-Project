@@ -36,6 +36,7 @@ struct TagView: View {
                     }.font(.system(size: 16, weight: .bold))
                     .foregroundColor(Color("background"))
                     .padding(10)
+                    .padding(.vertical)
                 }.fixedSize()
             } else {
                 // New Bigger Folders
