@@ -42,7 +42,7 @@ struct TagView: View {
                 ZStack {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(Color(Folder.getColor(title: folder.title ?? "default")))
-                        .dropShadow(on: settings.shadows, opacity: 0.1, radius: 10)
+                        .dropShadow(on: settings.shadows, opacity: settings.darkMode ? 0.6 : 0.2, radius: 4)
                     
                     VStack {
                         HStack {

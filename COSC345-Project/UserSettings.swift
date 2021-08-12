@@ -51,7 +51,7 @@ class UserSettings: ObservableObject {
         self.shadows = UserDefaults.standard.object(forKey: "shadows") as? Bool ?? true
         /// Colour scheme for background gradients.
         self.style = UserDefaults.standard.object(forKey: "style") as? Int ?? 0
-        
+        /// Enables the original thinner folder style, instead of the newer big folders.
         self.thinFolders = UserDefaults.standard.object(forKey: "thinFolders") as? Bool ?? false
     }
 }

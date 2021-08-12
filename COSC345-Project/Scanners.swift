@@ -66,13 +66,9 @@ struct ScanView: View {
                     Text("Saving...")
                         .font(.system(.title, design: .rounded))
                     Loading()
-                    /*ProgressView()
-                        .font(.largeTitle)
-                        .progressViewStyle(CircularProgressViewStyle(tint: Color("text")))
-                        .padding(.bottom, 20)*/
                     Spacer()
                 }
-            }.animation(.spring())
+            }
         }
     }
 }
@@ -93,8 +89,6 @@ struct ScannerSelectView: View {
                         Image(systemName: "photo.fill")
                             .font(.system(size: 60, design: .rounded))
                             .padding()
-                        /*Text("Add from Gallery")
-                            .font(.system(.title, design: .rounded))*/
                     }
                 }.contentShape(Rectangle())
             }.buttonStyle(ShrinkingButton())
@@ -109,9 +103,6 @@ struct ScannerSelectView: View {
             }){
                 VStack {
                     if scanSelection == .none {
-                        /*Text("Add from Camera")
-                            .font(.system(.title, design: .rounded))*/
-                        
                         Image(systemName: "camera.fill")
                             .font(.system(size: 60, design: .rounded))
                             .padding()
