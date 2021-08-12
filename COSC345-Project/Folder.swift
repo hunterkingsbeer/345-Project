@@ -12,52 +12,82 @@ import SwiftUI
 /// Tag/Folder
 struct TagView: View {
     @ObservedObject var folder: Folder
+    @State var selected: Bool = false
+    @Binding var selectedFolder: String
+    
+    @EnvironmentObject var settings: UserSettings
+    
     var body: some View {
-        //let color: String = Folder.getColor(title: folder.title ?? "default")
-        RoundedRectangle(cornerRadius: 12)
-            .fill(Color(Folder.getColor(title: folder.title ?? "default")))
-            .overlay(
-                HStack {
-                    Image(systemName: folder.icon ?? "folder")
-                    Text("\(folder.receiptCount) \(folder.title ?? " Default")")
-                    Spacer()
-                }.font(.system(size: 16, weight: .bold, design: .rounded))
-                .foregroundColor(Color("background"))
-                .padding(.horizontal, 10)
-                .minimumScaleFactor(0.8).lineLimit(1)
-            )
-            .frame(minWidth: UIScreen.screenWidth * 0.4)
-            .frame(height: UIScreen.screenHeight*0.05)
+        Button(action: {
+            withAnimation(.spring()){
+                selectedFolder = selectedFolder == folder.title ? "" : folder.title ?? "Default"
+            }
+        }){
+            if settings.thinFolders {
+                // Original Thin Folders
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color(Folder.getColor(title: folder.title ?? "default")))
+                    
+                    HStack {
+                        Image(systemName: folder.icon ?? "folder")
+                        Text("\(folder.receiptCount) \(folder.title ?? " Default")")
+                        Spacer()
+                    }.font(.system(size: 16, weight: .bold))
+                    .foregroundColor(Color("background"))
+                    .padding(10)
+                }.fixedSize()
+            } else {
+                // New Bigger Folders
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color(Folder.getColor(title: folder.title ?? "default")))
+                        .dropShadow(on: settings.shadows, opacity: 0.1, radius: 10)
+                    
+                    VStack {
+                        HStack {
+                            Image(systemName: folder.icon ?? "folder")
+                            Spacer()
+                            Text("\(folder.receiptCount)")
+                        }.padding(.trailing, 8)
+                        Text("\(folder.title ?? " Default")")
+                    }.padding(10)
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(Color("background"))
+                }.fixedSize()
+            }
+        }.buttonStyle(ShrinkingButton())
     }
 }
 
 /// Extension of the Folder object
 extension Folder {
     /// Defines the folders utilized, with their respective icons and colours.
-    static let folderMatch = [(title: "Default", icon: "doc.plaintext", color: "text"),
-                              (title: "Retail", icon: "tag", color: "blue"),
+    static let folders = [(title: "Default", icon: "doc.plaintext", color: "text"),
+                              (title: "Retail", icon: "tag", color: "lightYellow"),
                               (title: "Groceries", icon: "cart", color: "green"),
+                              (title: "Technology", icon: "desktopcomputer", color: "blue"),
                               (title: "Clothing", icon: "bag", color: "pink")]
     
     /// Retreives the icon of a folder based on it's title.
-    static func getIcon(title: String) -> String {
-        for match in folderMatch where match.title.lowercased() == title.lowercased(){
+    static func getIcon(title: String?) -> String {
+        for match in folders where match.title.lowercased() == title?.lowercased(){
             return match.icon.lowercased()
         }
         return "folder".lowercased()
     }
     
     /// Retreives the colour of a folder based on it's title.
-    static func getColor(title: String) -> String {
-        for match in folderMatch where match.title.lowercased() == title.lowercased(){
-            return match.color.lowercased()
+    static func getColor(title: String?) -> String {
+        for match in folders where match.title.lowercased() == title?.lowercased(){
+            return match.color
         }
         return "text"
     }
     
     /// Boolean true if folder exists, false if not.
-    static func folderExists(title: String) -> Bool {
-        for match in folderMatch where match.title.lowercased() == title.lowercased() {
+    static func folderExists(title: String?) -> Bool {
+        for match in folders where match.title.lowercased() == title?.lowercased() {
             return true
         }
         return false
@@ -78,14 +108,14 @@ extension Folder {
     }
     
     /// Returns the folder matching the input title
-    static func getFolder(folderTitle: String) -> Folder {
-        for folder in getFolders() where folder.title == folderTitle.capitalized {
+    static func getFolder(folderTitle: String?) -> Folder {
+        for folder in getFolders() where folder.title == folderTitle?.capitalized {
             return folder
         }
         return Folder()
     }
     
-    static func getCount(title: String) -> Int {
+    static func getCount(title: String?) -> Int {
         return Int(getFolder(folderTitle: title).receiptCount)
     }
     

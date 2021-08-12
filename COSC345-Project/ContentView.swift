@@ -37,15 +37,16 @@ struct ContentView: View {
         ZStack {
             TabView (){
                 HomeView()
-                    .tabItem { Label("Home", systemImage: "text.justify") }
+                    .tabItem { Label("Home", systemImage: "magnifyingglass") }
                     .tag(0)
                 ScanView()
-                    .tabItem { Label("Scan", systemImage: "camera.viewfinder") }
+                    .tabItem { Label("Scan", systemImage: "plus") }
                     .tag(1)
                 SettingsView()
-                    .tabItem { Label("Settings", systemImage: "gearshape.fill").foregroundColor(Color("text")) }
+                    .tabItem { Label("Settings", systemImage: "hammer.fill").foregroundColor(Color("text")) }
                     .tag(2)
-            }.accentColor(settings.minimal ? Color("text") : Color.colors[settings.style].text)
+            }
+            .accentColor(settings.minimal ? Color("text") : Color.colors[settings.style].text)
             .transition(.slide)
             .colorScheme(settings.darkMode ? .dark : .light)
         }
@@ -67,12 +68,13 @@ struct SettingsView: View  {
             BackgroundView()
             
             VStack {
-                TitleText(title: "settings")
+                TitleText(title: "settings", icon: "hammer.fill")
                 
                 ScrollView(showsIndicators: false){
                     VStack (alignment: .leading){
                         VStack{
                             Toggle("", isOn: $settings.darkMode)
+                                .accessibility(identifier: "DarkModeToggle")
                                 .contentShape(Rectangle())
                                 .overlay( // Testing taps text instead of toggle, text is put in usual toggle text field. Therefore overlay of text is required for testing.
                                     HStack{
@@ -92,6 +94,30 @@ struct SettingsView: View  {
                                         Spacer()
                                     }
                                 ).onChange(of: settings.minimal, perform: { _ in
+                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                })
+                            Divider()
+                            
+                            Toggle("", isOn: $settings.thinFolders)
+                                .contentShape(Rectangle())
+                                .overlay(
+                                    HStack {
+                                        Text("Thin Folders")
+                                        Spacer()
+                                    }
+                                ).onChange(of: settings.thinFolders, perform: { _ in
+                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                })
+                            Divider()
+                            
+                            Toggle("", isOn: $settings.shadows)
+                                .contentShape(Rectangle())
+                                .overlay(
+                                    HStack {
+                                        Text("Shadows")
+                                        Spacer()
+                                    }
+                                ).onChange(of: settings.shadows, perform: { _ in
                                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                 })
                             Divider()
@@ -151,12 +177,11 @@ struct BackgroundView: View {
             Color("background").ignoresSafeArea(.all)
             
             VStack{
-                if !settings.minimal {
+                if !settings.minimal && false {
                     RoundedRectangle(cornerRadius: 0)
-                        .fill(LinearGradient(gradient: Gradient(colors: [colors[settings.style].leading, colors[settings.style].trailing]), startPoint: .leading, endPoint: .trailing))
-                        //.fill(LinearGradient(gradient: Gradient(colors: [Color("green"), Color("grass")]), startPoint: .leading, endPoint: .trailing))
-                        .frame(height: UIScreen.screenHeight * 0.14)
-                    
+                        .fill(LinearGradient(gradient: Gradient(colors: [colors[settings.style].leading, colors[settings.style].trailing]), startPoint: .topLeading, endPoint: .bottomTrailing))
+                        //.fill(LinearGradient(gradient: Gradient(colors: [Color("green"), Color("grass")]), startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .frame(height: UIScreen.screenHeight * 0.16)
                     Spacer()
                 }
             }.ignoresSafeArea()
@@ -166,14 +191,40 @@ struct BackgroundView: View {
 
 struct TitleText: View {
     @EnvironmentObject var settings: UserSettings
+    @State var colors = Color.colors
     
     let title: String
+    let icon: String
     var body: some View {
+        
         HStack {
-            Text("\(title.capitalized).")
-                .font(.system(.largeTitle)).bold()
-                .foregroundColor(Color(settings.style == 4 || settings.minimal ? "text" : "background"))
-            Spacer()
-        }.padding(.bottom, 10).padding(.top, 20)
+            HStack {
+                Text("\(title.capitalized).")
+                    .font(.system(size: 40, weight: .semibold))
+                    .foregroundColor(Color(settings.minimal ? "background" : "text"))
+                    .transition(AnyTransition.opacity.combined(with: .move(edge: .bottom)))
+                    .padding(.bottom, 10).padding(.top, 21)
+                Spacer()
+            }.background(
+                ZStack {
+                    Rectangle()
+                        .fill(Color.clear)
+                        .scaleEffect(x: 1.5)
+                        .animation(.easeOut(duration: 0.3))
+                        .ignoresSafeArea(edges: .top)
+                    VStack {
+                        Spacer()
+                        Rectangle()
+                            .frame(height: 2)
+                            .foregroundColor(Color("object"))
+                    }.padding(.bottom, 14)
+                    .transition(AnyTransition.opacity.combined(with: .move(edge: .bottom)))
+            })
+            Image(systemName: icon)
+                .font(.system(size: 19, weight: .bold, design: .rounded))
+                .foregroundColor(Color(settings.minimal ? "background" : "text"))
+                .padding(.horizontal)
+                .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.9)))
+        }
     }
 }

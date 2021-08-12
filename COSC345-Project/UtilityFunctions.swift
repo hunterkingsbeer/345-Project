@@ -12,6 +12,13 @@ import Swift
 
 // --------------------------------------------------------- UTILITIES
 
+/// Formats and returns date (Format E.g. : Wednesday, 11 Aug 2021.)
+func getDate(date: Date?) -> String {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "EEEE, d MMM yyyy."
+    return formatter.string(from: date ?? Date())
+}
+
 /// Retrieves the screen size of the user's device.
 extension UIScreen {
    static let screenWidth = UIScreen.main.bounds.size.width
@@ -30,7 +37,20 @@ extension UIView {
          mask.path = path.cgPath
          self.layer.mask = mask
     }
+}
 
+extension View {
+    func underlineTextField() -> some View {
+        self
+            .padding(.vertical, 10)
+            .overlay(Rectangle().frame(height: 2).padding(.top, 45))
+            .padding(10)
+    }
+    
+    func dropShadow(on: Bool, opacity: Double, radius: CGFloat) -> some View {
+        self
+            .shadow(color: Color("shadow").opacity(on ? opacity : 0.0), radius: radius)
+    }
 }
 
 extension Image {
@@ -49,7 +69,7 @@ extension UIDevice {
     }
 }
 
-/// Shrinking a=nimation for the UI buttons.
+/// Shrinking animation for the UI buttons.
 struct ShrinkingButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
@@ -69,6 +89,7 @@ extension UIApplication {
 struct CustomTextField: View {
     var placeholder: Text
     @Binding var text: String
+    var font: Font = .body
     var editingChanged: (Bool) -> Void = { _ in }
     var commit: () -> Void = { }
 
@@ -76,7 +97,7 @@ struct CustomTextField: View {
         ZStack(alignment: .leading) {
             if text.isEmpty { placeholder }
             TextField("", text: $text, onEditingChanged: editingChanged, onCommit: commit)
-        }
+        }.font(font)
     }
 }
 
@@ -84,9 +105,27 @@ struct CustomTextField: View {
 /// Extension of the Color object
 extension Color {
     /// Define all gradient schemes for the background colours. Two colours each gradient, top and bottom.
-    static let colors = [(leading: Color("blue"), trailing: Color("lightBlue"), text: Color("blue")),
+    static let colors = [(leading: Color("object"), trailing: Color("accent"), text: Color("text")),
+                         (leading: Color("blue"), trailing: Color("lightBlue"), text: Color("blue")),
                          (leading: Color("lightPink"), trailing: Color("purple"), text: Color("lightPink")),
-                         (leading: Color("green"), trailing: Color("grass"), text: Color("green")),
-                         (leading: Color("text"), trailing: Color("backgroundContrast"), text: Color("text")),
-                         (leading: Color("object"), trailing: Color("accent"), text: Color("text"))]
+                         (leading: Color("green"), trailing: Color("grass"), text: Color("green"))
+    ]
+}
+
+struct Loading: View {
+    @State var rotation: Double = 0
+    
+    var body: some View {
+        Image(systemName: "sun.min")
+            .font(.largeTitle)
+            .rotationEffect(.degrees(getRotation()))
+            .animation(.spring())
+    }
+    
+    func getRotation() -> Double {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            rotation += 100
+        }
+        return rotation
+    }
 }

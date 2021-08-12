@@ -28,6 +28,18 @@ class UserSettings: ObservableObject {
             UserDefaults.standard.set(style, forKey: "style")
         }
     }
+    
+    @Published var thinFolders: Bool {
+        didSet {
+            UserDefaults.standard.set(thinFolders, forKey: "thinFolders")
+        }
+    }
+    
+    @Published var shadows: Bool {
+        didSet {
+            UserDefaults.standard.set(shadows, forKey: "shadows")
+        }
+    }
 
     /// Default settings.
     init() {
@@ -35,7 +47,11 @@ class UserSettings: ObservableObject {
         self.darkMode = UserDefaults.standard.object(forKey: "darkMode") as? Bool ?? true
         /// Mimimal mode.
         self.minimal = UserDefaults.standard.object(forKey: "minimal") as? Bool ?? false
+        /// Enables shadows on objects.
+        self.shadows = UserDefaults.standard.object(forKey: "shadows") as? Bool ?? true
         /// Colour scheme for background gradients.
         self.style = UserDefaults.standard.object(forKey: "style") as? Int ?? 0
+        
+        self.thinFolders = UserDefaults.standard.object(forKey: "thinFolders") as? Bool ?? false
     }
 }

@@ -18,34 +18,14 @@ struct PersistenceController {
         let result = PersistenceController(inMemory: true)
         /// Context in relation to Core Data
         let viewContext = result.container.viewContext
-        /// *Rename to categories?
-        let newFolder = Folder(context: viewContext)
-        newFolder.title = "groceries".capitalized
-        newFolder.color = "green"
-        newFolder.icon = "cart"
-        newFolder.id = UUID()
-        newFolder.favorite = false
         
-        let newFolder1 = Folder(context: viewContext)
-        newFolder1.title = "retail".capitalized
-        newFolder1.color = "blue"
-        newFolder1.icon = "tag"
-        newFolder1.id = UUID()
-        newFolder1.favorite = false
-        
-        let newFolder2 = Folder(context: viewContext)
-        newFolder2.title = "clothing".capitalized
-        newFolder2.color = "pink"
-        newFolder2.icon = "bag"
-        newFolder2.id = UUID()
-        newFolder2.favorite = false
-        
-        let newFolder3 = Folder(context: viewContext)
-        newFolder3.title = "default".capitalized
-        newFolder3.color = "white"
-        newFolder3.icon = "doc.plaintext"
-        newFolder3.id = UUID()
-        newFolder3.favorite = false
+        for folder in Folder.folders {
+            let newFolder = Folder(context: viewContext)
+            newFolder.title = folder.title.capitalized
+            newFolder.color = folder.color
+            newFolder.icon = folder.icon
+            newFolder.id = UUID()
+        }
         
         save(viewContext: viewContext)
         
@@ -54,11 +34,8 @@ struct PersistenceController {
             newReceipt.body = "BODY TEXT EXAMPLE"
             newReceipt.date = Date()
             newReceipt.id = UUID()
-            newReceipt.store = "Example Store"
-            newReceipt.folder = Prediction.pointPrediction(text: ((newReceipt.store ?? "") + (newReceipt.body ?? "")))
-            newReceipt.tags = "tag1,tag2,tag3,tag4"
-            newReceipt.warrenty = ""
-            newReceipt.total = Double(index)
+            newReceipt.title = "Example Store"
+            newReceipt.folder = Prediction.pointPrediction(text: ((newReceipt.title ?? "") + (newReceipt.body ?? "")))
         }
                 
         save(viewContext: viewContext)
