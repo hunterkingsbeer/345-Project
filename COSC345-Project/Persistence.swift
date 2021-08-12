@@ -18,7 +18,7 @@ struct PersistenceController {
         let result = PersistenceController(inMemory: true)
         /// Context in relation to Core Data
         let viewContext = result.container.viewContext
-        
+        /// *Rename to categories?
         let newFolder = Folder(context: viewContext)
         newFolder.title = "groceries".capitalized
         newFolder.color = "green"

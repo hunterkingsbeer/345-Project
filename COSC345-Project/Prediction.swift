@@ -140,7 +140,123 @@ struct Prediction {
                                               "cottonon", "cotton:on", "hallenstein", "shorts",
                                               "hallensteins", "barkers", "barker", "suit",
                                               "sweater", "sweatshirt", "sweatshirts", "hood",
-                                              "hoodie", "hoody", "swimsuit", "bikini", "tee"])
+                                              "hoodie", "hoody", "swimsuit", "bikini", "tee"]),
+                                   
+                                   (title: "pets",
+                                    keywords: ["dog", "puppy", "cat", "kitten", "hamster", "gerbil",
+                                              "mouse", "bird", "parrot", "litter", "litter box", "bowl",
+                                              "pet food", "pet box", "pet carrier"]),
+                                   
+                                   (title: "baby & toddler",
+                                    keywords: ["nappy", "nappies", "diapers", "stroller", "baby carrier",
+                                              "car seat", "play mat", "pacifier", "bottle warmer", "bib",
+                                              "high chair", "baby formula", "baby lotion", "crib",
+                                              "cradle", "bassinet", "baby monitor", "mittens", "onesie",
+                                              "booties", "rompers", "baby swing", "bottle sterilizer"]),
+                                   
+                                   (title: "luggage",
+                                    keywords: ["bag", "suitcase", "backpack", "satchel", "fanny pack",
+                                              "duffel", "tote", "trunk", "pet box", "pet carrier",
+                                              "ski bag", "handbag", "carry on case", "poster tube",
+                                              "instrument case", "hard shell", "hat bag", "briefcase",
+                                              "camera bag", "pelican case", "ride-on case",
+                                              "ride on case", "packs", "dry box", "messenger bags",
+                                              "garment bags"]),
+                                   
+                                   (title: "food & drink",
+                                    keywords: []),
+                                   
+                                   (title: "health & beauty",
+                                    keywords: ["soap", "shampoo", "conditioner", "deodorant",
+                                              "throat lozenge", "face mask", "thermometer",
+                                              "painkillers", "paracetamol", "panadol", "ibuprofen",
+                                              "nurofen", "plaster", "bandage", "bandaid", "band aid",
+                                              "vitamins", "vitamin", "vapo rub", "vapodrops",
+                                              "disinfectant", "antiseptic", "dettol", "deep heat",
+                                              "emulgel", "berocca", "antihistamine", "hayfever",
+                                              "allergy relief", "savlon", "lemsip", "centrum",
+                                              "nuromol", "voltaren", "codral", "probiotics",
+                                              "moisturiser", "antiperspirant", "hand wash",
+                                              "hand sanitizer", "toothpaste", "toothbrush",
+                                              "mouthwash", "floss", "lip balm", "hand cream",
+                                              "facial cleanser", "nail polish", "aftershave",
+                                              "mascara", "razor", "toiletry bag", "concealer",
+                                              "tweezers", "foundation", "face powder", "face primer",
+                                              "eyelash glue", "contour powder", "contour cream",
+                                              "bronzer", "highlighter", "lipgloss",
+                                              "makeup remover", "blush", "setting spray"]),
+                                   
+                                   (title: "home & garden",
+                                    keywords: []),
+                                   
+                                   (title: "office supplies",
+                                    keywords: ["stapler", "staples", "paper", "printer", "pens",
+                                              "pencils", "scissors", "paper clips",
+                                              "binder clips", "tape", "tape dispenser", "highlighter",
+                                              "permanent markers", "glue", "glue stick", "rubber band",
+                                              "pencil sharpener", "hole punch", "calculator",
+                                              "envelopes", "stamps", "sticky notes", "notepads",
+                                              "ink", "toner", "cartridge", "file cabinent",
+                                              "file folders", "file labels", "binders",
+                                              "index dividers", "calendar", "planner", "whiteboard",
+                                              "white board", "papper shredder", "scanner",
+                                              "label maker"]),
+                                   
+                                   (title: "apparel & accessories",
+                                    keywords: ["sunglasses", "apron", "necklace", "watch",
+                                              "tie", "purse", "ring", "gloves", "scarf", "umbrella",
+                                              "earmuffs", "hair clip", "bobby pin", "hair band",
+                                              "safety pin", "watch"]),
+                                   
+                                   (title: "arts & entertainment",
+                                    keywords: []),
+                                   
+                                   /* Don't think we need this one
+                                   (title: "media",
+                                    keywords: ["book", "dvd", "cd", "]),
+                                   */
+                                   
+                                   (title: "software",
+                                    keywords: ["ide", "integrated development environment", "app",
+                                              "application", "video game", "cad", "cadd",
+                                              "computer aided design", "computer-aided design",
+                                              "game engine", "unity", "unreal", "game maker",
+                                              "daw", "digital audio workstation", "ableton live",
+                                              "fl studio", "fruity loops", "logic Pro", "bitwig",
+                                              "reason", "reaper", "studio one", "pro tools",
+                                              "protools", "word processor", "image editor",
+                                              "photoshop", "video editor", "adobe", "premiere pro",
+                                              "vegas pro", "after effects", "wondershare",
+                                              "filmora pro", "autodesk flame", "autodesk smoke",
+                                              "avid media composer", "camtasia", "davinci resolve",
+                                              "final cut pro"]),
+                                   
+                                   (title: "toys & games",
+                                    keywords: ["puzzle", "wasjig", "board game", "monopoly", "chess",
+                                              "checkers", "draughts", "catan", "dice", "dnd",
+                                              "d&d", "dungeons and dragons", "dice", "cards"]),
+                                   
+                                   (title: "sports",
+                                    keywords: ["football", "soccer", "rugby", "cricket",
+                                              "basketball", "ball", "stick", "boots", "gloves",
+                                              "frisbee", "mouthguard", "shin pads", "elbow pads",
+                                              "helmet", "whistle", "goal", "post", "net", "uniform",
+                                              "cones", "weights"]),
+                                   
+                                   (title: "vehicles",
+                                    keywords: ["timing chain", "camshaft", "crankshaft", "spark plug",
+                                              "cylinder head", "valve", "piston", "battery",
+                                              "gearbox", "alternator", "radiator", "coolant", "mags",
+                                              "rims", "hub", "wheel", "shocks", "shock absorber",
+                                              "brakes", "brake pads", "brake calipers", "brake discs",
+                                              "catalytic converter", "muffler", "turbocharger",
+                                              "supercharger", "intake", "tyres", "tires"]),
+                                   
+                                   (title: "business & industrial",
+                                    keywords:[]),
+                                   
+                                   
+                                   
     ]
     
     /// Searches through keywordLists. Checking the title (category.0) until it matches, upon which it returns said category.
