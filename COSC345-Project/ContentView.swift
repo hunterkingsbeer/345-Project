@@ -74,7 +74,7 @@ struct SettingsView: View  {
                     VStack (alignment: .leading){
                         VStack{
                             Toggle("", isOn: $settings.darkMode)
-                                .accessibility(identifier: "DarkModeToggle")
+                                .accessibility(identifier: "DarkModeToggle: \(settings.darkMode)")
                                 .contentShape(Rectangle())
                                 .overlay( // Testing taps text instead of toggle, text is put in usual toggle text field. Therefore overlay of text is required for testing.
                                     HStack{
@@ -182,7 +182,7 @@ struct BackgroundView: View {
                         .fill(LinearGradient(gradient: Gradient(colors: [colors[settings.style].leading, colors[settings.style].trailing]), startPoint: .topLeading, endPoint: .bottomTrailing))
                         //.fill(LinearGradient(gradient: Gradient(colors: [Color("green"), Color("grass")]), startPoint: .topLeading, endPoint: .bottomTrailing))
                         .frame(height: UIScreen.screenHeight * 0.16)
-                        //.accessibility(identifier: self.colors as! String?)
+                        .accessibility(identifier: "DarkMode: \(settings.darkMode)")
                     Spacer()
                 }
             }.ignoresSafeArea()
@@ -220,7 +220,7 @@ struct TitleText: View {
                             .foregroundColor(Color("object"))
                     }.padding(.bottom, 14)
                     .transition(AnyTransition.opacity.combined(with: .move(edge: .bottom)))
-            })
+                })
             Image(systemName: icon)
                 .font(.system(size: 19, weight: .bold, design: .rounded))
                 .foregroundColor(Color(settings.minimal ? "background" : "text"))

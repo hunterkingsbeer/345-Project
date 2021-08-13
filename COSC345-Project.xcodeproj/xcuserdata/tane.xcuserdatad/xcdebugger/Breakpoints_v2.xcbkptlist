@@ -14,8 +14,8 @@
             filePath = "COSC345-ProjectUITests/COSC345_ProjectUITests.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "127"
-            endingLineNumber = "127"
+            startingLineNumber = "139"
+            endingLineNumber = "139"
             landmarkName = "unknown"
             landmarkType = "0">
          </BreakpointContent>
@@ -50,6 +50,86 @@
             endingLineNumber = "30"
             landmarkName = "recognizeText()"
             landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "3F2BC8AA-E894-4850-BC5D-FE87787B8F4D"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "COSC345-ProjectUITests/COSC345_ProjectUITests.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "28"
+            endingLineNumber = "28"
+            landmarkName = "testSettingsView()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "AD7F9AF0-2307-4CE3-B8B7-3E5C05F8DF2B"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "COSC345-ProjectUITests/COSC345_ProjectUITests.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "29"
+            endingLineNumber = "29"
+            landmarkName = "testSettingsView()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "99CB01EA-3D4A-4BA5-AE4A-E9BC2BDCA8F4"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "COSC345-ProjectTests/COSC345_ProjectTests.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "36"
+            endingLineNumber = "36"
+            landmarkName = "testReceipt()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "99CB01EA-3D4A-4BA5-AE4A-E9BC2BDCA8F4 - 99a4aa19a8317ca9"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "COSC345_ProjectTests.COSC345_ProjectTests.testReceipt() throws -&gt; ()"
+                  moduleName = "COSC345-ProjectTests"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/tane/Documents/345-Project/COSC345-ProjectTests/COSC345_ProjectTests.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "35"
+                  endingLineNumber = "35"
+                  offsetFromSymbolStart = "2430">
+               </Location>
+               <Location
+                  uuid = "99CB01EA-3D4A-4BA5-AE4A-E9BC2BDCA8F4 - 9dd8895b26c9d854"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 () -&gt; () in COSC345_ProjectTests.COSC345_ProjectTests.testReceipt() throws -&gt; ()"
+                  moduleName = "COSC345-ProjectTests"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/tane/Documents/345-Project/COSC345-ProjectTests/COSC345_ProjectTests.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "36"
+                  endingLineNumber = "36"
+                  offsetFromSymbolStart = "128">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

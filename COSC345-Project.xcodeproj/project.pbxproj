@@ -20,7 +20,6 @@
 		5A7772A526B95C4100BF54B2 /* ScanTranslation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A7772A426B95C4100BF54B2 /* ScanTranslation.swift */; };
 		5A827F9926AFD958001A3E2D /* Folder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A827F9826AFD958001A3E2D /* Folder.swift */; };
 		5A827F9B26AFD98A001A3E2D /* Receipt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A827F9A26AFD98A001A3E2D /* Receipt.swift */; };
-		5A827F9D26B190B9001A3E2D /* Folder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A827F9C26B190B9001A3E2D /* Folder.swift */; };
 		5AB20BC8265FC3F50055D2AD /* UtilityFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AB20BC7265FC3F50055D2AD /* UtilityFunctions.swift */; };
 		5AC3EA1B266107D100891542 /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AC3EA1A266107D100891542 /* UserSettings.swift */; };
 		5AEDB898264DCD8D003A3CDD /* COSC345_ProjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AEDB897264DCD8D003A3CDD /* COSC345_ProjectTests.swift */; platformFilter = ios; };
@@ -231,7 +230,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1250;
-				LastUpgradeCheck = 1240;
+				LastUpgradeCheck = 1300;
 				TargetAttributes = {
 					5A3DCE13264490E7003442C3 = {
 						CreatedOnToolsVersion = 12.4;
@@ -311,7 +310,6 @@
 				5A827F9B26AFD98A001A3E2D /* Receipt.swift in Sources */,
 				5AB20BC8265FC3F50055D2AD /* UtilityFunctions.swift in Sources */,
 				5A3DCE18264490E7003442C3 /* COSC345_ProjectApp.swift in Sources */,
-				5A827F9D26B190B9001A3E2D /* Folder.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -24,29 +24,41 @@ class COSC345_ProjectUITests: XCTestCase {
         
     }
     
-//    func testSettingsView() throws {
-//                        
-//        
-//        let app = XCUIApplication()
-//        app.launch()
-//        let tabBar = app.tabBars["Tab Bar"]
-//        tabBar.buttons["Settings"].tap()
-//        
-//        let scrollViewsQuery = app.scrollViews
-//        let elementsQuery = scrollViewsQuery
-//        //app.switches["DarkModeToggle"].forcetap()
-//        elementsQuery.children(matching: .switch).matching(identifier: "0").element(boundBy: 0).tap()
-//        elementsQuery.children(matching: .switch).matching(identifier: "0").element(boundBy: 1).tap()
-//        
-//        let elementsQuery2 = elementsQuery
-//        elementsQuery.buttons["Generate Receipts"].tap()
-//        tabBar.buttons["Home"].tap()
-//        
-//        let invoiceElement = scrollViewsQuery.otherElements.containing(.staticText, identifier:"Invoice.").element
-//        
-//        
-//                
-//    }
+    
+    func testSettingsView() throws {
+                        
+        let app = XCUIApplication()
+        app.launch()
+        
+        let tabBar = app.tabBars["Tab Bar"]
+        tabBar.buttons["Settings"].tap()
+        
+        let scrollViewsQuery = app.scrollViews
+        let elementsQuery = scrollViewsQuery
+        
+        if( app.switches["DarkModeToggle: true"].exists){
+            var darkMode = app.switches["DarkModeToggle: true"]
+            darkMode.tap()
+            //darkMode = app.switches["DarkModeToggle: false"]
+            //XCTAssert(darkMode.identifier == "DarkModeToggle: false")
+        }
+        
+        elementsQuery.buttons["Generate Receipts"].tap()
+        tabBar.buttons["Home"].tap()
+        
+        
+        
+        
+       
+        
+        
+  
+        
+        //let invoiceElement = scrollViewsQuery.otherElements.containing(.staticText, identifier:"Invoice.").element
+        
+        
+                
+    }
     
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
