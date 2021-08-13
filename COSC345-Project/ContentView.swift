@@ -35,7 +35,7 @@ struct ContentView: View {
     
     var body: some View {
         ZStack {
-            TabView (){
+            TabView(selection: $tabSelection){
                 HomeView()
                     .tabItem { Label("Home", systemImage: "magnifyingglass") }
                     .tag(0)

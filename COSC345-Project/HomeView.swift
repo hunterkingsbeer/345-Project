@@ -21,11 +21,11 @@ struct HomeView: View {
     /// Stores the fetched results as an array of Folder objects.
     var folders: FetchedResults<Folder>
     
-    /// Settings imports the UserSettings
-    @EnvironmentObject var settings: UserSettings
     @State var userSearch: String = ""
     @State var selectedFolder: String = ""
     @State var colors = Color.colors
+    /// Settings imports the UserSettings
+    @EnvironmentObject var settings: UserSettings
 
     var body: some View {
         ZStack {
@@ -33,60 +33,7 @@ struct HomeView: View {
             
             VStack {
                 HStack {
-                    HStack {
-                        if selectedFolder.isEmpty {
-                            ZStack(alignment: .leading) {
-                                if userSearch.isEmpty {
-                                    Text("Receipted.")
-                                        .font(.system(size: 40, weight: .semibold))
-                                        .transition(AnyTransition.opacity.combined(with: .move(edge: .bottom)))
-                                }
-                                TextField("", text: $userSearch)
-                                    .animation(.easeInOut(duration: 0.3))
-                            }
-                            .transition(AnyTransition.opacity.combined(with: .move(edge: .bottom)))
-                            .foregroundColor(Color(selectedFolder.isEmpty || settings.minimal ? "text" : "background"))
-                            .font(.system(size: 40, weight: .regular))
-                        } else {
-                            HStack {
-                                Image(systemName: Folder.getIcon(title: selectedFolder))
-                                    .font(.system(size: 30, weight: .semibold))
-                                Text("\(selectedFolder).")
-                                    .font(.system(size: 40, weight: .semibold))
-                            }
-                            .foregroundColor(Color(selectedFolder.isEmpty || settings.minimal ? "text" : "background"))
-                            .transition(AnyTransition.opacity.combined(with: .offset(y: -100)))
-                        }
-                        Spacer()
-                    }.padding(.bottom, 10).padding(.top, 20)
-                    .background(
-                        ZStack{
-                            if !settings.minimal {
-                                VStack {
-                                    if selectedFolder.isEmpty {
-                                        Rectangle()
-                                            .fill(Color.clear)
-                                    } else {
-                                        Rectangle()
-                                            .fill(Color(Folder.getColor(title: selectedFolder)))
-                                            .transition(AnyTransition.offset(y: -150).combined(with: .opacity))
-                                    }
-                                }
-                                .scaleEffect(x: 1.5)
-                                .animation(.easeOut(duration: 0.3))
-                                .ignoresSafeArea(edges: .top)
-                            }
-                            if selectedFolder.isEmpty {
-                                VStack {
-                                    Spacer()
-                                    Rectangle()
-                                        .frame(height: 2)
-                                        .foregroundColor(Color("object"))
-                                }.padding(.bottom, 14)
-                                .transition(AnyTransition.opacity.combined(with: .move(edge: .bottom)))
-                            }
-                        }
-                    )
+                    HomeTitleBar(selectedFolder: $selectedFolder, userSearch: $userSearch)
                     
                     ZStack{
                         if userSearch.isEmpty && selectedFolder.isEmpty {
@@ -125,7 +72,7 @@ struct HomeView: View {
                                     .animation(.spring())
                                 
                             }
-                        }
+                        }.padding(.vertical, 8)
                     }.padding(.horizontal)
                 }
                 
@@ -148,7 +95,7 @@ struct HomeView: View {
                                     .padding(.horizontal)
                                     .padding(.bottom, 5)
                             }
-                        }.padding(.top, 10)
+                        }.padding(.top, 8).padding(.bottom)
                     } else {
                         noReceiptsView()
                     }
@@ -193,22 +140,70 @@ struct noReceiptsView: View {
                     Spacer()
                 }.padding(10)
             ).frame(height: UIScreen.screenHeight * 0.08)
+            .padding(.horizontal)
     }
 }
 
-struct SearchBar: View {
+struct HomeTitleBar: View {
+    /// Settings imports the UserSettings
+    @EnvironmentObject var settings: UserSettings
+    @Binding var selectedFolder: String
     @Binding var userSearch: String
     var body: some View {
         HStack {
-            Image(systemName: "magnifyingglass")
-            CustomTextField(placeholder: Text("Search"), text: $userSearch)
+            if selectedFolder.isEmpty {
+                ZStack(alignment: .leading) {
+                    if userSearch.isEmpty {
+                        Text("Receipted.")
+                            .font(.system(size: 40, weight: .semibold))
+                            .foregroundColor(Color.accentColor)
+                            .transition(AnyTransition.opacity.combined(with: .move(edge: .bottom)))
+                    }
+                    TextField("", text: $userSearch)
+                        .animation(.easeInOut(duration: 0.3))
+                }
+                .transition(AnyTransition.opacity.combined(with: .move(edge: .bottom)))
+                .foregroundColor(Color(selectedFolder.isEmpty || settings.minimal ? "text" : "background"))
+                .font(.system(size: 40, weight: .regular))
+            } else {
+                HStack {
+                    Image(systemName: Folder.getIcon(title: selectedFolder))
+                        .font(.system(size: 30, weight: .semibold))
+                    Text("\(selectedFolder).")
+                        .font(.system(size: 40, weight: .semibold))
+                }
+                .foregroundColor(Color(selectedFolder.isEmpty || settings.minimal ? "text" : "background"))
+                .transition(AnyTransition.opacity.combined(with: .offset(y: -100)))
+            }
             Spacer()
-        }.padding(.leading, 12)
-        .frame(height: UIScreen.screenHeight*0.05)
+        }.padding(.bottom, 10).padding(.top, 20)
         .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color("accent"))
+            ZStack{
+                if !settings.minimal {
+                    VStack {
+                        if selectedFolder.isEmpty {
+                            Rectangle()
+                                .fill(Color.clear)
+                        } else {
+                            Rectangle()
+                                .fill(Color(Folder.getColor(title: selectedFolder)))
+                                .transition(AnyTransition.offset(y: -150).combined(with: .opacity))
+                        }
+                    }
+                    .scaleEffect(x: 1.5)
+                    .animation(.easeOut(duration: 0.3))
+                    .ignoresSafeArea(edges: .top)
+                }
+                if selectedFolder.isEmpty {
+                    VStack {
+                        Spacer()
+                        Rectangle()
+                            .frame(height: 2)
+                            .foregroundColor(Color("object"))
+                    }.padding(.bottom, 14)
+                    .transition(AnyTransition.opacity.combined(with: .move(edge: .bottom)))
+                }
+            }
         )
-        .ignoresSafeArea(.keyboard)
     }
 }

@@ -30,8 +30,8 @@ struct ReceiptView: View {
     
     var body: some View {
         RoundedRectangle(cornerRadius: 12)
-            .fill(Color("accent"))
-            .dropShadow(on: settings.shadows, opacity: 0.2, radius: 6)
+            .fill(Color(settings.shadows ? "background" : "accent"))
+            .dropShadow(on: settings.shadows, opacity: settings.darkMode ? 0.45 : 0.15, radius: 4)
             .overlay(
                 // the title and body
                 HStack (alignment: .center){
@@ -41,7 +41,7 @@ struct ReceiptView: View {
                         Text("\(getDate(date: receipt.date))")
                             .font(.system(size: 14, weight: .regular, design: .rounded))
                     }
-                    
+
                     Spacer()
                     Group {
                         if pendingDelete == true {
@@ -57,7 +57,6 @@ struct ReceiptView: View {
                         } else {
                             Image(systemName: Folder.getIcon(title: receipt.folder ?? "doc.plaintext"))
                                 .font(.system(size: 20))
-                                
                         }
                     }.frame(width: UIScreen.screenWidth * 0.08)
                     .transition(AnyTransition.scale(scale: 0.0).combined(with: .opacity))
