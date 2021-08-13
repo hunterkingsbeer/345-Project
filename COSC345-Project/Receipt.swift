@@ -266,6 +266,23 @@ extension Receipt {
         print("-----------------------")
     }
     
+    /// Returns an array of all folders.
+    static func getReceipts() -> [Receipt] {
+        let fetchRequest: NSFetchRequest<Receipt> = Receipt.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)]
+        
+        do {
+            let managedObjectContext = PersistenceController.shared.getContext()
+            let receipts = try managedObjectContext.fetch(fetchRequest)
+            return receipts
+          } catch let error as NSError {
+            print("Error fetching Folders: \(error.localizedDescription), \(error.userInfo)")
+          }
+        return [Receipt]()
+    }
+    
+    
+    
     /// Deletes a Receipt object.
     static func delete(receipt: Receipt) {
         if Folder.folderExists(folderTitle: receipt.folder ?? "Default"){ 
@@ -284,6 +301,13 @@ extension Receipt {
         }
     }
     
+    static func getReceipt(title: String) -> Receipt{
+        for receipt in getReceipts() where receipt.title == title {
+            return receipt
+        }
+        return Receipt()
+    }
+    
     static func generateRandomReceipts() {
         let scans = ["Cotton On\n TEE - $12.00, PANTS - $23.99, HOODIE - $33.99",
                      "JB Hifi\n Airpods - $300.00, Keyboard - $30.99, Monitor - $275.00",
@@ -292,6 +316,18 @@ extension Receipt {
         for _ in 0..<10 {
             Receipt.saveScan(recognizedText: scans.randomElement() ?? "")
         }
+    }
+    
+    static func generateKnownReceipts() {
+        let scans = ["Cotton On\n TEE - $12.00, PANTS - $23.99, HOODIE - $33.99",
+                     "JB Hifi\n Airpods - $300.00, Keyboard - $30.99, Monitor - $275.00",
+                     "Countdown\n Lettuce - $2.00, Doritos - $2.99, Milk - $3",
+                     "Invoice\n LABOR $25p/h, HOURS WORKED - 25. TOTAL $625"]
+        
+        for i in 0..<4 {
+            Receipt.saveScan(recognizedText: scans[i])
+        }
+        
     }
 
     /// Saves the Receipt object

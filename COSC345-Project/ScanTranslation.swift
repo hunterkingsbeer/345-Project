@@ -28,7 +28,6 @@ struct ScanTranslation {
                     receiptItem.image = image
                     try requestHandler.perform([getTextRecognitionRequest(with: receiptItem)])
                     try requestHandler.perform([getTextRecognitionRequest(with: receiptItem)])
-                    
                     DispatchQueue.main.async {
                         recognizedContent.items.append(receiptItem)
                     }

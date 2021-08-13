@@ -30,7 +30,7 @@ struct Prediction {
             bestPrediction.matches = prediction.matches
         }
         // return prediction with highest num of matches
-        print("Final Prediction: \(bestPrediction.title)")
+        //print("Final Prediction: \(bestPrediction.title)")
         return bestPrediction.title
     }
     

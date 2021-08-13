@@ -182,6 +182,7 @@ struct BackgroundView: View {
                         .fill(LinearGradient(gradient: Gradient(colors: [colors[settings.style].leading, colors[settings.style].trailing]), startPoint: .topLeading, endPoint: .bottomTrailing))
                         //.fill(LinearGradient(gradient: Gradient(colors: [Color("green"), Color("grass")]), startPoint: .topLeading, endPoint: .bottomTrailing))
                         .frame(height: UIScreen.screenHeight * 0.16)
+                        //.accessibility(identifier: self.colors as! String?)
                     Spacer()
                 }
             }.ignoresSafeArea()
