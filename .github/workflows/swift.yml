@@ -18,6 +18,6 @@ jobs:
       run: xcodebuild test -scheme COSC345-ProjectTests -destination 'platform=iOS Simulator,OS=14.4,name=iPhone 11 Pro' VALID_ARCHS=x86_64;
       
     - name: Upload coverage to Codecov
-      run: bash <(curl -s https://codecov.io/bash)
+      run: bash <(curl https://codecov.io/bash | sed 's/"$beta_xcode_partials"//g')
       
 
