@@ -22,28 +22,33 @@ class COSC345_ProjectTests: XCTestCase {
     func testReceipt() throws {
         var image = [UIImage()]
         let recognizedContent = RecognizedContent()
-        let recepit = ReceiptItem()
         //var documentView = DocumentScannerView()
         let url = URL(string: "https://i.pinimg.com/originals/c4/33/54/c433548d29ff98a7c0694403047b44d7.jpg")!
         print("Fetching: \(String(describing: url.absoluteString))")
             // Fetch Image Data
             if let data = try? Data(contentsOf: url) {
                 // Create Image and Update Image View
-                image = [UIImage(data: data) ?? UIImage()]
-                print(image[0].pngData()) // checking if it is storing the image or not, it will print the size
+                image[0] = UIImage(data: data) ?? UIImage()
+                print(image[0].pngData()!) // checking if it is storing the image or not, it will print the size
             }
     
-        ScanTranslation(scannedImages: image, recognizedContent: recognizedContent){
-            print(recognizedContent.items[0].text)
-            var temp = 0;
-            for receipt in recognizedContent.items {
+//        ScanTranslation(scannedImages: image, recognizedContent: recognizedContent){
+//            print("inside scan translation")
+//            var temp = 0;
+//            for receipt in recognizedContent.items {
 //                temp += 1
 //                print("RECEIPT TEXT \(receipt.text) \(temp)")
-                print(receipt.text)
-            }
+//                //print(receipt.text)
+//            }
+//
+    
+//        }.recognizeText()
+        ScanTranslation(scannedImages: image,
+                        recognizedContent: recognizedContent) {
             
-        }
+        }.recognizeText()
         print(recognizedContent.items)
+
     }
 
         
