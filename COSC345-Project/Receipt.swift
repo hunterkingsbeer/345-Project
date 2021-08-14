@@ -256,7 +256,8 @@ extension Receipt {
         newReceipt.id = UUID()
         newReceipt.title = title
         newReceipt.body = String(recognizedText.dropFirst((newReceipt.title ?? "").count)).capitalized
-        newReceipt.image = image == nil ? UIImage().jpegData(compressionQuality: 0.5) : image.jpegData(compressionQuality: 0.5) // warning is incorrect, this is only true when a default value is applied. Valid images are passed.
+        newReceipt.image = image == UIImage() ? UIImage().jpegData(compressionQuality: 0.5) : image.jpegData(compressionQuality: 0.5) // warning is incorrect, this is only true when a default value is applied. Valid images are passed.
+        // image cant be compared to nil, but it can be compared to an empty UIImage
         newReceipt.date = Date()
         newReceipt.folder = Prediction.pointPrediction(text: (title + (newReceipt.body ?? "")))
         Folder.verifyFolder(folderTitle: newReceipt.folder ?? "Default")

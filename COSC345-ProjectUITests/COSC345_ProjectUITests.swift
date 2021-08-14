@@ -16,10 +16,10 @@ class COSC345_ProjectUITests: XCTestCase {
         
         XCTAssertEqual(app.images["Search"].exists, app.images["Search"].isHittable)
         
-        tabBar.buttons["Scan"].tap()
+        tabBar.buttons["Scan"].forceTap()
         XCTAssertEqual(app.staticTexts["Scan."].exists, app.staticTexts["Scan."].isHittable)
         
-        tabBar.buttons["Settings"].tap()
+        tabBar.buttons["Settings"].forceTap()
         XCTAssertEqual(app.staticTexts["Settings."].exists,app.staticTexts["Settings."].exists)
         
     }
@@ -31,35 +31,64 @@ class COSC345_ProjectUITests: XCTestCase {
         app.launch()
         
         let tabBar = app.tabBars["Tab Bar"]
-        tabBar.buttons["Settings"].tap()
-        
-        let scrollViewsQuery = app.scrollViews
-        let elementsQuery = scrollViewsQuery
+        tabBar.buttons["Settings"].forceTap()
         
         if( app.switches["DarkModeToggle: true"].exists){
             var darkMode = app.switches["DarkModeToggle: true"]
-            darkMode.tap()
-            //darkMode = app.switches["DarkModeToggle: false"]
-            //XCTAssert(darkMode.identifier == "DarkModeToggle: false")
+            darkMode.forceTap()
+            darkMode = app.switches["DarkModeToggle: false"]
+            tabBar.buttons["Settings"].forceTap() // will remove one the toggle to home screen issue is fixed
+            XCTAssert(darkMode.identifier == "DarkModeToggle: false")
         }
-        
-        elementsQuery.buttons["Generate Receipts"].tap()
-        tabBar.buttons["Home"].tap()
-        
-        
-        
-        
-       
-        
-        
-  
-        
-        //let invoiceElement = scrollViewsQuery.otherElements.containing(.staticText, identifier:"Invoice.").element
-        
-        
                 
     }
     
+    func testFolderView() throws {
+        
+        let app = XCUIApplication()
+        app.launch()
+        let tabBar = app.tabBars["Tab Bar"]
+        tabBar.buttons["Settings"].tap()
+        
+        //generate recepits
+        let elementsQuery = app.scrollViews["ReceiptHomeView"].otherElements
+        elementsQuery.buttons["Delete All"].tap()
+        elementsQuery.buttons["Generate Receipts"].tap()
+        tabBar.buttons["Home"].tap()
+        
+        //check recepits
+        let elementsQuery2 = app.scrollViews.otherElements
+        elementsQuery2.buttons["1, Technology"].tap()
+        XCTAssert(elementsQuery2.staticTexts["Jb Hifi"].exists)
+        elementsQuery2.buttons["1, Default"].tap()
+        XCTAssert(!elementsQuery2.staticTexts["Jb Hifi"].exists)
+                
+    }
+    
+    func testSearchView() throws {
+        
+        let app = XCUIApplication()
+        app.launch()
+        let tabBar = app.tabBars["Tab Bar"]
+        tabBar.buttons["Settings"].tap()
+        
+        //generate recepits
+        let elementsQuery = app.scrollViews["ReceiptHomeView"].otherElements
+        elementsQuery.buttons["Delete All"].tap()
+        elementsQuery.buttons["Generate Receipts"].tap()
+        tabBar.buttons["Home"].tap()
+        
+        //check searcbar
+        app
+        app.textFields["SearchBar"].tap()
+        app.textFields["SearchBar"].typeText("J")
+        sleep(5)
+        XCTAssert(app.staticTexts["Jb Hifi"].exists)
+        app.textFields["SearchBar"].typeText("I")
+        XCTAssert(!app.staticTexts["Jb Hifi"].exists)
+                        
+       
+    }
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
@@ -74,8 +103,8 @@ extension XCUIElement {
 }
 
 //extension XCUIApplication {
-//    func forceTap() {
-//        coordinate(withNormalizedOffset: CGVector(dx:0.5, dy:0.5)).tap()
+//    func forceforceTap() {
+//        coordinate(withNormalizedOffset: CGVector(dx:0.5, dy:0.5)).forceTap()
 //    }
 //}
 
@@ -84,67 +113,67 @@ extension XCUIElement {
 //        let tabBar = app.tabBars["Tab Bar"]
 //        let homeButton = tabBar.buttons["Home"]
 //
-//        homeButton.tap()
-//        tabBar.buttons["Scan"].tap()
-//        app.buttons["Add from Camera"].tap()
+//        homeButton.forceTap()
+//        tabBar.buttons["Scan"].forceTap()
+//        app.buttons["Add from Camera"].forceTap()
 //
 //        let cameraText = app.staticTexts["CameraSimCheck"]// checking if its in the sim or not
 //        XCTAssertEqual(cameraText.label, "Camera not supported in the simulator!\n\nPlease use a physical device.")
 //
-//        app/*@START_MENU_TOKEN@*/.buttons["BackButtonCamera"]/*[[".buttons[\"BACK\"]",".buttons[\"BackButtonCamera\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
+//        app/*@START_MENU_TOKEN@*/.buttons["BackButtonCamera"]/*[[".buttons[\"BACK\"]",".buttons[\"BackButtonCamera\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.forceTap()
 //        XCTAssert((app.buttons["Add from Camera"].exists && app.buttons["Add from Camera"].isHittable))
 //
-//        app.buttons["Add from Gallery"].tap()
-//        // app.scrollViews.otherElements.images["Photo, March 31, 2018, 8:14 AM"].tap()
+//        app.buttons["Add from Gallery"].forceTap()
+//        // app.scrollViews.otherElements.images["Photo, March 31, 2018, 8:14 AM"].forceTap()
 //        // need to add a reciet here to check for valid output
 //
 //
 //        let scanButton = tabBar.buttons["Scan"]
-//        scanButton.tap()
-//        scanButton.tap()
-//        app.buttons["Add from Camera"].tap()
-//        app/*@START_MENU_TOKEN@*/.staticTexts["CameraSimCheck"].press(forDuration: 0.5);/*[[".staticTexts[\"Camera not supported in the simulator!\\n\\nPlease use a physical device.\"]",".tap()",".press(forDuration: 0.5);",".staticTexts[\"CameraSimCheck\"]"],[[[-1,3,1],[-1,0,1]],[[-1,2],[-1,1]]],[0,0]]@END_MENU_TOKEN@*/
-//        app/*@START_MENU_TOKEN@*/.buttons["BackButtonCamera"]/*[[".buttons[\"BACK\"]",".buttons[\"BackButtonCamera\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
-//        tabBar.buttons["Settings"].tap()
+//        scanButton.forceTap()
+//        scanButton.forceTap()
+//        app.buttons["Add from Camera"].forceTap()
+//        app/*@START_MENU_TOKEN@*/.staticTexts["CameraSimCheck"].press(forDuration: 0.5);/*[[".staticTexts[\"Camera not supported in the simulator!\\n\\nPlease use a physical device.\"]",".forceTap()",".press(forDuration: 0.5);",".staticTexts[\"CameraSimCheck\"]"],[[[-1,3,1],[-1,0,1]],[[-1,2],[-1,1]]],[0,0]]@END_MENU_TOKEN@*/
+//        app/*@START_MENU_TOKEN@*/.buttons["BackButtonCamera"]/*[[".buttons[\"BACK\"]",".buttons[\"BackButtonCamera\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.forceTap()
+//        tabBar.buttons["Settings"].forceTap()
 //
 //        let scrollViewsQuery = app.scrollViews
 //        let elementsQuery = scrollViewsQuery.otherElements
-//        elementsQuery.switches["DarkModeToggle"].tap()
+//        elementsQuery.switches["DarkModeToggle"].forceTap()
 //
 //        let darkModeElementsQuery = scrollViewsQuery.otherElements.containing(.staticText, identifier:"Dark Mode")
-//        darkModeElementsQuery.children(matching: .switch).matching(identifier: "0").element(boundBy: 0).tap()
-//        darkModeElementsQuery.children(matching: .switch).matching(identifier: "0").element(boundBy: 1).tap()
+//        darkModeElementsQuery.children(matching: .switch).matching(identifier: "0").element(boundBy: 0).forceTap()
+//        darkModeElementsQuery.children(matching: .switch).matching(identifier: "0").element(boundBy: 1).forceTap()
 //
 //        let elementsQuery2 = elementsQuery
-//        elementsQuery2/*@START_MENU_TOKEN@*/.buttons["Style 2"]/*[[".segmentedControls.buttons[\"Style 2\"]",".buttons[\"Style 2\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
-//        elementsQuery2/*@START_MENU_TOKEN@*/.buttons["Style 3"]/*[[".segmentedControls.buttons[\"Style 3\"]",".buttons[\"Style 3\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
-//        elementsQuery2/*@START_MENU_TOKEN@*/.buttons["Style 4"]/*[[".segmentedControls.buttons[\"Style 4\"]",".buttons[\"Style 4\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
-//        elementsQuery2/*@START_MENU_TOKEN@*/.buttons["Style 5"]/*[[".segmentedControls.buttons[\"Style 5\"]",".buttons[\"Style 5\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
-//        elementsQuery.buttons["Generate Receipts"].tap()
-//        elementsQuery.buttons["Delete All"].tap()
-//        tabBar.buttons["Home"].tap()
-//        elementsQuery.staticTexts["Tap the 'Scan' button at the bottom."].tap()
-//        scanButton.tap()
+//        elementsQuery2/*@START_MENU_TOKEN@*/.buttons["Style 2"]/*[[".segmentedControls.buttons[\"Style 2\"]",".buttons[\"Style 2\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.forceTap()
+//        elementsQuery2/*@START_MENU_TOKEN@*/.buttons["Style 3"]/*[[".segmentedControls.buttons[\"Style 3\"]",".buttons[\"Style 3\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.forceTap()
+//        elementsQuery2/*@START_MENU_TOKEN@*/.buttons["Style 4"]/*[[".segmentedControls.buttons[\"Style 4\"]",".buttons[\"Style 4\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.forceTap()
+//        elementsQuery2/*@START_MENU_TOKEN@*/.buttons["Style 5"]/*[[".segmentedControls.buttons[\"Style 5\"]",".buttons[\"Style 5\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.forceTap()
+//        elementsQuery.buttons["Generate Receipts"].forceTap()
+//        elementsQuery.buttons["Delete All"].forceTap()
+//        tabBar.buttons["Home"].forceTap()
+//        elementsQuery.staticTexts["Tap the 'Scan' button at the bottom."].forceTap()
+//        scanButton.forceTap()
 //
 //
 //        let tabBar = app.tabBars["Tab Bar"]
 //        let settingsButton = tabBar.buttons["Settings"]
-//        settingsButton.tap()
-//        app.scrollViews.otherElements/*@START_MENU_TOKEN@*/.buttons["Style 1"]/*[[".segmentedControls.buttons[\"Style 1\"]",".buttons[\"Style 1\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
+//        settingsButton.forceTap()
+//        app.scrollViews.otherElements/*@START_MENU_TOKEN@*/.buttons["Style 1"]/*[[".segmentedControls.buttons[\"Style 1\"]",".buttons[\"Style 1\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.forceTap()
         //print(app.scrollViews.otherElements["Horizontal scroll bar, 1 page"].value)
 
 
 //    func testAddPanel() throws {
 //        let buttons = app.buttons
 //        app.launch()
-//        buttons["Scan"].tap()
-//        buttons["Add from Gallery"].tap()
+//        buttons["Scan"].forceTap()
+//        buttons["Add from Gallery"].forceTap()
 //        sleep(2)
 //        app.terminate()
 //        app.launch()
-//        buttons["Scan"].tap()
+//        buttons["Scan"].forceTap()
 //        // xct enum for camera state
-//        buttons["Add from Camera"].forceTap()
+//        buttons["Add from Camera"].forceforceTap()
 //        // assert for camera view
 //        sleep(3)
 //        let cameraText = app.staticTexts["CameraSimCheck"]// checking if its in the sim or not
@@ -156,8 +185,8 @@ extension XCUIElement {
 //    func testMainSettings() throws {
 //        app.terminate()
 //        app.launch()
-//        app.buttons["Settings"].forceTap()
-//        app.switches["DarkModeToggle"].forceTap()
+//        app.buttons["Settings"].forceforceTap()
+//        app.switches["DarkModeToggle"].forceforceTap()
 //        sleep(2)
 //        //dark mode toggle assert
 //
