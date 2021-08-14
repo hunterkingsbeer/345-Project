@@ -124,6 +124,7 @@ struct HomeView: View {
 }
 
 struct noReceiptsView: View {
+    
     var body: some View{
         RoundedRectangle(cornerRadius: 18)
             .fill(Color("accent"))
@@ -141,6 +142,9 @@ struct noReceiptsView: View {
                 }.padding(10)
             ).frame(height: UIScreen.screenHeight * 0.08)
             .padding(.horizontal)
+            .onTapGesture(perform: {
+                // TODO: change once a way has been found to scanview ContentView().moveToView()
+            })
     }
 }
 
@@ -161,6 +165,7 @@ struct HomeTitleBar: View {
                     }
                     TextField("", text: $userSearch)
                         .animation(.easeInOut(duration: 0.3))
+                        .accessibility(identifier: "SearchBar")
                 }
                 .transition(AnyTransition.opacity.combined(with: .move(edge: .bottom)))
                 .foregroundColor(Color(selectedFolder.isEmpty || settings.minimal ? "text" : "background"))

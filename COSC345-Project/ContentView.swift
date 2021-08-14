@@ -32,7 +32,6 @@ struct ContentView: View {
     /// Settings imports the UserSettings
     @EnvironmentObject var settings: UserSettings
     @State var colors = Color.colors
-    
     var body: some View {
         ZStack {
             TabView(selection: $tabSelection){
@@ -49,8 +48,17 @@ struct ContentView: View {
             .accentColor(settings.minimal ? Color("text") : Color.colors[settings.style].text)
             .transition(.slide)
             .colorScheme(settings.darkMode ? .dark : .light)
+            
         }
     }
+//    /**
+//     trying to figure out how to move views from another struct using the current tabView
+//     */
+//    public func moveToView(){
+//        print(tabSelection)
+//        tabSelection = .scan
+//        print(tabSelection)
+//    }
 }
 
 /// SettingsView displays the settings menu
@@ -134,32 +142,34 @@ struct SettingsView: View  {
                                 Divider()
                             }
                         }.padding(.horizontal, 2)
+                        #if DEBUG
                         
-                        Button(action: {
-                            Receipt.generateRandomReceipts()
-                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                        }){
-                            Text("Generate Receipts")
-                                .padding(.vertical, 10)
-                                .frame(minWidth: 0, maxWidth: .infinity)
-                                .background(Color("accent"))
-                                .cornerRadius(10)
-                        }.buttonStyle(ShrinkingButton())
-                        Divider()
-                        
-                        Button(action: {
-                            Receipt.deleteAll(receipts: receipts)
-                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                        }){
-                            Text("Delete All")
-                                .padding(.vertical, 10)
-                                .frame(minWidth: 0, maxWidth: .infinity)
-                                .background(Color("accent"))
-                                .cornerRadius(10)
-                        }.buttonStyle(ShrinkingButton())
+                            Button(action: {
+                                Receipt.generateKnownReceipts()
+                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                            }){
+                                Text("Generate Receipts")
+                                    .padding(.vertical, 10)
+                                    .frame(minWidth: 0, maxWidth: .infinity)
+                                    .background(Color("accent"))
+                                    .cornerRadius(10)
+                            }.buttonStyle(ShrinkingButton())
+                            Divider()
+                            
+                            Button(action: {
+                                Receipt.deleteAll(receipts: receipts)
+                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                            }){
+                                Text("Delete All")
+                                    .padding(.vertical, 10)
+                                    .frame(minWidth: 0, maxWidth: .infinity)
+                                    .background(Color("accent"))
+                                    .cornerRadius(10)
+                            }.buttonStyle(ShrinkingButton())
+                        #endif
                         Spacer()
                     }.frame(minWidth: 0, maxWidth: .infinity).animation(.spring())
-                }
+                }.accessibility(identifier: "ReceiptHomeView")
             }.padding(.horizontal)
         }
     }
