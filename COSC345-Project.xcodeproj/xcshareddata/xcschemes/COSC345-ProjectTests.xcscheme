@@ -23,6 +23,16 @@
                ReferencedContainer = "container:COSC345-Project.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "5AEDB8A2264DD6AB003A3CDD"
+               BuildableName = "COSC345-ProjectUITests.xctest"
+               BlueprintName = "COSC345-ProjectUITests"
+               ReferencedContainer = "container:COSC345-Project.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
