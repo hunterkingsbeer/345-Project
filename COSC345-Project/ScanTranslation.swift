@@ -32,7 +32,7 @@ struct ScanTranslation {
                         recognizedContent.items.append(receiptItem)
                     }
                 } catch {
-                    print(error.localizedDescription)
+                    print("\nERROR HAS OCCURED: \(error.localizedDescription)")
                 }
                 
                 DispatchQueue.main.async {
@@ -45,7 +45,8 @@ struct ScanTranslation {
     private func getTextRecognitionRequest(with receiptItem: ReceiptItem) -> VNRecognizeTextRequest {
         let request = VNRecognizeTextRequest { request, error in
             if let error = error {
-                print(error.localizedDescription)
+                
+                print("\nERROR HAS OCCURED: \(error.localizedDescription)")
                 return
             }
             
@@ -61,6 +62,7 @@ struct ScanTranslation {
             }
         }
         
+        print(receiptItem.text)
         request.recognitionLevel = .accurate
         request.usesLanguageCorrection = true
         

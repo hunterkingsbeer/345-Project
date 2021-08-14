@@ -21,36 +21,32 @@ class COSC345_ProjectTests: XCTestCase {
 
     func testReceipt() throws {
         var image = [UIImage()]
-        let recognizedContent = RecognizedContent()
-        let recepit = ReceiptItem()
+        let content = RecognizedContent()
         //var documentView = DocumentScannerView()
         let url = URL(string: "https://i.pinimg.com/originals/c4/33/54/c433548d29ff98a7c0694403047b44d7.jpg")!
         print("Fetching: \(String(describing: url.absoluteString))")
             // Fetch Image Data
-            if let data = try? Data(contentsOf: url) {
-                // Create Image and Update Image View
-                image = [UIImage(data: data) ?? UIImage()]
-                print(image[0].pngData()) // checking if it is storing the image or not, it will print the size
-            }
-    
-        ScanTranslation(scannedImages: image, recognizedContent: recognizedContent){
-            print(recognizedContent.items[0].text)
-            var temp = 0;
-            for receipt in recognizedContent.items {
-//                temp += 1
-//                print("RECEIPT TEXT \(receipt.text) \(temp)")
-                print(receipt.text)
-            }
-            
+        if let data = try? Data(contentsOf: url) {
+            // Create Image and Update Image View
+            image[0] = UIImage(data: data) ?? UIImage()
+            //print((image[0] == UIImage())) // checking if it is storing default or not
         }
-        print(recognizedContent.items)
+
+        let storedImage = [UIImage(systemName: "receipt") ?? UIImage()]
+        ScanTranslation(scannedImages: storedImage, recognizedContent: content){
+            print(content.items[0].text)
+            var temp = 0;
+            print("IS THIS WORKING")
+            for receipt in content.items {
+                temp += 1
+                print("RECEIPT TEXT \(temp) \(receipt.text)")
+            }
+        }.recognizeText()
+        print(content.items)
     }
-
-        
     
     
-            
-
+    
     /**
      Checks if the recpits are being stored and fetched in folders correctly
      */
