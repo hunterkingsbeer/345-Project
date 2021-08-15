@@ -17,12 +17,6 @@ class UserSettings: ObservableObject {
         }
     }
     
-    @Published var minimal: Bool {
-        didSet {
-            UserDefaults.standard.set(minimal, forKey: "minimal")
-        }
-    }
-    
     @Published var style: Int {
         didSet {
             UserDefaults.standard.set(style, forKey: "style")
@@ -44,14 +38,12 @@ class UserSettings: ObservableObject {
     /// Default settings.
     init() {
         /// Dark mode.
-        self.darkMode = UserDefaults.standard.object(forKey: "darkMode") as? Bool ?? true
-        /// Mimimal mode.
-        self.minimal = UserDefaults.standard.object(forKey: "minimal") as? Bool ?? false
+        self.darkMode = UserDefaults.standard.object(forKey: "darkMode") as? Bool ?? false
         /// Enables shadows on objects.
         self.shadows = UserDefaults.standard.object(forKey: "shadows") as? Bool ?? true
         /// Colour scheme for background gradients.
         self.style = UserDefaults.standard.object(forKey: "style") as? Int ?? 0
         /// Enables the original thinner folder style, instead of the newer big folders.
-        self.thinFolders = UserDefaults.standard.object(forKey: "thinFolders") as? Bool ?? false
+        self.thinFolders = UserDefaults.standard.object(forKey: "thinFolders") as? Bool ?? true
     }
 }

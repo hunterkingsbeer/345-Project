@@ -32,6 +32,20 @@ enum TabPage: Int {
     case settings = 2
 }
 
+class TabSelection: ObservableObject {
+    @Published var page: TabPage
+    @Published var selection: Int
+    
+    init(page: TabPage, selection: Int) {
+        self.page = page
+        self.selection = selection
+    }
+    
+    func changeTab(tabPage: TabPage) {
+        self.selection = tabPage.rawValue
+    }
+}
+
 /// **ContentView** is a View struct that is first called in the application. It is the highest parent of all other called structs It holds a TabView that forms the basis of the apps UI.
 ///  The applications accent color and light/dark mode is controlled here as this is the highest parent, resulting in it affecting all child views.
 ///
@@ -46,11 +60,12 @@ enum TabPage: Int {
 ///
 struct ContentView: View {
     @State var tabSelection: TabPage = .home
+    @State var selectedTab: Int = 0
     @EnvironmentObject var settings: UserSettings
     @State var colors = Color.colors
     var body: some View {
-        TabView(selection: $tabSelection){
-            HomeView()
+        TabView(selection: $selectedTab){
+            HomeView(tabSelection: $tabSelection)
                 .tabItem { Label("Home", systemImage: "magnifyingglass") }
                 .tag(0)
             ScanView()
@@ -60,17 +75,14 @@ struct ContentView: View {
                 .tabItem { Label("Settings", systemImage: "hammer.fill").foregroundColor(Color("text")) }
                 .tag(2)
         }
-        .accentColor(settings.minimal ? Color("text") : Color.colors[settings.style].text)
+        .accentColor(colors[settings.style].text)
         .colorScheme(settings.darkMode ? .dark : .light)
+        .onChange(of: tabSelection){ _ in
+            selectedTab = tabSelection.rawValue
+        }.onChange(of: selectedTab){ _ in
+            tabSelection = TabPage(rawValue: selectedTab) ?? .home
+        }
     }
-//    /**
-//     trying to figure out how to move views from another struct using the current tabView
-//     */
-//    public func moveToView(){
-//        print(tabSelection)
-//        tabSelection = .scan
-//        print(tabSelection)
-//    }
 }
 
 /// **SettingsView** is a View struct that is called by ContentView. It imports the UserSettings and displays a range of toggles/buttons/pickers that alter the UserSettings upon user action.
@@ -108,18 +120,6 @@ struct SettingsView: View  {
                                 })
                             Divider()
                             
-                            Toggle("", isOn: $settings.minimal)
-                                .contentShape(Rectangle())
-                                .overlay(
-                                    HStack{
-                                        Text("Minimal Color Mode")
-                                        Spacer()
-                                    }
-                                ).onChange(of: settings.minimal, perform: { _ in
-                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                })
-                            Divider()
-                            
                             Toggle("", isOn: $settings.thinFolders)
                                 .contentShape(Rectangle())
                                 .overlay(
@@ -144,17 +144,16 @@ struct SettingsView: View  {
                                 })
                             Divider()
                             
-                            if !settings.minimal {
-                                Picker("Background Color", selection: $settings.style) {
-                                    ForEach(0..<Color.colors.count){ color in
-                                        Text("Style \(color+1)").tag(color)
-                                    }
-                                }.pickerStyle(SegmentedPickerStyle())
-                                .onChange(of: settings.style, perform: { _ in
-                                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                                })
-                                Divider()
-                            }
+                            Picker("Accent Color", selection: $settings.style) {
+                                ForEach(0..<Color.colors.count){ color in
+                                    Text("Style \(color+1)").tag(color)
+                                }
+                            }.pickerStyle(SegmentedPickerStyle())
+                            .onChange(of: settings.style, perform: { _ in
+                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                            })
+                            Divider()
+                            
                         }.padding(.horizontal, 2)
                         #if DEBUG
                             Button(action: {
@@ -221,7 +220,7 @@ struct TitleText: View {
             HStack {
                 Text("\(title.capitalized).")
                     .font(.system(size: 40, weight: .semibold))
-                    .foregroundColor(Color(settings.minimal ? "background" : "text"))
+                    .foregroundColor(Color("text"))
                     .transition(AnyTransition.opacity.combined(with: .move(edge: .bottom)))
                     .padding(.bottom, 10).padding(.top, 21)
                 Spacer()
@@ -242,7 +241,7 @@ struct TitleText: View {
                 })
             Image(systemName: icon)
                 .font(.system(size: 19, weight: .bold, design: .rounded))
-                .foregroundColor(Color(settings.minimal ? "background" : "text"))
+                .foregroundColor(Color("text"))
                 .padding(.horizontal)
                 .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.9)))
         }
