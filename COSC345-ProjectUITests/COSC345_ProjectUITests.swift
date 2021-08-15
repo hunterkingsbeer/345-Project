@@ -75,7 +75,7 @@ class COSC345_ProjectUITests: XCTestCase {
         
         app.buttons["photo"].forceTap()
         XCTAssert(!app.buttons["go down"].firstMatch.isHittable)
-        
+        // this should be passing just fine
         app.buttons["photo"].forceTap()
         XCTAssert(app.buttons["go down"].firstMatch.exists)
         
