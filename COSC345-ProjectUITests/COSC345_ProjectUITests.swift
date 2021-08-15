@@ -67,17 +67,19 @@ class COSC345_ProjectUITests: XCTestCase {
         elementsQuery2.buttons["1 Default"].tap()
         
         XCTAssert(!elementsQuery2.staticTexts["Jb Hifi"].exists)
-        elementsQuery2.staticTexts["Invoice"].forceTap()
+        elementsQuery2.staticTexts["Invoice"].tap()
+        sleep(2)
         XCTAssert(!elementsQuery2.staticTexts["Invoice"].isHittable)
         
-        XCUIApplication().buttons["go down"].tap()
+        sleep(2)
+        XCUIApplication().buttons["go down"].firstMatch.tap()
         XCTAssert(elementsQuery2.staticTexts["Invoice"].isHittable)
         elementsQuery2.staticTexts["Invoice"].tap()
         
         app.buttons["photo"].tap()
         XCTAssert(!app.buttons["go down"].firstMatch.isHittable)
         // this should be passing just fine
-        sleep(2)
+        
         app.buttons["photo"].tap()
         XCTAssert(app.buttons["go down"].firstMatch.exists)
         
@@ -86,17 +88,7 @@ class COSC345_ProjectUITests: XCTestCase {
         
         XCTAssert(!elementsQuery2.staticTexts["Invoice"].isHittable)
         
-        
-                
-        
-        
-                
-        
-                
-        
-        
-        
-                
+
     }
     
     func testSearchView() throws {
