@@ -4,13 +4,15 @@ import UIKit
 
 class COSC345_ProjectUITests: XCTestCase {
     private var image: UIImage?
+    var app = XCUIApplication()
     
     override func setUp() {
         super.setUp()
+        app.launchArguments = ["testMode"]
     }
 
     func testHomeView() throws {
-        let app = XCUIApplication()
+        
         app.launch()
         let tabBar = XCUIApplication().tabBars["Tab Bar"]
         
@@ -27,7 +29,6 @@ class COSC345_ProjectUITests: XCTestCase {
     
     func testSettingsView() throws {
                         
-        let app = XCUIApplication()
         app.launch()
         
         let tabBar = app.tabBars["Tab Bar"]
@@ -45,14 +46,15 @@ class COSC345_ProjectUITests: XCTestCase {
     
     func testFolderView() throws {
         
-        let app = XCUIApplication()
+        
         app.launch()
         let tabBar = app.tabBars["Tab Bar"]
         tabBar.buttons["Settings"].tap()
         
         //generate recepits
         let elementsQuery = app.scrollViews["ReceiptHomeView"].otherElements
-        elementsQuery.buttons["Delete All"].tap()
+        elementsQuery.buttons["Delete All"].forceTap()
+        elementsQuery.buttons["Delete All"].forceTap()
         elementsQuery.buttons["Generate Receipts"].tap()
         tabBar.buttons["Home"].tap()
         
@@ -94,7 +96,7 @@ class COSC345_ProjectUITests: XCTestCase {
     
     func testSearchView() throws {
         
-        let app = XCUIApplication()
+        
         app.launch()
         let tabBar = app.tabBars["Tab Bar"]
         tabBar.buttons["Settings"].tap()
@@ -117,7 +119,7 @@ class COSC345_ProjectUITests: XCTestCase {
     }
     
     func testScanView() throws {
-        let app = XCUIApplication()
+        
         app.launch()
         let tabBar = XCUIApplication().tabBars["Tab Bar"]
         

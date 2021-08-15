@@ -60,6 +60,7 @@ class COSC345_ProjectTests: XCTestCase {
     
 
     }
+    }
     
     /**
      Checks if the recpits are being stored and fetched in folders correctly
@@ -80,50 +81,8 @@ class COSC345_ProjectTests: XCTestCase {
         }
        
     }
-    func testUtilitys(){
-        
-    }
     
-    
-    
-    
-    
-    
-}
 }
 
 
-//*let result = PersistenceController(inMemory: true)
-///// Context in relation to Core Data
-//let viewContext = result.container.viewContext
-//
-//
-//for folder in Folder.folders {
-//    let newFolder = Folder(context: viewContext)
-//    newFolder.title = folder.title.capitalized
-//    newFolder.color = folder.color
-//    newFolder.icon = folder.icon
-//    newFolder.id = UUID()
-//}
-//
-//PersistenceController.save(viewContext: viewContext)
-//
-//
-//var count = 0
-//for index in 0..<10 {
-//    let newReceipt = Receipt(context: viewContext)
-//    newReceipt.body = "BODY TEXT EXAMPLE"
-//    newReceipt.date = Date()
-//    newReceipt.id = UUID()
-//    newReceipt.title = "Example Store \(count)"
-//    newReceipt.folder = Prediction.pointPrediction(text: ((newReceipt.title ?? "") + (newReceipt.body ?? "")))
-//    count += 1
-//}
-//
-//PersistenceController.save(viewContext: viewContext)
-//
-//let fetchRequest: NSFetchRequest<Receipt> = Receipt.fetchRequest()
-//fetchRequest.sortDescriptors = [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)]
-//let managedObjectContext = PersistenceController.shared.getContext()
-//let receipts = try managedObjectContext.fetch(fetchRequest)*/
 
