@@ -127,7 +127,7 @@ struct SettingsView: View  {
                         }.padding(.horizontal, 2)
                         
                         Button(action: {
-                            if isTesting() {
+                            if isTesting(){
                                 Receipt.generateKnownReceipts()
                             } else {
                                 Receipt.generateRandomReceipts()

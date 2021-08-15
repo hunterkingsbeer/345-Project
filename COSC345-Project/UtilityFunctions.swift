@@ -31,7 +31,7 @@ func getDate(date: Date?) -> String {
 /// - Returns
 ///     - True if the environment is in testing.
 ///     - False if the environment is not in testing.
-func isTesting() -> Bool {
+public func isTesting() -> Bool {
     return (ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil || ProcessInfo().arguments.contains("testMode"))
 }
 
