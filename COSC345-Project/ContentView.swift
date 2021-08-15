@@ -14,6 +14,7 @@ struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
             .environmentObject(UserSettings())
+            .environmentObject(TabSelection())
             .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
     }
 }
@@ -36,9 +37,9 @@ class TabSelection: ObservableObject {
     @Published var page: TabPage
     @Published var selection: Int
     
-    init(page: TabPage, selection: Int) {
-        self.page = page
-        self.selection = selection
+    init() {
+        self.page = .home
+        self.selection = 0
     }
     
     func changeTab(tabPage: TabPage) {
@@ -59,13 +60,12 @@ class TabSelection: ObservableObject {
 ///     - colors: Imports an array of tuples containing various colors that are used to style the UI. This is based on the UserSettings 'style' setting, and is an @State to update the UI.
 ///
 struct ContentView: View {
-    @State var tabSelection: TabPage = .home
-    @State var selectedTab: Int = 0
+    @EnvironmentObject var selectedTab: TabSelection
     @EnvironmentObject var settings: UserSettings
     @State var colors = Color.colors
     var body: some View {
-        TabView(selection: $selectedTab){
-            HomeView(tabSelection: $tabSelection)
+        TabView(selection: $selectedTab.selection){
+            HomeView()
                 .tabItem { Label("Home", systemImage: "magnifyingglass") }
                 .tag(0)
             ScanView()
@@ -77,11 +77,6 @@ struct ContentView: View {
         }
         .accentColor(colors[settings.style].text)
         .colorScheme(settings.darkMode ? .dark : .light)
-        .onChange(of: tabSelection){ _ in
-            selectedTab = tabSelection.rawValue
-        }.onChange(of: selectedTab){ _ in
-            tabSelection = TabPage(rawValue: selectedTab) ?? .home
-        }
     }
 }
 

@@ -25,8 +25,6 @@ struct HomeView: View {
     @State var colors = Color.colors
     /// Settings imports the UserSettings
     @EnvironmentObject var settings: UserSettings
-    
-    @Binding var tabSelection: TabPage
 
     var body: some View {
         ZStack {
@@ -98,7 +96,7 @@ struct HomeView: View {
                             }
                         }.padding(.top, 8).padding(.bottom)
                     } else {
-                        noReceiptsView(tabSelection: $tabSelection)
+                        noReceiptsView()
                     }
                 }
                 .cornerRadius(0)
@@ -125,14 +123,16 @@ struct HomeView: View {
 }
 
 struct noReceiptsView: View {
-    @Binding var tabSelection: TabPage // needs to be changed to an environment object
+    @EnvironmentObject var selectedTab: TabSelection
+    @EnvironmentObject var settings: UserSettings
     
     var body: some View{
         Button(action: {
-            tabSelection = .scan
+            selectedTab.changeTab(tabPage: .scan)
         }){
             RoundedRectangle(cornerRadius: 18)
-                .fill(Color("accent"))
+                .fill(Color(settings.shadows ? "shadowObject" : "accent"))
+                .dropShadow(on: settings.shadows, opacity: settings.darkMode ? 0.45 : 0.15, radius: 4)
                 .overlay(
                     // the title and body
                     HStack (alignment: .center){
