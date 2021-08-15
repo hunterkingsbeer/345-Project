@@ -30,7 +30,7 @@ struct ReceiptView: View {
     
     var body: some View {
         RoundedRectangle(cornerRadius: 12)
-            .fill(Color(settings.shadows ? "background" : "accent"))
+            .fill(Color(settings.shadows ? "shadowObject" : "accent"))
             .dropShadow(on: settings.shadows, opacity: settings.darkMode ? 0.45 : 0.15, radius: 4)
             .overlay(
                 // the title and body
@@ -183,7 +183,7 @@ struct ReceiptViewButtons: View {
                         RoundedRectangle(cornerRadius: 15)
                             .fill(Color("object"))
                         VStack {
-                            if detailState == .image && !UIDevice.current.isSimulator {
+                            if detailState == .image && receipt.image != nil && !UIDevice.current.isSimulator {
                                 (Image(data: receipt.image) ?? Image(""))
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
@@ -256,7 +256,7 @@ extension Receipt {
         newReceipt.id = UUID()
         newReceipt.title = title
         newReceipt.body = String(recognizedText.dropFirst((newReceipt.title ?? "").count)).capitalized
-        newReceipt.image = image == UIImage() ? UIImage().jpegData(compressionQuality: 0.5) : image.jpegData(compressionQuality: 0.5) // warning is incorrect, this is only true when a default value is applied. Valid images are passed.
+        newReceipt.image = image.jpegData(compressionQuality: 0.5) // warning is incorrect, this is only true when a default value is applied. Valid images are passed.
         // image cant be compared to nil, but it can be compared to an empty UIImage
         newReceipt.date = Date()
         newReceipt.folder = Prediction.pointPrediction(text: (title + (newReceipt.body ?? "")))

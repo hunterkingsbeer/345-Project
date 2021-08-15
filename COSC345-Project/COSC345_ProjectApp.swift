@@ -16,6 +16,7 @@ struct COSC345_ProjectApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(UserSettings())
+                .environmentObject(TabSelection())
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
         }
     }

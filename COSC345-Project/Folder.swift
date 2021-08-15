@@ -28,6 +28,7 @@ struct TagView: View {
                 ZStack {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(Color(Folder.getColor(title: folder.title ?? "default")))
+                        .dropShadow(on: settings.shadows, opacity: settings.darkMode ? 0.6 : 0.2, radius: 4)
                     
                     HStack {
                         Image(systemName: folder.icon ?? "folder")
@@ -36,7 +37,7 @@ struct TagView: View {
                     }.font(.system(size: 16, weight: .bold))
                     .foregroundColor(Color("background"))
                     .padding(10)
-                    .padding(.vertical)
+                    .padding(.vertical, 4)
                 }.fixedSize()
             } else {
                 // New Bigger Folders

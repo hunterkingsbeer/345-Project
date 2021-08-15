@@ -50,12 +50,9 @@ class COSC345_ProjectTests: XCTestCase {
         print(recognizedContent.items)
 
     }
-
-        
     
     
-            
-
+    
     /**
      Checks if the recpits are being stored and fetched in folders correctly
      */
