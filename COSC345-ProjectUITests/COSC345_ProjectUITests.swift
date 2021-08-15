@@ -61,7 +61,33 @@ class COSC345_ProjectUITests: XCTestCase {
         //elementsQuery2.buttons["1, Technology"].tap()
         //XCTAssert(elementsQuery2.staticTexts["Jb Hifi"].exists)
         elementsQuery2.buttons["1, Default"].tap()
+        
         XCTAssert(!elementsQuery2.staticTexts["Jb Hifi"].exists)
+        elementsQuery2.staticTexts["Invoice"].forceTap()
+        XCTAssert(!elementsQuery2.staticTexts["Invoice"].isHittable)
+        
+        app.buttons["go down"].firstMatch.forceTap()
+        XCTAssert(elementsQuery2.staticTexts["Invoice"].isHittable)
+        elementsQuery2.staticTexts["Invoice"].forceTap()
+        
+        app.buttons["photo"].forceTap()
+        XCTAssert(!app.buttons["go down"].firstMatch.isHittable)
+        
+        app.buttons["photo"].forceTap()
+        XCTAssert(app.buttons["go down"].firstMatch.exists)
+        
+        app.buttons["trash"].tap()
+        app.buttons["trash"].tap()
+        
+        XCTAssert(!elementsQuery2.staticTexts["Invoice"].isHittable)
+        
+        
+                
+        
+                
+        
+        
+        
                 
     }
     
@@ -79,7 +105,6 @@ class COSC345_ProjectUITests: XCTestCase {
         tabBar.buttons["Home"].tap()
         
         //check searcbar
-        app
         app.textFields["SearchBar"].tap()
         app.textFields["SearchBar"].typeText("J")
         sleep(5)
@@ -88,6 +113,38 @@ class COSC345_ProjectUITests: XCTestCase {
         XCTAssert(!app.staticTexts["Jb Hifi"].exists)
                         
        
+    }
+    
+    func testScanView() throws {
+        let app = XCUIApplication()
+        app.launch()
+        let tabBar = XCUIApplication().tabBars["Tab Bar"]
+        
+        tabBar.buttons["Scan"].forceTap()
+        XCTAssertEqual(app.staticTexts["Scan."].exists, app.staticTexts["Scan."].isHittable)
+        
+        
+        app.tabBars["Tab Bar"].buttons["Scan"].tap()
+        app/*@START_MENU_TOKEN@*/.buttons["Add from Gallery"]/*[[".buttons[\"photo\"]",".buttons[\"Add from Gallery\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.forceTap()
+        XCTAssert(!app/*@START_MENU_TOKEN@*/.buttons["Add from Gallery"]/*[[".buttons[\"photo\"]",".buttons[\"Add from Gallery\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.exists)
+        
+        app.terminate()
+        app.launch()
+        
+        tabBar.buttons["Scan"].forceTap()
+        XCTAssertEqual(app.staticTexts["Scan."].exists, app.staticTexts["Scan."].isHittable)
+        
+        
+        app.tabBars["Tab Bar"].buttons["Scan"].tap()
+        app.buttons["Add from Camera"].forceTap()
+        
+        XCTAssert(app/*@START_MENU_TOKEN@*/.staticTexts["CameraSimCheck"]/*[[".staticTexts[\"Camera not supported in the simulator!\\n\\nPlease use a physical device.\"]",".staticTexts[\"CameraSimCheck\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.exists)
+        
+        
+
+        
+        
+        
     }
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
@@ -101,6 +158,20 @@ extension XCUIElement {
         coordinate(withNormalizedOffset: CGVector(dx:0.5, dy:0.5)).tap()
     }
 }
+//
+//extension XCUIElement {
+//
+//    func clearAndEnterText(text: String) {
+//        guard let stringValue = self.value
+//
+//        self.tap()
+//
+//        let deleteString = String(repeating: XCUIKeyboardKey.delete.rawValue, count: stringValue.count)
+//
+//        self.typeText(deleteString)
+//        self.typeText(text)
+//    }
+//}
 
 //extension XCUIApplication {
 //    func forceforceTap() {
