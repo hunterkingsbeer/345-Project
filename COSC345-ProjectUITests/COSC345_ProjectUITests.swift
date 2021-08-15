@@ -70,7 +70,7 @@ class COSC345_ProjectUITests: XCTestCase {
         elementsQuery2.staticTexts["Invoice"].forceTap()
         XCTAssert(!elementsQuery2.staticTexts["Invoice"].isHittable)
         
-        app.buttons["go down"].firstMatch.forceTap()
+        XCUIApplication().buttons["go down"].tap()
         XCTAssert(elementsQuery2.staticTexts["Invoice"].isHittable)
         elementsQuery2.staticTexts["Invoice"].tap()
         
@@ -85,6 +85,9 @@ class COSC345_ProjectUITests: XCTestCase {
         app.buttons["trash"].tap()
         
         XCTAssert(!elementsQuery2.staticTexts["Invoice"].isHittable)
+        
+        
+                
         
         
                 
