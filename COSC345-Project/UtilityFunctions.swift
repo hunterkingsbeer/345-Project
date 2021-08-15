@@ -12,34 +12,43 @@ import Swift
 
 // --------------------------------------------------------- UTILITIES
 
-/// Formats and returns date (Format E.g. : Wednesday, 11 Aug 2021.)
+/// ``getDate``
+/// is used to convert an optional Date value into a formatted date in a String type.
+/// - Format: EEEE, d MMM yyyy. (E.g. : Wednesday, 11 Aug 2021.)
+/// - Parameter date: The Date variable that will be converted into a formatted String.
+/// - Returns
+///     - The formatted date in a String type.
 func getDate(date: Date?) -> String {
     let formatter = DateFormatter()
     formatter.dateFormat = "EEEE, d MMM yyyy."
     return formatter.string(from: date ?? Date())
 }
 
-/// Retrieves the screen size of the user's device.
-extension UIScreen {
-   static let screenWidth = UIScreen.main.bounds.size.width
-   static let screenHeight = UIScreen.main.bounds.size.height
-   static let screenSize = UIScreen.main.bounds.size
+/// ``isTesting``
+/// is used to check if the environment is being tested via UITests or Tests.
+/// - Parameters
+///     -    None required.
+/// - Returns
+///     - True if the environment is in testing.
+///     - False if the environment is not in testing.
+func isTesting() -> Bool {
+    return ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
 }
 
-extension UIView {
-    /// Rounds specific corners of a view.
-    /// USAGE: view.roundCorners([.topLeft, .bottomRight], radius: 10)
-    func roundCorners(_ corners: UIRectCorner, radius: CGFloat) {
-         let path = UIBezierPath(roundedRect: self.bounds,
-                                 byRoundingCorners: corners,
-                                 cornerRadii: CGSize(width: radius, height: radius))
-         let mask = CAShapeLayer()
-         mask.path = path.cgPath
-         self.layer.mask = mask
-    }
+extension UIScreen {
+    /// Returns the UIScreens size of width in the form of a CGFloat
+    static let screenWidth = UIScreen.main.bounds.size.width
+    /// Returns the UIScreens size of height in the form of a CGFloat
+    static let screenHeight = UIScreen.main.bounds.size.height
+    /// Returns the UIScreens size of width and height in the form of a CGFloat
+    static let screenSize = UIScreen.main.bounds.size
 }
 
 extension View {
+    /// ``underlineTextField``
+    /// is a property than can be applied to any View object to provide a predetermined underline to it. However, this is specifically designed to be applied to text.
+    /// - Returns
+    ///     - A (text) view with an underline.
     func underlineTextField() -> some View {
         self
             .padding(.vertical, 10)
@@ -47,6 +56,14 @@ extension View {
             .padding(10)
     }
     
+    /// ``dropShadow``
+    /// is a property than can be applied to any View object to provide a desired shadow on it. This is a quality of life function, and only serves to make the calling parameters more straight forward while using an already set shadow color.
+    ///
+    /// - Parameter on: True if you want the shadow on. False if you want to turn it off. Handy for hooking into UserSettings.
+    /// - Parameter opacity: Adjusts the opacity of the shadow.
+    /// - Parameter radius: Adjusts the radius of the shadow.
+    /// - Returns
+    ///     - A shadow as specified in the params.
     func dropShadow(on: Bool, opacity: Double, radius: CGFloat) -> some View {
         self
             .shadow(color: Color("shadow").opacity(on ? opacity : 0.0), radius: radius)
@@ -54,6 +71,8 @@ extension View {
 }
 
 extension Image {
+    /// Overrides the Image(data: Data) parameter to allow for optional values without a default value. This is a quality of life function, serving to make code look prettier.
+    /// - Parameter data: The data to be translated into an image.
     public init?(data: Data?) {
         guard let data = data,
             let uiImage = UIImage(data: data) else {
@@ -64,57 +83,50 @@ extension Image {
 }
 
 extension UIDevice {
-    var isSimulator: Bool {
+    /// ``inSimulator``
+    /// is used to check if the environment is in the simulator or not.
+    /// - True if the environment is in the simulator.
+    /// - False if the environment is not in the simulator.
+    var inSimulator: Bool {
         return TARGET_OS_SIMULATOR != 0
     }
 }
 
-/// Shrinking animation for the UI buttons.
+/// ``ShrinkingButton``
+/// is a ButtonStyle that transforms a button when tapped.
+/// It scales the button from 1 to 0.98 its size, to give a shrinking effect.
 struct ShrinkingButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.99 : 1)
+            .scaleEffect(configuration.isPressed ? 0.98 : 1)
             .animation(.spring())
     }
 }
 
 extension UIApplication {
+    /// ```endEditing```
+    /// is a function that can be called to dismiss the keyboard. This is useful when needing a button to dismiss the keyboard.
     func endEditing() {
         sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }
 
-// Normal TextField doesn't allow colored placeholder text, this does. SOLUTION FOUND AT THIS LINK https://stackoverflow.com/questions/57688242/swiftui-how-to-change-the-placeholder-color-of-the-textfield
-/// Workaround to allow for coloured placeholder text.
-struct CustomTextField: View {
-    var placeholder: Text
-    @Binding var text: String
-    var font: Font = .body
-    var editingChanged: (Bool) -> Void = { _ in }
-    var commit: () -> Void = { }
-
-    var body: some View {
-        ZStack(alignment: .leading) {
-            if text.isEmpty { placeholder }
-            TextField("", text: $text, onEditingChanged: editingChanged, onCommit: commit)
-        }.font(font)
-    }
-}
-
-// --------------------------------------------------------- COLORS
-/// Extension of the Color object
 extension Color {
-    /// Define all gradient schemes for the background colours. Two colours each gradient, top and bottom.
-    static let colors = [(leading: Color("object"), trailing: Color("accent"), text: Color("text")),
-                         (leading: Color("blue"), trailing: Color("lightBlue"), text: Color("blue")),
-                         (leading: Color("lightPink"), trailing: Color("purple"), text: Color("lightPink")),
-                         (leading: Color("green"), trailing: Color("grass"), text: Color("green"))
-    ]
+    /// ``colors``
+    /// is an array of tuples that hold Color types, associated with the UserSettings Style setting.
+    /// Can be called by using 'Color.colors'
+    /// - Usage with UserSettings: colors[userSettings.style].
+    /// - Format: (leading: Color(The leading color of a linear gradient), trailing: Color(The trailing color of a linear gradient))
+    static let colors = [(leading: Color("text"), trailing: Color("accent")),
+                         (leading: Color("blue"), trailing: Color("lightBlue")),
+                         (leading: Color("lightPink"), trailing: Color("purple")),
+                         (leading: Color("green"), trailing: Color("grass"))]
 }
 
+/// ``Loading``
+/// is a loading screen than can be called to display a loading animation. This displays a rotating sun icon.
 struct Loading: View {
     @State var rotation: Double = 0
-    
     var body: some View {
         Image(systemName: "sun.min")
             .font(.largeTitle)
@@ -127,5 +139,34 @@ struct Loading: View {
             rotation += 100
         }
         return rotation
+    }
+}
+
+/// ``TabPage``
+/// is an enum of type Int. It is used to control the ContentView's tabview's active page in the TabSelection.changeTab function.
+enum TabPage: Int {
+    ///``home``: When this is active it will change the TabView to index 0, resulting in HomeView being active.
+    case home = 0
+    ///``home``: When this is active it will change the TabView to index 1, resulting in ScanView being active.
+    case scan = 1
+    ///``home``: When this is active it will change the TabView to index 2, resulting in SettingsView being active.
+    case settings = 2
+}
+
+/// ``TabSelection``
+///  is an Observable Object class that allows application wide control of the active tab.
+///  This class is placed as an environment object in the App struct, allowing all
+class TabSelection: ObservableObject {
+    ///``selection``: Used to set the active tab of the ContentView's TabView. Controlled either by directly setting, or through the changeTab function.
+    @Published var selection: Int
+    
+    init() {
+        self.selection = 0
+    }
+    
+    /// Used to change the active tab using a TabPage value. This allows for easy tab changing, meaning we don't need to remember the raw values of each page.
+    /// - Parameter tabPage: The new tab you want to be active [.home, .scan. or .settings].
+    func changeTab(tabPage: TabPage) {
+        self.selection = tabPage.rawValue
     }
 }

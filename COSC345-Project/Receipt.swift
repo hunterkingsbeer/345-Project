@@ -149,7 +149,7 @@ struct ReceiptViewButtons: View {
                                 .fill(Color(detailState == .deleting ? "red" : "object"))
                                 .animation(.easeInOut)
                             VStack {
-                                if detailState == .image && !UIDevice.current.isSimulator {
+                                if detailState == .image && !UIDevice.current.inSimulator {
                                     Image(data: receipt.image)! // find some way to not use !, causes crashes by forcing a view with an optional variable (which is nil)
                                         .resizable()
                                         .aspectRatio(contentMode: .fit)
@@ -183,7 +183,7 @@ struct ReceiptViewButtons: View {
                         RoundedRectangle(cornerRadius: 15)
                             .fill(Color("object"))
                         VStack {
-                            if detailState == .image && receipt.image != nil && !UIDevice.current.isSimulator {
+                            if detailState == .image && receipt.image != nil && !UIDevice.current.inSimulator {
                                 (Image(data: receipt.image) ?? Image(""))
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)

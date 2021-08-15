@@ -37,7 +37,7 @@ class COSC345_ProjectUITests: XCTestCase {
             var darkMode = app.switches["DarkModeToggle: true"]
             darkMode.forceTap()
             darkMode = app.switches["DarkModeToggle: false"]
-            tabBar.buttons["Settings"].forceTap() // will remove one the toggle to home screen issue is fixed
+            //tabBar.buttons["Settings"].forceTap() // will remove one the toggle to home screen issue is fixed
             XCTAssert(darkMode.identifier == "DarkModeToggle: false")
         }
                 
@@ -58,8 +58,8 @@ class COSC345_ProjectUITests: XCTestCase {
         
         //check recepits
         let elementsQuery2 = app.scrollViews.otherElements
-        elementsQuery2.buttons["1, Technology"].tap()
-        XCTAssert(elementsQuery2.staticTexts["Jb Hifi"].exists)
+        //elementsQuery2.buttons["1, Technology"].tap()
+        //XCTAssert(elementsQuery2.staticTexts["Jb Hifi"].exists)
         elementsQuery2.buttons["1, Default"].tap()
         XCTAssert(!elementsQuery2.staticTexts["Jb Hifi"].exists)
                 

@@ -10,8 +10,7 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES"
-      codeCoverageEnabled = "YES">
+      shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
          <TestableReference
             skipped = "NO">
@@ -20,16 +19,6 @@
                BlueprintIdentifier = "5AEDB894264DCD8C003A3CDD"
                BuildableName = "COSC345-ProjectTests.xctest"
                BlueprintName = "COSC345-ProjectTests"
-               ReferencedContainer = "container:COSC345-Project.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "5AEDB8A2264DD6AB003A3CDD"
-               BuildableName = "COSC345-ProjectUITests.xctest"
-               BlueprintName = "COSC345-ProjectUITests"
                ReferencedContainer = "container:COSC345-Project.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -45,16 +34,6 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "5A3DCE13264490E7003442C3"
-            BuildableName = "COSC345-Project.app"
-            BlueprintName = "COSC345-Project"
-            ReferencedContainer = "container:COSC345-Project.xcodeproj">
-         </BuildableReference>
-      </BuildableProductRunnable>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -62,15 +41,6 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "5A3DCE13264490E7003442C3"
-            BuildableName = "COSC345-Project.app"
-            BlueprintName = "COSC345-Project"
-            ReferencedContainer = "container:COSC345-Project.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

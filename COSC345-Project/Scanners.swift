@@ -10,35 +10,52 @@ import SwiftUI
 import VisionKit
 import Vision
 
+///``RecognizedContent``
+/// is an observable object that holds an array of ReceiptItem type variables. This is what is passed to the ScanTranslation process and receipt processes.
 class RecognizedContent: ObservableObject {
+    ///``items`` holds the array of ReceiptItem variables.
     @Published var items = [ReceiptItem]()
-    @Published var images = [UIImage]()
 }
 
+/// ``ReceiptItem``
+/// is an identifiable object that holds information relating to a scanned receipt.
 class ReceiptItem: Identifiable {
+    ///``id`` holds a unique ID that allows the object to be identifiable
     var id: UUID = UUID()
+    ///``text`` is the text extracted from the image.
     var text: String = ""
+    ///``image`` is the UI Image the receipt is based on.
     var image: UIImage = UIImage()
 }
 
+/// ``ScanSelection``
+/// is an enum with three cases that relate to the active scanning in the ScanView.
 enum ScanSelection {
+    ///``none``: When none is active, the ScannerSelectView is active. Showing the user the option to pick between camera or gallery to scan.
     case none
+    ///``camera``: When camera is active, the DocumentScannerView is active. Showing the user the document scanner to scan with.
     case camera
+    ///``gallery``:  When camera is active, the GalleryScannerView is active. Showing the user the gallery to scan with.
     case gallery
 }
 
-// TODO: when adding multiple images the doc scanner will duplicate previous images in the respective scan
-    // e.g. Scanning receipt 1 & 2. Saving them results in Receipt 1 saved, then receipt 1 (dupe) and receipt 2 saved.
-
-/// Parent View for the scanners.
-/// Controls the background, and visibility of the gallery, document camera, and selection screen used in scanning receipts.
+/// ``ScanView``
+/// is a Parent View struct that holds the scanner views (GalleryScannerView, DocumentScannerView, and ScannerSelectView).
+/// This manages the visibility of the scanners based on the ScanSelection variable. A Loading screen is displayed when translating a scanned image.
+/// - Called by ContentView.
+/// - ScanSelection
+///     - .none = ScannerSelectView
+///     - .camera = DocumentScannerView
+///     - .gallery  = GalleryScannerView
 struct ScanView: View {
+    ///``settings`` Alters the view based on the user's settings. Imports the UserSettings EnvironmentObject allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
-    let inSimulator: Bool = UIDevice.current.isSimulator
-    
+    ///``inSimulator`` provides a bool based on if the application is in a simulator. Allows the view to avoid errors relating to the camera being available or not.
+    let inSimulator: Bool = UIDevice.current.inSimulator
+    ///``scanSelection`` is used to manage the screens active view, based on the values presented in the ScanView's documentation.
     @State var scanSelection: ScanSelection = .none
+    ///``isRecognizing`` is used to provide a loading screen when the scanner is recognizing text (via ScanTranslation).
     @State var isRecognizing: Bool = false
-    @State var isConfirming: Bool = false
     
     var body: some View {
         ZStack {
@@ -73,9 +90,11 @@ struct ScanView: View {
     }
 }
 
-/// Selection screen for picking either Gallery or Document Scanner to input a receipt to scan.
-/// Controls the selection by altering the @Binding scanSelection passed to it from the parent view.
+/// ``ScannerSelectView``
+/// is a View struct that displays the option of scanning by camera (DocumentScanner) or gallery (ImagePicker). Upon user interaction it will set the ScanSelection to ther respective value, changing the view.
+/// - Called by ScanView.
 struct ScannerSelectView: View {
+    ///``scanSelection`` is used to manage the screens active view. This is @Binding as it controls the parent views value, allowing it to change the screen as desired.
     @Binding var scanSelection: ScanSelection
     
     var body: some View {
@@ -115,8 +134,13 @@ struct ScannerSelectView: View {
     }
 }
 
-/// Confirmation view displays the receipt before saving the receipt. Allows user to confirm, edit, and delete the receipt along with providing the image of the receipt for reference.
+/// ``ConfirmationView``
+/// is a View struct that shows the user its scanned receipt(s) and then provides them with an option of editing, discarding, or confirming the scan.
+/// - Called by DocumentScannerView and GalleryScannerView.
 struct ConfirmationView: View {
+    ///``isConfirming`` is used to display a confirmation/edit screen when confirming the users scans as correct. (CURRENTLY NOT IN USE, IMPLEMENTATION IS PLANNED).
+    @State var isConfirming: Bool = false
+    ///``recognizedContent`` is an object that holds an array of ReceiptItems that hold the information about the scan performed by the user.
     @ObservedObject var recognizedContent: RecognizedContent = RecognizedContent()
     
     var body: some View {
@@ -179,16 +203,27 @@ struct ConfirmationView: View {
     }
 }
 
-/// Document Camera used for scanning receipts to save.
-/// Controls the DocumentScanner which is used to get a array of images. The images are passed to TextRecognition to extract the text and create a recognizedContent variable, which is saved as a receipt.
+/// ``DocumentScannerView``
+/// is a View struct that manages the DocumentScanner and its outputs and surrounding processes.
+/// The document scanner is only displayed if the application is being run on a physical iPhone, otherwise an error message is displayed.
+/// - Called by ScanView.
+/// - The DocumentScanner outputs a result, which is either a success or a failure.
+///     - A success holds scanned images, which are passed to ScanTranslation which extracts the information from the images and applies it into the recognizedContent variable. ScanTranslation holds the saveReceipt function which saves the receipt to the database.
+///     - A failure prints an error to the debug console and places the user back on the document scanner.
 struct DocumentScannerView: View {
+    ///``selectedTab`` Controls the TabView's active tab it is viewing. Imports the TabSelection EnvironmentObject, allowing for application wide changing of the selected tab.
+    @EnvironmentObject var selectedTab: TabSelection
+    ///``invalidAlert`` is used to handle invalid scans (which have too few words). It displays an alert, explaining an invalid scan and then returns the user to the scanner they chose.
     @State var invalidAlert: Bool = false
+    ///``scanSelection`` is used to manage the screens active view. This is @Binding as it controls the parent views value, allowing it to change the screen as desired.
     @Binding var scanSelection: ScanSelection
+    ///``isRecognizing`` binds to the parent views boolean and allows the display of a loading screen while the scan's image is being translated to text.
     @Binding var isRecognizing: Bool
+    ///``recognizedContent`` is an object that holds an array of ReceiptItems, holding the information about the scan performed by the user.
     @ObservedObject var recognizedContent: RecognizedContent  = RecognizedContent()
     
     var body: some View {
-        if !UIDevice.current.isSimulator { // if device is physical (supports camera)
+        if !UIDevice.current.inSimulator { // if device is physical (supports camera)
             DocumentScanner { result in
                 switch result {
                     case .success(let scannedImages):
@@ -198,6 +233,7 @@ struct DocumentScannerView: View {
                                         recognizedContent: recognizedContent) {
                             if saveReceipt(){ // if save receipt returns true (valid scan), exit the scanner
                                 scanSelection = .none
+                                selectedTab.changeTab(tabPage: .home)
                             } else { // else stay in the scanner and alert them to scan again
                                 invalidAlert = true
                             }
@@ -234,9 +270,10 @@ struct DocumentScannerView: View {
         }
     }
     
-    /* i would put saveReceipt() in a separate function since its duplicated in both scanners,
-    but scanSelection keeps saying "im a let tho, you cant change me"
-    despite me assigning it as a Binding<ScanSelection> in the function params :( */
+    /// ``saveReceipt``
+    /// is a function that is used to save a RecognizedContent objects receipts. It is used in an if statement to determine whether there is actually translated text, and if its at an acceptable number.
+    /// - Returns
+    ///     - True if the scan is being saved, and passed the validity tests, False if the scan isn't able to be saved, and didn't pass the validity tests.
     func saveReceipt() -> Bool {
         if recognizedContent.items.count > 0 {
             for receipt in recognizedContent.items {
@@ -249,17 +286,29 @@ struct DocumentScannerView: View {
             }
             scanSelection = .none
         }
+        
         return false
     }
 }
 
 
-/// Gallery Scanner used for scanning receipts to save.
-/// Controls the ImagePicker (gallery) which is used to get a array of images. The images are passed to TextRecognition to extract the text and create a recognizedContent variable, which is saved as a receipt.
+
+/// ``GalleryScannerView``
+/// is a View struct that manages the ImagePicker and its outputs and surrounding processes.
+/// - Called by ScanView.
+/// - The ImagePicker outputs a result, which is either a success or a failure.
+///     - A success holds scanned images, which are passed to ScanTranslation which extracts the information from the images and applies it into the recognizedContent variable. ScanTranslation holds the saveReceipt function which saves the receipt to the database.
+///     - A failure prints an error to the debug console and places the user back on the image picker.
 struct GalleryScannerView: View {
+    ///``selectedTab`` Controls the TabView's active tab it is viewing. Imports the TabSelection EnvironmentObject, allowing for application wide changing of the selected tab.
+    @EnvironmentObject var selectedTab: TabSelection
+    ///``invalidAlert`` is used to handle invalid scans (which have too few words). It displays an alert, explaining an invalid scan and then returns the user to the scanner they chose.
     @State var invalidAlert: Bool = false
+    ///``scanSelection`` is used to manage the screens active view. This is @Binding as it controls the parent views value, allowing it to change the screen as desired.
     @Binding var scanSelection: ScanSelection
+    ///``isRecognizing`` binds to the parent views boolean and allows the display of a loading screen while the scan's image is being translated to text.
     @Binding var isRecognizing: Bool
+    ///``recognizedContent`` is an object that holds an array of ReceiptItems, holding the information about the scan performed by the user.
     @ObservedObject var recognizedContent: RecognizedContent  = RecognizedContent()
     
     var body: some View {
@@ -272,6 +321,7 @@ struct GalleryScannerView: View {
                                     recognizedContent: recognizedContent) {
                         if saveReceipt(){ // if save receipt returns true (valid scan), exit the scanner
                             scanSelection = .none
+                            selectedTab.changeTab(tabPage: .home)
                         } else { // else stay in the scanner and alert them to scan again
                             invalidAlert = true
                         }
@@ -292,9 +342,10 @@ struct GalleryScannerView: View {
         }
     }
     
-    /* i would put saveReceipt() in a separate function since its duplicated in both scanners,
-    but scanSelection keeps saying "im a let tho, you cant change me"
-    despite me assigning it as a Binding<ScanSelection> in the function params :( */
+    /// ``saveReceipt``
+    /// is a function that is used to save a RecognizedContent objects receipts. It is used in an if statement to determine whether there is actually translated text, and if its at an acceptable number.
+    /// - Returns
+    ///     - True if the scan is being saved, and passed the validity tests, False if the scan isn't able to be saved, and didn't pass the validity tests.
     func saveReceipt() -> Bool{
         if recognizedContent.items.count > 0 {
             for receipt in recognizedContent.items {
@@ -311,7 +362,13 @@ struct GalleryScannerView: View {
     }
 }
 
-/// ImagePicker handles the gallery importing of images to be stored.
+/// ``ImagePicker``
+/// is a UIViewControllerRepresentable struct that initializes the ImagePicker.
+/// - ImagePicker outputs either didFinishScanning or didCancelScanning.
+///     - didFinishScanning holds a Result containing an array of UI Images and an error. These are the scanned images and whether the scan was a success or not.
+///     - didCancelScanning returns empty, allowing error handling.
+///
+/// - Called by GalleryScannerView.
 struct ImagePicker: UIViewControllerRepresentable {
     var didFinishScanning: ((_ result: Result<[UIImage], Error>) -> Void)
     var didCancelScanning: () -> Void
@@ -354,7 +411,13 @@ struct ImagePicker: UIViewControllerRepresentable {
     }
 }
 
-/// DocumentScanner handles the camera importing of images to be stored.
+/// ``DocumentScanner``
+/// is a UIViewControllerRepresentable struct that initializes the DocumentCamera.
+/// - ImagePicker outputs either didFinishScanning or didCancelScanning.
+///     - didFinishScanning holds a Result containing an array of UI Images and an error. These are the scanned images and whether the scan was a success or not.
+///     - didCancelScanning returns empty, allowing error handling.
+///
+/// - Called by DocumentScannerView.
 struct DocumentScanner: UIViewControllerRepresentable {
     var didFinishScanning: ((_ result: Result<[UIImage], Error>) -> Void)
     var didCancelScanning: () -> Void
