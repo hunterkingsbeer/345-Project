@@ -20,36 +20,48 @@ struct ContentView_Previews: PreviewProvider {
 
 // -------------------------------------------------------------------------- VIEWS
 
+/// **TabPage** is an enum of type Int. It is used to control the ContentView's tabview's active page.
+/// ## Parameters
+///     case home: //When this is active it will change the TabView to index 0, resulting in HomeView being active.
+///     case scan: //When this is active it will change the TabView to index 1, resulting in ScanView being active.
+///     case home: //When this is active it will change the TabView to index 2, resulting in SettingsView being active.
+///
 enum TabPage: Int {
     case home = 0
     case scan = 1
     case settings = 2
 }
 
-/// ContentView is the main content view that is called when starting the app.
+/// **ContentView** is a View struct that is first called in the application. It is the highest parent of all other called structs It holds a TabView that forms the basis of the apps UI.
+///  The applications accent color and light/dark mode is controlled here as this is the highest parent, resulting in it affecting all child views.
+///
+/// - TabView contains
+///     - HomeView: is the home screen of the app, displaying the receipts, folders, and search bar/title.
+///     - ScanView: displays and provides the option of scanning receipts via gallery or camera.
+///     - SettingsView: holds the controls for the various settings of the application.
+/// - Parameters
+///     - tabSelection: Controls the tabview's active tab to view. Uses a TabPage enum type, and is an @State to update the UI.
+///     - settings: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
+///     - colors: Imports an array of tuples containing various colors that are used to style the UI. This is based on the UserSettings 'style' setting, and is an @State to update the UI.
+///
 struct ContentView: View {
     @State var tabSelection: TabPage = .home
-    /// Settings imports the UserSettings
     @EnvironmentObject var settings: UserSettings
     @State var colors = Color.colors
     var body: some View {
-        ZStack {
-            TabView(selection: $tabSelection){
-                HomeView()
-                    .tabItem { Label("Home", systemImage: "magnifyingglass") }
-                    .tag(0)
-                ScanView()
-                    .tabItem { Label("Scan", systemImage: "plus") }
-                    .tag(1)
-                SettingsView()
-                    .tabItem { Label("Settings", systemImage: "hammer.fill").foregroundColor(Color("text")) }
-                    .tag(2)
-            }
-            .accentColor(settings.minimal ? Color("text") : Color.colors[settings.style].text)
-            .transition(.slide)
-            .colorScheme(settings.darkMode ? .dark : .light)
-            
+        TabView(selection: $tabSelection){
+            HomeView()
+                .tabItem { Label("Home", systemImage: "magnifyingglass") }
+                .tag(0)
+            ScanView()
+                .tabItem { Label("Scan", systemImage: "plus") }
+                .tag(1)
+            SettingsView()
+                .tabItem { Label("Settings", systemImage: "hammer.fill").foregroundColor(Color("text")) }
+                .tag(2)
         }
+        .accentColor(settings.minimal ? Color("text") : Color.colors[settings.style].text)
+        .colorScheme(settings.darkMode ? .dark : .light)
     }
 //    /**
 //     trying to figure out how to move views from another struct using the current tabView
@@ -61,14 +73,16 @@ struct ContentView: View {
 //    }
 }
 
-/// SettingsView displays the settings menu
-/// - Main Parent: DashboardHomePageView
+/// **SettingsView** is a View struct that is called by ContentView. It imports the UserSettings and displays a range of toggles/buttons/pickers that alter the UserSettings upon user action.
+///  The view is made up of a ZStack allowing the BackgroundView to be placed behind a VStack containing the title view (which says "Settings" with a hammer icon) and various settings to change.
+/// - Parameters
+///     - **FetchRequest**: Creates a FetchRequest for the 'Receipt' CoreData entities. Contains a NSSortDescriptor that sorts and orders the receipts as specified by Date.
+///     - **receipts**: Takes and stores the requested Receipt entities in a FetchedResults variable of type Receipt. This variable is essentially an array of Receipt objects that the user has scanned.
+///     - **settings**: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
+///
 struct SettingsView: View  {
-    /// Fetches Receipt entities in CoreData sorting by the NSSortDescriptor.
     @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)], animation: .spring())
-    /// Stores the fetched results as an array of Receipt objects.
     var receipts: FetchedResults<Receipt>
-    /// Settings imports the UserSettings
     @EnvironmentObject var settings: UserSettings
    
     var body: some View {
@@ -143,7 +157,6 @@ struct SettingsView: View  {
                             }
                         }.padding(.horizontal, 2)
                         #if DEBUG
-                        
                             Button(action: {
                                 Receipt.generateKnownReceipts()
                                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
@@ -175,31 +188,27 @@ struct SettingsView: View  {
     }
 }
 
-/// Background view is the background of the application
-/// - Main Parent: ContentView
+/// **BackgroundView** is a View struct that is called by HomeView, ScanView, and SettingsView. It holds the background that we see in all the tabs of the app. Usually this is placed in a ZStack behind the specific pages objects.
+///  Consists of a Color with value "background", which automatically updates to be white when in light mode, and almost black in dark mode.
+/// - Parameters
+///     - **settings**: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
+///     - colors: Imports an array of tuples containing various colors that are used to style the UI. This is based on the UserSettings 'style' setting, and is an @State to update the UI.
+///
 struct BackgroundView: View {
-    /// Settings imports the UserSettings
     @EnvironmentObject var settings: UserSettings
     @State var colors = Color.colors
     
     var body: some View {
-        ZStack {
-            Color("background").ignoresSafeArea(.all)
-            
-            VStack{
-                if !settings.minimal && false {
-                    RoundedRectangle(cornerRadius: 0)
-                        .fill(LinearGradient(gradient: Gradient(colors: [colors[settings.style].leading, colors[settings.style].trailing]), startPoint: .topLeading, endPoint: .bottomTrailing))
-                        //.fill(LinearGradient(gradient: Gradient(colors: [Color("green"), Color("grass")]), startPoint: .topLeading, endPoint: .bottomTrailing))
-                        .frame(height: UIScreen.screenHeight * 0.16)
-                        .accessibility(identifier: "DarkMode: \(settings.darkMode)")
-                    Spacer()
-                }
-            }.ignoresSafeArea()
-        }
+        Color("background").ignoresSafeArea(.all)
     }
 }
 
+/// **BackgroundView** is a View struct that is called by HomeView, ScanView, and SettingsView. It holds the background that we see in all the tabs of the app. Usually this is placed in a ZStack behind the specific pages objects.
+///  Consists
+/// - Parameters
+///     - **settings**: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
+///     - **colors**: Imports an array of tuples containing various colors that are used to style the UI. This is based on the UserSettings 'style' setting, and is an @State to update the UI.
+///
 struct TitleText: View {
     @EnvironmentObject var settings: UserSettings
     @State var colors = Color.colors

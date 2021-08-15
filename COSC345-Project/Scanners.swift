@@ -237,7 +237,7 @@ struct DocumentScannerView: View {
     /* i would put saveReceipt() in a separate function since its duplicated in both scanners,
     but scanSelection keeps saying "im a let tho, you cant change me"
     despite me assigning it as a Binding<ScanSelection> in the function params :( */
-    func saveReceipt() -> Bool { 
+    func saveReceipt() -> Bool {
         if recognizedContent.items.count > 0 {
             for receipt in recognizedContent.items {
                 if receipt.text.count < 2 {
@@ -252,6 +252,7 @@ struct DocumentScannerView: View {
         return false
     }
 }
+
 
 /// Gallery Scanner used for scanning receipts to save.
 /// Controls the ImagePicker (gallery) which is used to get a array of images. The images are passed to TextRecognition to extract the text and create a recognizedContent variable, which is saved as a receipt.
