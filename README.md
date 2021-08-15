@@ -1,5 +1,5 @@
 # Receipted.
-[![PublishDocumentation](https://github.com/hunterkingsbeer/345-Project/actions/workflows/swift.yml/badge.svg)](https://github.com/hunterkingsbeer/345-Project/actions/workflows/swift.yml) 
+[![SwiftUI & Codecov Tests](https://github.com/hunterkingsbeer/345-Project/actions/workflows/swift.yml/badge.svg)](https://github.com/hunterkingsbeer/345-Project/actions/workflows/swift.yml)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/f50d2c33986744c68b1372ff88f9b8d6)](https://www.codacy.com/gh/hunterkingsbeer/345-Project/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hunterkingsbeer/345-Project&amp;utm_campaign=Badge_Grade)
 [![codecov](https://codecov.io/gh/hunterkingsbeer/345-Project/branch/main/graph/badge.svg?token=D8BWFYEIIN)](https://codecov.io/gh/hunterkingsbeer/345-Project)
 
