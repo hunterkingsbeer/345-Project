@@ -41,6 +41,20 @@ struct ScanTranslation {
             }
         }
     }
+    func recognizeTextDebug(){
+        for image in scannedImages {
+            guard let cgImage = image.cgImage else { return }
+            let requestHandler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+            let receiptItem = ReceiptItem()
+            receiptItem.image = image
+            try? requestHandler.perform([getTextRecognitionRequest(with: receiptItem)])
+            recognizedContent.items.append(receiptItem)
+            didFinishRecognition()
+        }
+        
+    }
+    
+    
     
     private func getTextRecognitionRequest(with receiptItem: ReceiptItem) -> VNRecognizeTextRequest {
         let request = VNRecognizeTextRequest { request, error in

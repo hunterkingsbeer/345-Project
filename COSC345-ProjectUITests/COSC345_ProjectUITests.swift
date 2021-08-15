@@ -58,10 +58,10 @@ class COSC345_ProjectUITests: XCTestCase {
         
         //check recepits
         let elementsQuery2 = app.scrollViews.otherElements
-        elementsQuery2.buttons["1, Technology"].tap()
+        elementsQuery2.buttons["1 Technology"].tap()
         
         XCTAssert(elementsQuery2.staticTexts["Jb Hifi"].exists)
-        elementsQuery2.buttons["1, Default"].tap()
+        elementsQuery2.buttons["1 Default"].tap()
         
         XCTAssert(!elementsQuery2.staticTexts["Jb Hifi"].exists)
         elementsQuery2.staticTexts["Invoice"].forceTap()

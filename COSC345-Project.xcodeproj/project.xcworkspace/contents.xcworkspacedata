@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:/Users/tane/Desktop/345-Project/COSC345-ProjectTests/test.txt">
+   </FileRef>
+   <FileRef
       location = "self:">
    </FileRef>
 </Workspace>
