@@ -22,4 +22,9 @@ Caitlin Jillybelle - Design and Research.
 
 Rhys Davie - Administration and Content.
 
-### [Documentation](https://hunterkingsbeer.github.io/345-Project/index.html)
+### Documentation:
+[Click Here!](https://hunterkingsbeer.github.io/345-Project/index.html)
+
+### Previews:
+<img src="https://i.imgur.com/dgObdhW.jpg" width="500">
+<img src="https://i.imgur.com/RUrsiBh.jpg" width="500">
