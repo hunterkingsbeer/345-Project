@@ -274,7 +274,7 @@ extension Receipt {
         // image cant be compared to nil, but it can be compared to an empty UIImage
         newReceipt.date = Date()
         newReceipt.folder = Prediction.pointPrediction(text: (title + (newReceipt.body ?? "")))
-        Folder.verifyFolder(folderTitle: newReceipt.folder ?? "Default")
+        Folder.verifyFolder(title: newReceipt.folder ?? "Default")
         save()
         print("New receipt: \(title)")
         print("-----------------------")
@@ -299,9 +299,9 @@ extension Receipt {
     
     /// Deletes a Receipt object.
     static func delete(receipt: Receipt) {
-        if Folder.folderExists(folderTitle: receipt.folder ?? "Default"){ 
-            Folder.getFolder(folderTitle: receipt.folder ?? "Default").receiptCount -= 1
-            Folder.ifEmptyDelete(folderTitle: receipt.folder ?? "")
+        if Folder.folderExists(title: receipt.folder ?? "Default"){
+            Folder.getFolder(title: receipt.folder ?? "Default").receiptCount -= 1
+            Folder.ifEmptyDelete(title: receipt.folder ?? "")
         }
         let viewContext = PersistenceController.shared.getContext()
         print("Deleted Receipt: \(receipt.title ?? "")")
