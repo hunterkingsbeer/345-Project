@@ -54,38 +54,38 @@ class COSC345_ProjectUITests: XCTestCase {
         
         //generate recepits
         let elementsQuery = app.scrollViews["ReceiptHomeView"].otherElements
-        elementsQuery.buttons["Delete All"].forceTap()
-        elementsQuery.buttons["Delete All"].forceTap()
-        elementsQuery.buttons["Generate Receipts"].forceTap()
-        tabBar.buttons["Home"].forceTap()
+        elementsQuery.buttons["Delete All"].tap()
+        elementsQuery.buttons["Delete All"].tap()
+        elementsQuery.buttons["Generate Receipts"].tap()
+        tabBar.buttons["Home"].tap()
         
         //check recepits
         let elementsQuery2 = app.scrollViews.otherElements
-        elementsQuery2.buttons["1 Technology"].forceTap()
+        elementsQuery2.buttons["1 Technology"].tap()
         
         XCTAssert(elementsQuery2.staticTexts["Jb Hifi"].exists)
-        elementsQuery2.buttons["1 Default"].forceTap()
+        elementsQuery2.buttons["1 Default"].tap()
         
         XCTAssert(!elementsQuery2.staticTexts["Jb Hifi"].exists)
-        elementsQuery2.staticTexts["Invoice"].forceTap()
+        elementsQuery2.staticTexts["Invoice"].tap()
         sleep(2)
 
         XCTAssert(!elementsQuery2.staticTexts["Invoice"].isHittable)
         
         sleep(2)
-        XCUIApplication().buttons["go down"].firstMatch.forceTap()
+        XCUIApplication().buttons["go down"].firstMatch.tap()
         XCTAssert(elementsQuery2.staticTexts["Invoice"].isHittable)
-        elementsQuery2.staticTexts["Invoice"].forceTap()
+        elementsQuery2.staticTexts["Invoice"].tap()
         
-        app.buttons["photo"].forceTap()
+        app.buttons["photo"].tap()
         XCTAssert(!app.buttons["go down"].firstMatch.isHittable)
        // this should be passing just fine
         
-        app.buttons["photo"].forceTap()
+        app.buttons["photo"].tap()
         XCTAssert(app.buttons["go down"].firstMatch.exists)
         
-        app.buttons["trash"].forceTap()
-        app.buttons["trash"].forceTap()
+        app.buttons["trash"].tap()
+        app.buttons["trash"].tap()
         
         XCTAssert(!elementsQuery2.staticTexts["Invoice"].isHittable)
         
