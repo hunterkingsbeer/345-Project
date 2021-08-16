@@ -259,6 +259,7 @@ extension Receipt {
     /// - Parameter recognizedText: The text from the scanned image, to be placed into a receipt variable.
     /// - Parameter image: The image of the receipt that was scanned.
     static func saveScan(recognizedText: String, image: UIImage = UIImage()){
+        print("\n----------------------------")
         let viewContext = PersistenceController.shared.getContext()
         
         let newReceipt = Receipt(context: viewContext)
@@ -266,6 +267,7 @@ extension Receipt {
     
         newReceipt.id = UUID()
         newReceipt.title = title
+        print("New Receipt Saving: \(title)")
         newReceipt.body = String(recognizedText.dropFirst((newReceipt.title ?? "").count)).capitalized
         newReceipt.image = image.jpegData(compressionQuality: 0.5) // warning is incorrect, this is only true when a default value is applied. Valid images are passed.
         // image cant be compared to nil, but it can be compared to an empty UIImage
@@ -273,8 +275,7 @@ extension Receipt {
         newReceipt.folder = Prediction.pointPrediction(text: (title + (newReceipt.body ?? "")))
         Folder.verifyFolder(title: newReceipt.folder ?? "Default")
         save()
-        print("New receipt: \(title)")
-        print("-----------------------")
+        print("Receipt saved!")
     }
     
     ///``getReceipts``

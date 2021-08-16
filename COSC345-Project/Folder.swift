@@ -207,7 +207,7 @@ extension Folder {
     static func verifyFolder(title: String){
         if folderExists(title: title) {
             getFolder(title: title).receiptCount += 1
-            print("Added to: \(title) folder")
+            print("Receipt Added to: \(title) folder.\n")
         } else {
             addFolder(title: title, icon: "folder")
         }

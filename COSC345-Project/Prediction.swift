@@ -33,6 +33,7 @@ struct Prediction {
             bestPrediction.title = prediction.title.capitalized
             bestPrediction.matches = prediction.matches
         }
+        print("Final Prediction: \(bestPrediction.title).")
         return bestPrediction.title
     }
     
@@ -46,7 +47,7 @@ struct Prediction {
         for category in categoryKeywords {
             let count = matchString(keywords: category.1, input: text)
             if count > 0 {
-                print("Category Prediction: \(category.0), \(count) matches." )
+                print("Category Prediction: \(category.0), \(count) matches.\n" )
                 predictedType.append((category.0, count))
             }
         }
@@ -62,7 +63,7 @@ struct Prediction {
         var count = 0
         for keyword in keywords {
             if input.lowercased().contains(keyword){
-                print("\nMatched word '\(keyword)'")
+                print("Matched word: '\(keyword)'.")
                 count += 1
             }
         }
