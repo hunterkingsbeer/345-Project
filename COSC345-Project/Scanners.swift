@@ -134,6 +134,7 @@ struct ScannerSelectView: View {
     }
 }
 
+/*
 /// ``ConfirmationView``
 /// is a View struct that shows the user its scanned receipt(s) and then provides them with an option of editing, discarding, or confirming the scan.
 /// - Called by DocumentScannerView and GalleryScannerView.
@@ -201,7 +202,7 @@ struct ConfirmationView: View {
             }
         }.padding(.horizontal)
     }
-}
+}*/
 
 /// ``DocumentScannerView``
 /// is a View struct that manages the DocumentScanner and its outputs and surrounding processes.
