@@ -26,5 +26,6 @@ Rhys Davie - Administration and Content.
 [Click Here!](https://hunterkingsbeer.github.io/345-Project/index.html)
 
 ### Previews:
-<img src="https://i.imgur.com/dgObdhW.jpg" width="500">
-<img src="https://i.imgur.com/RUrsiBh.jpg" width="500">
+Home Screen            |  Selected Folder
+:-------------------------:|:-------------------------:
+<img src="https://i.imgur.com/dgObdhW.jpg" width="500"> | <img src="https://i.imgur.com/RUrsiBh.jpg" width="500">
