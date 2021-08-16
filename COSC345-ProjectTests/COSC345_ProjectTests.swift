@@ -69,7 +69,7 @@ class COSC345_ProjectTests: XCTestCase {
         var count = 0
         for receipt in Receipt.getReceipts() {
             XCTAssert(scans.contains(receipt.title ?? ""))
-            if(count < scans.count-1) {
+            if count < scans.count-1 {
                 count += 1
             } else {
                 break

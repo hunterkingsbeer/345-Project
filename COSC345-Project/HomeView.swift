@@ -125,7 +125,7 @@ struct NoReceiptsView: View {
         }){
             RoundedRectangle(cornerRadius: 18)
                 .fill(Color(settings.shadows ? "shadowObject" : "accent"))
-                .dropShadow(on: settings.shadows, opacity: settings.darkMode ? 0.45 : 0.15, radius: 4)
+                .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.45 : 0.15, radius: 4)
                 .overlay(
                     // the title and body
                     HStack (alignment: .center){

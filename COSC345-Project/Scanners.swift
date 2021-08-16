@@ -251,21 +251,21 @@ struct GalleryScannerView: View {
     var body: some View {
         ImagePicker { result in
             switch result {
-                case .success(let scannedImages):
-                    isRecognizing = true
-                    print(recognizedContent.items.count)
-                    ScanTranslation(scannedImages: scannedImages,
-                                    recognizedContent: recognizedContent) {
-                        if saveReceipt(){ // if save receipt returns true (valid scan), exit the scanner
-                            scanSelection = .none
-                            selectedTab.changeTab(tabPage: .home)
-                        } else { // else stay in the scanner and alert them to scan again
-                            invalidAlert = true
-                        }
-                        isRecognizing = false // Text recognition is finished, hide the progress indicator.
-                    }.recognizeText()
-                case .failure(let error):
-                    print(error.localizedDescription)
+            case .success(let scannedImages):
+                isRecognizing = true
+                print(recognizedContent.items.count)
+                ScanTranslation(scannedImages: scannedImages,
+                                recognizedContent: recognizedContent) {
+                    if saveReceipt(){ // if save receipt returns true (valid scan), exit the scanner
+                        scanSelection = .none
+                        selectedTab.changeTab(tabPage: .home)
+                    } else { // else stay in the scanner and alert them to scan again
+                        invalidAlert = true
+                    }
+                    isRecognizing = false // Text recognition is finished, hide the progress indicator.
+                }.recognizeText()
+            case .failure(let error):
+                print(error.localizedDescription)
             }
         } didCancelScanning: {
             // Dismiss the scanner

@@ -62,9 +62,9 @@ extension View {
     /// - Parameter radius: Adjusts the radius of the shadow.
     /// - Returns
     ///     - A shadow as specified in the params.
-    func dropShadow(on: Bool, opacity: Double, radius: CGFloat) -> some View {
+    func dropShadow(isOn: Bool, opacity: Double, radius: CGFloat) -> some View {
         self
-            .shadow(color: Color("shadow").opacity(on ? opacity : 0.0), radius: radius)
+            .shadow(color: Color("shadow").opacity(isOn ? opacity : 0.0), radius: radius)
     }
 }
 
