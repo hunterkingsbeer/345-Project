@@ -292,8 +292,6 @@ struct DocumentScannerView: View {
     }
 }
 
-
-
 /// ``GalleryScannerView``
 /// is a View struct that manages the ImagePicker and its outputs and surrounding processes.
 /// - Called by ScanView.

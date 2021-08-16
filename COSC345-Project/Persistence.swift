@@ -8,15 +8,15 @@
 import CoreData
 import SwiftUI
 
-/// Initializes default Core Data information with example Core Data entries when previewing the application within Xcode, also holds the context in relation to Core Data
+///``PersistenceController``
+/// is a struct that is used to control the CoreData database entities.
+/// In here, we set the previews fake values so we have something to view in the canvas preview within Xcode.
 struct PersistenceController {
-    
+    ///``shared`` allows the PersistanceController to be accessed as an object outside of this struct.
     static let shared = PersistenceController()
-
+    ///``preview`` initializes Xcode's canvas database with the specified values.
     static var preview: PersistenceController = {
-
         let result = PersistenceController(inMemory: true)
-        /// Context in relation to Core Data
         let viewContext = result.container.viewContext
         
         for folder in Folder.folders {
@@ -42,7 +42,9 @@ struct PersistenceController {
         return result
     }()
 
+    ///``container`` is a NSPersistentContainer that holds the apps database.
     let container: NSPersistentContainer
+    /// The applications container is initialized.
     init(inMemory: Bool = false) {
         container = NSPersistentContainer(name: "COSC345_Project")
         if inMemory {
@@ -62,10 +64,17 @@ struct PersistenceController {
         })
     }
     
+    ///``getContext``
+    /// allows application wide access to the databases context.
+    /// If the view creates its own context, the database will be out of sync, therefore usage of this is important.
+    /// - Returns: the context of the database.
     func getContext() -> NSManagedObjectContext {
         return container.viewContext
     }
     
+    ///``save``
+    /// Used to save the context to confirm changes with the CoreData database.
+    /// This should be performed after any changes to the database entities.
     static func save(viewContext: NSManagedObjectContext) {
         let viewContext = shared.getContext()
         do {
