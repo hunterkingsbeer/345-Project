@@ -75,7 +75,10 @@ struct ScanTranslation {
         return request
     }
     
-    /*
+    ///``recognizeTextDebug``
+    /// is a function that is used to recognize text in the scannedImages parameter of the ScanTranslation struct.
+    /// It loops through all images in scannedImages, creates a ReceiptItem, and sets the image to the ReceiptItem before calling getTextRecognitionRequest to extract and set the images text.
+    /// This has been modified to be compatible with the UI testing performed.
     func recognizeTextDebug(){
         for image in scannedImages {
             guard let cgImage = image.cgImage else { return }
@@ -86,5 +89,5 @@ struct ScanTranslation {
             recognizedContent.items.append(receiptItem)
             didFinishRecognition()
         }
-    }*/
+    }
 }
