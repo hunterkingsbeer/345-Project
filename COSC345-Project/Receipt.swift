@@ -43,7 +43,7 @@ struct ReceiptView: View {
                 // the title and body
                 HStack (alignment: .center){
                     VStack(alignment: .leading) {
-                        Text(receipt.title ?? "")
+                        Text(receipt.title ?? "".trimmingCharacters(in: .whitespacesAndNewlines))
                             .font(.system(size: 16, weight: .bold, design: .rounded))
                         Text("\(getDate(date: receipt.date))")
                             .font(.system(size: 14, weight: .regular, design: .rounded))
@@ -109,10 +109,13 @@ struct ReceiptDetailView: View  {
                 VStack (alignment: .leading){
                     HStack {
                         VStack(alignment: .leading) {
-                            Text("\(receipt.title ?? "").")
+                            Text("\(receipt.title ?? "".trimmingCharacters(in: .whitespacesAndNewlines))")
                                 .font(.system(.title))
                             Text("\(getDate(date: receipt.date))")
                                 .font(.caption)
+                                .opacity(0.5)
+                            Text("\(receipt.folder ?? "Default").")
+                                .opacity(0.5)
                         }
                         Spacer()
                         Image(systemName: Folder.getIcon(title: receipt.folder))

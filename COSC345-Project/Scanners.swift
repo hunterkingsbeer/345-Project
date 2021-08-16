@@ -56,6 +56,8 @@ struct ScanView: View {
     @State var scanSelection: ScanSelection = .none
     ///``isRecognizing`` is used to provide a loading screen when the scanner is recognizing text (via ScanTranslation).
     @State var isRecognizing: Bool = false
+    ///``invalidAlert`` is used to handle invalid scans (which have too few words). It displays an alert, explaining an invalid scan and then returns the user to scan again.
+    @State var invalidAlert: Bool = false
     
     var body: some View {
         ZStack {
@@ -67,11 +69,13 @@ struct ScanView: View {
                 
                 if !isRecognizing {
                     if scanSelection == .gallery { // scan via gallery
-                        GalleryScannerView(scanSelection: $scanSelection,
+                        GalleryScannerView(invalidAlert: $invalidAlert,
+                                           scanSelection: $scanSelection,
                                            isRecognizing: $isRecognizing)
                         
                     } else if scanSelection == .camera { // scan via camera
-                        DocumentScannerView(scanSelection: $scanSelection,
+                        DocumentScannerView(invalidAlert: $invalidAlert,
+                                            scanSelection: $scanSelection,
                                             isRecognizing: $isRecognizing)
                     } else { // default "gallery or camera" screen
                         ScannerSelectView(scanSelection: $scanSelection)
@@ -85,6 +89,12 @@ struct ScanView: View {
                     Spacer()
                 }
             }
+        }.alert(isPresented: $invalidAlert) {
+            Alert(
+                title: Text("Receipt Not Saved!"),
+                message: Text("This image is not valid. Try again."),
+                dismissButton: .default(Text("Okay"))
+            )
         }
     }
 }
@@ -133,76 +143,6 @@ struct ScannerSelectView: View {
     }
 }
 
-/*
-/// ``ConfirmationView``
-/// is a View struct that shows the user its scanned receipt(s) and then provides them with an option of editing, discarding, or confirming the scan.
-/// - Called by DocumentScannerView and GalleryScannerView.
-struct ConfirmationView: View {
-    ///``isConfirming`` is used to display a confirmation/edit screen when confirming the users scans as correct. (CURRENTLY NOT IN USE, IMPLEMENTATION IS PLANNED).
-    @State var isConfirming: Bool = false
-    ///``recognizedContent`` is an object that holds an array of ReceiptItems that hold the information about the scan performed by the user.
-    @ObservedObject var recognizedContent: RecognizedContent = RecognizedContent()
-    
-    var body: some View {
-        VStack {
-            TitleText(title: "Confirm", icon: "confirm")
-            ScrollView(showsIndicators: false) {
-                //ForEach(recognizedContent.items){ receipt in
-                    VStack (alignment: .leading){
-                        Text("Title")
-                            .font(.system(.title))
-                        Text("15/10/2021")
-                            .font(.caption)
-                        Divider()
-                        Text("body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text")
-                    }.padding()
-                    .background(Color("object")).cornerRadius(15)
-                    .padding()
-                    .frame(width: UIScreen.screenWidth * 0.85)
-                //}
-            }
-            HStack {
-                let buttonHeight = UIScreen.screenHeight * 0.06
-                Button(action:{
-                    // cancel scan
-                }){
-                    RoundedRectangle(cornerRadius: 15)
-                        .foregroundColor(Color("object"))
-                        .frame(height: buttonHeight)
-                        .overlay(Image(systemName: "xmark"))
-                }.buttonStyle(ShrinkingButton())
-                
-                Button(action:{
-                    // view image of scan
-                }){
-                    RoundedRectangle(cornerRadius: 15)
-                        .foregroundColor(Color("object"))
-                        .frame(height: buttonHeight)
-                        .overlay(Image(systemName: "photo"))
-                }.buttonStyle(ShrinkingButton())
-                
-                Button(action:{
-                    // edit scan
-                }){
-                    RoundedRectangle(cornerRadius: 15)
-                        .foregroundColor(Color("object"))
-                        .frame(height: buttonHeight)
-                        .overlay(Image(systemName: "pencil"))
-                }.buttonStyle(ShrinkingButton())
-                
-                Button(action:{
-                    // confirm scan
-                }){
-                    RoundedRectangle(cornerRadius: 15)
-                        .foregroundColor(Color("object"))
-                        .frame(height: buttonHeight)
-                        .overlay(Image(systemName: "checkmark"))
-                }.buttonStyle(ShrinkingButton())
-            }
-        }.padding(.horizontal)
-    }
-}*/
-
 /// ``DocumentScannerView``
 /// is a View struct that manages the DocumentScanner and its outputs and surrounding processes.
 /// The document scanner is only displayed if the application is being run on a physical iPhone, otherwise an error message is displayed.
@@ -213,8 +153,8 @@ struct ConfirmationView: View {
 struct DocumentScannerView: View {
     ///``selectedTab`` Controls the TabView's active tab it is viewing. Imports the TabSelection EnvironmentObject, allowing for application wide changing of the selected tab.
     @EnvironmentObject var selectedTab: TabSelection
-    ///``invalidAlert`` is used to handle invalid scans (which have too few words). It displays an alert, explaining an invalid scan and then returns the user to the scanner they chose.
-    @State var invalidAlert: Bool = false
+    ///``invalidAlert`` is used to set whether the scan is valid or not. This links with the parent ScanView which actually displays the error.
+    @Binding var invalidAlert: Bool
     ///``scanSelection`` is used to manage the screens active view. This is @Binding as it controls the parent views value, allowing it to change the screen as desired.
     @Binding var scanSelection: ScanSelection
     ///``isRecognizing`` binds to the parent views boolean and allows the display of a loading screen while the scan's image is being translated to text.
@@ -299,8 +239,8 @@ struct DocumentScannerView: View {
 struct GalleryScannerView: View {
     ///``selectedTab`` Controls the TabView's active tab it is viewing. Imports the TabSelection EnvironmentObject, allowing for application wide changing of the selected tab.
     @EnvironmentObject var selectedTab: TabSelection
-    ///``invalidAlert`` is used to handle invalid scans (which have too few words). It displays an alert, explaining an invalid scan and then returns the user to the scanner they chose.
-    @State var invalidAlert: Bool = false
+    ///``invalidAlert`` is used to set whether the scan is valid or not. This links with the parent ScanView which actually displays the error.
+    @Binding var invalidAlert: Bool
     ///``scanSelection`` is used to manage the screens active view. This is @Binding as it controls the parent views value, allowing it to change the screen as desired.
     @Binding var scanSelection: ScanSelection
     ///``isRecognizing`` binds to the parent views boolean and allows the display of a loading screen while the scan's image is being translated to text.
@@ -330,12 +270,6 @@ struct GalleryScannerView: View {
         } didCancelScanning: {
             // Dismiss the scanner
             scanSelection = .none
-        }.alert(isPresented: $invalidAlert) {
-            Alert(
-                title: Text("Receipt Not Saved!"),
-                message: Text("This image is not valid. Try again."),
-                dismissButton: .default(Text("Okay"))
-            )
         }
     }
     
@@ -444,3 +378,73 @@ struct DocumentScanner: UIViewControllerRepresentable {
         }
     }
 }
+
+/*
+/// ``ConfirmationView``
+/// is a View struct that shows the user its scanned receipt(s) and then provides them with an option of editing, discarding, or confirming the scan.
+/// - Called by DocumentScannerView and GalleryScannerView.
+struct ConfirmationView: View {
+    ///``isConfirming`` is used to display a confirmation/edit screen when confirming the users scans as correct. (CURRENTLY NOT IN USE, IMPLEMENTATION IS PLANNED).
+    @State var isConfirming: Bool = false
+    ///``recognizedContent`` is an object that holds an array of ReceiptItems that hold the information about the scan performed by the user.
+    @ObservedObject var recognizedContent: RecognizedContent = RecognizedContent()
+    
+    var body: some View {
+        VStack {
+            TitleText(title: "Confirm", icon: "confirm")
+            ScrollView(showsIndicators: false) {
+                //ForEach(recognizedContent.items){ receipt in
+                    VStack (alignment: .leading){
+                        Text("Title")
+                            .font(.system(.title))
+                        Text("15/10/2021")
+                            .font(.caption)
+                        Divider()
+                        Text("body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text")
+                    }.padding()
+                    .background(Color("object")).cornerRadius(15)
+                    .padding()
+                    .frame(width: UIScreen.screenWidth * 0.85)
+                //}
+            }
+            HStack {
+                let buttonHeight = UIScreen.screenHeight * 0.06
+                Button(action:{
+                    // cancel scan
+                }){
+                    RoundedRectangle(cornerRadius: 15)
+                        .foregroundColor(Color("object"))
+                        .frame(height: buttonHeight)
+                        .overlay(Image(systemName: "xmark"))
+                }.buttonStyle(ShrinkingButton())
+                
+                Button(action:{
+                    // view image of scan
+                }){
+                    RoundedRectangle(cornerRadius: 15)
+                        .foregroundColor(Color("object"))
+                        .frame(height: buttonHeight)
+                        .overlay(Image(systemName: "photo"))
+                }.buttonStyle(ShrinkingButton())
+                
+                Button(action:{
+                    // edit scan
+                }){
+                    RoundedRectangle(cornerRadius: 15)
+                        .foregroundColor(Color("object"))
+                        .frame(height: buttonHeight)
+                        .overlay(Image(systemName: "pencil"))
+                }.buttonStyle(ShrinkingButton())
+                
+                Button(action:{
+                    // confirm scan
+                }){
+                    RoundedRectangle(cornerRadius: 15)
+                        .foregroundColor(Color("object"))
+                        .frame(height: buttonHeight)
+                        .overlay(Image(systemName: "checkmark"))
+                }.buttonStyle(ShrinkingButton())
+            }
+        }.padding(.horizontal)
+    }
+}*/
