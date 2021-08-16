@@ -115,7 +115,7 @@ extension Folder {
     }
     
     ///``getFolders``
-    /// Gets the folders you want to retrieve.
+    /// Gets an array of folders from the database.
     /// It creates a fetch request and calls in the CoreData database's collection of Folder entities, returning them as an array.
     /// - Returns: An array of the Folder entities from the database.
     static func getFolders() -> [Folder] {

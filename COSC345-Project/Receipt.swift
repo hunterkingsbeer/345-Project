@@ -134,7 +134,9 @@ struct ReceiptDetailView: View  {
         .ignoresSafeArea(edges: /*@START_MENU_TOKEN@*/.bottom/*@END_MENU_TOKEN@*/)
     }
 }
-
+/// ``ReceiptViewButtons``
+/// is a View struct that displays the buttons at the bottom of the ReceiptDetailView, allowing the receipt to be modified as needed.
+/// - Called by ReceiptDetailView.
 struct ReceiptViewButtons: View {
     @Environment(\.presentationMode) var presentationMode
     ///``detailState``:  binds to the parent views detailState, to update it based on the users interaction.
@@ -249,18 +251,12 @@ struct ReceiptViewButtons: View {
     }
 }
 
-struct ReceiptScan: Identifiable {
-    var id: UUID
-    var title: String
-    var body: String
-    var image: Data
-    var date: Date
-    var folder: String
-}
-
 /// Extension of the Receipt object.
 extension Receipt {
-    /// Converts scanned text into a new Receipt object.
+    ///``saveScan``
+    /// takes in an image and recognized text and applies it to a Receipt variable to be saved to the database.
+    /// - Parameter recognizedText: The text from the scanned image, to be placed into a receipt variable.
+    /// - Parameter image: The image of the receipt that was scanned.
     static func saveScan(recognizedText: String, image: UIImage = UIImage()){
         let viewContext = PersistenceController.shared.getContext()
         
@@ -280,7 +276,10 @@ extension Receipt {
         print("-----------------------")
     }
     
-    /// Returns an array of all folders.
+    ///``getReceipts``
+    /// Gets an array of receipts from the database.
+    /// It creates a fetch request and calls in the CoreData database's collection of Receipt entities, returning them as an array.
+    /// - Returns: An array of the Receipt entities from the database.
     static func getReceipts() -> [Receipt] {
         let fetchRequest: NSFetchRequest<Receipt> = Receipt.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)]
@@ -295,9 +294,10 @@ extension Receipt {
         return [Receipt]()
     }
     
-    
-    
-    /// Deletes a Receipt object.
+    ///``delete``
+    /// Deletes the receipt passed to it in the param.
+    /// Creates a context and then deletes the receipt, before saving the context to confirm this.
+    /// - Parameter receipt: The receipt you want to delete.
     static func delete(receipt: Receipt) {
         if Folder.folderExists(title: receipt.folder ?? "Default"){
             Folder.getFolder(title: receipt.folder ?? "Default").receiptCount -= 1
@@ -309,12 +309,20 @@ extension Receipt {
         save()
     }
     
+    ///``deleteAll``
+    /// Deletes all the receipts passed to it in the param.
+    /// - Parameter receipts: The receipts you want to delete.
     static func deleteAll(receipts: FetchedResults<Receipt>) {
         for receipt in receipts {
             delete(receipt: receipt)
         }
     }
     
+    ///``getReceipt``
+    /// Gets the receipt you want to retrieve.
+    /// Performs this by doing a for loop, checking each receipt until the matching receipt title (and receipt) is found, where it returns the Receipt.
+    /// - Parameter title: The title of the receipt you want to retrieve.
+    /// - Returns A Receipt with the matching title as the parameter.
     static func getReceipt(title: String) -> Receipt{
         for receipt in getReceipts() where receipt.title == title {
             return receipt
@@ -322,6 +330,9 @@ extension Receipt {
         return Receipt()
     }
     
+    ///``generateRandomReceipts``
+    /// Uses a pre-determined array of strings to create receipts. This function generates the receipts at random varying ratios.
+    /// Each receipt is saved to the database.
     static func generateRandomReceipts() {
         let scans = ["Cotton On\n TEE - $12.00, PANTS - $23.99, HOODIE - $33.99",
                      "JB Hifi\n Airpods - $300.00, Keyboard - $30.99, Monitor - $275.00",
@@ -332,6 +343,9 @@ extension Receipt {
         }
     }
     
+    ///``generateKnownReceipts``
+    /// Uses a pre-determined array of strings to create receipts. This function generates the receipts at 1:1 ratios, which is useful in testing.
+    /// Each receipt is saved to the database.
     static func generateKnownReceipts() {
         let scans = ["Cotton On\n TEE - $12.00, PANTS - $23.99, HOODIE - $33.99",
                      "JB Hifi\n Airpods - $300.00, Keyboard - $30.99, Monitor - $275.00",
@@ -344,7 +358,9 @@ extension Receipt {
         
     }
 
-    /// Saves the Receipt object
+    ///``save``
+    /// Used to save the context to confirm changes with the CoreData database.
+    /// This should be performed after any changes to the database entities.
     static func save() {
         let viewContext = PersistenceController.shared.getContext()
         
