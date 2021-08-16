@@ -38,7 +38,6 @@ class COSC345_ProjectTests: XCTestCase {
                 
             }
         }
-        
     
         ScanTranslation(scannedImages: image, recognizedContent: recognizedContent){
             generatedString = recognizedContent.items[0].text
@@ -57,32 +56,24 @@ class COSC345_ProjectTests: XCTestCase {
         
         print(recognizedContent.items)
         XCTAssert(generatedString == testString)
-    
 
-    }
+        }
     }
     
     /**
      Checks if the recpits are being stored and fetched in folders correctly
      */
     func testFolders() throws {
-        let scans = ["Cotton On","Jb Hifi", "Countdown","Invoice"]
+        let scans = ["Cotton On", "Jb Hifi", "Countdown", "Invoice"]
         Receipt.generateKnownReceipts()
         var count = 0
-        for i in Receipt.getReceipts(){
-            XCTAssert(scans.contains(i.title ?? ""))
-            if(count < scans.count-1){
+        for receipt in Receipt.getReceipts() {
+            XCTAssert(scans.contains(receipt.title ?? ""))
+            if(count < scans.count-1) {
                 count += 1
-            }
-            else{
+            } else {
                 break
             }
-            
         }
-       
     }
-    
 }
-
-
-

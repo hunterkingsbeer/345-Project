@@ -13,7 +13,6 @@ class COSC345_ProjectUITests: XCTestCase {
     }
 
     func testHomeView() throws {
-        
         app.launch()
         let tabBar = XCUIApplication().tabBars["Tab Bar"]
         
@@ -23,10 +22,8 @@ class COSC345_ProjectUITests: XCTestCase {
         XCTAssertEqual(app.staticTexts["Scan."].exists, app.staticTexts["Scan."].isHittable)
         
         tabBar.buttons["Settings"].forceTap()
-        XCTAssertEqual(app.staticTexts["Settings."].exists,app.staticTexts["Settings."].exists)
-        
+        XCTAssertEqual(app.staticTexts["Settings."].exists, app.staticTexts["Settings."].exists)
     }
-    
     
     func testSettingsView() throws {
                         
@@ -35,16 +32,14 @@ class COSC345_ProjectUITests: XCTestCase {
         let tabBar = app.tabBars["Tab Bar"]
         tabBar.buttons["Settings"].forceTap()
         
-        if( app.switches["DarkModeToggle: true"].exists){
+        if(app.switches["DarkModeToggle: true"].exists) {
             var darkMode = app.switches["DarkModeToggle: true"]
             darkMode.forceTap()
             darkMode = app.switches["DarkModeToggle: false"]
             tabBar.buttons["Settings"].forceTap() // will remove one the toggle to home screen issue is fixed
             XCTAssert(darkMode.identifier == "DarkModeToggle: false")
         }
-                
     }
-    
 
     func testFolderView() throws {
         
@@ -163,5 +158,3 @@ extension XCUIElement {
         coordinate(withNormalizedOffset: CGVector(dx:0.5, dy:0.5)).tap()
     }
 }
-
-

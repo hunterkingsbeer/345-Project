@@ -20,8 +20,8 @@ class RecognizedContent: ObservableObject {
 /// ``ReceiptItem``
 /// is an identifiable object that holds information relating to a scanned receipt.
 class ReceiptItem: Identifiable {
-    ///``id`` holds a unique ID that allows the object to be identifiable
-    var id: UUID = UUID()
+    ///``uuid`` holds a unique ID that allows the object to be identifiable
+    var uuid: UUID = UUID()
     ///``text`` is the text extracted from the image of the receipt the user has scanned.
     var text: String = ""
     ///``image`` is a UI Image that the user has scanned of their receipt, and which the receipt is based on.
@@ -70,7 +70,6 @@ struct ScanView: View {
                         GalleryScannerView(scanSelection: $scanSelection,
                                            isRecognizing: $isRecognizing)
                         
-                        
                     } else if scanSelection == .camera { // scan via camera
                         DocumentScannerView(scanSelection: $scanSelection,
                                             isRecognizing: $isRecognizing)
@@ -117,7 +116,7 @@ struct ScannerSelectView: View {
             Divider()
             Spacer()
             
-            Button(action:{
+            Button(action: {
                 scanSelection = scanSelection == .camera ? .none : .camera
             }){
                 VStack {
@@ -227,21 +226,21 @@ struct DocumentScannerView: View {
         if !UIDevice.current.inSimulator { // if device is physical (supports camera)
             DocumentScanner { result in
                 switch result {
-                    case .success(let scannedImages):
-                        isRecognizing = true
-                        print(recognizedContent.items.count)
-                        ScanTranslation(scannedImages: scannedImages,
-                                        recognizedContent: recognizedContent) {
-                            if saveReceipt(){ // if save receipt returns true (valid scan), exit the scanner
-                                scanSelection = .none
-                                selectedTab.changeTab(tabPage: .home)
-                            } else { // else stay in the scanner and alert them to scan again
-                                invalidAlert = true
-                            }
-                            isRecognizing = false // Text recognition is finished, hide the progress indicator.
-                        }.recognizeText()
-                    case .failure(let error):
-                        print(error.localizedDescription)
+                case .success(let scannedImages):
+                    isRecognizing = true
+                    print(recognizedContent.items.count)
+                    ScanTranslation(scannedImages: scannedImages,
+                                    recognizedContent: recognizedContent) {
+                        if saveReceipt(){ // if save receipt returns true (valid scan), exit the scanner
+                            scanSelection = .none
+                            selectedTab.changeTab(tabPage: .home)
+                        } else { // else stay in the scanner and alert them to scan again
+                            invalidAlert = true
+                        }
+                        isRecognizing = false // Text recognition is finished, hide the progress indicator.
+                    }.recognizeText()
+                case .failure(let error):
+                    print(error.localizedDescription)
                 }
             } didCancelScanning: {
                 // Dismiss the scanner
@@ -287,7 +286,6 @@ struct DocumentScannerView: View {
             }
             scanSelection = .none
         }
-        
         return false
     }
 }
@@ -379,31 +377,25 @@ struct ImagePicker: UIViewControllerRepresentable {
         imagePicker.delegate = context.coordinator
         return imagePicker
     }
-    
     func updateUIViewController(_ uiViewController: UIImagePickerController, context: UIViewControllerRepresentableContext<ImagePicker>) { }
-    
     func makeCoordinator() -> Coordinator {
         Coordinator(with: self)
     }
-    
     final class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
         var galleryView: ImagePicker
         
         init(with gallery: ImagePicker) {
             self.galleryView = gallery
         }
-
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
             
             if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
                 galleryView.didFinishScanning(.success([image]))
             }
         }
-        
         func imagePickerControllerDidCancel(_ controller: UIImagePickerController) {
             galleryView.didCancelScanning()
         }
-        
         func imagePickerViewController(_ controller: UIImagePickerController, didFailWithError error: Error) {
             galleryView.didFinishScanning(.failure(error))
         }
@@ -426,37 +418,29 @@ struct DocumentScanner: UIViewControllerRepresentable {
         scannerViewController.delegate = context.coordinator
         return scannerViewController
     }
-    
     func updateUIViewController(_ uiViewController: VNDocumentCameraViewController, context: Context) { }
-    
-    
     func makeCoordinator() -> Coordinator {
         Coordinator(with: self)
     }
-    
     class Coordinator: NSObject, VNDocumentCameraViewControllerDelegate {
         let scannerView: DocumentScanner
         
         init(with scannerView: DocumentScanner) {
             self.scannerView = scannerView
         }
-        
         func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFinishWith scan: VNDocumentCameraScan) {
             var scannedPages = [UIImage]()
             
-            for i in 0..<scan.pageCount {
-                scannedPages.append(scan.imageOfPage(at: i))
+            for index in 0..<scan.pageCount {
+                scannedPages.append(scan.imageOfPage(at: index))
             }
             scannerView.didFinishScanning(.success(scannedPages))
         }
-        
         func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {
             scannerView.didCancelScanning()
         }
-        
         func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFailWithError error: Error) {
             scannerView.didFinishScanning(.failure(error))
         }
     }
 }
-

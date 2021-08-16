@@ -131,7 +131,7 @@ struct ReceiptDetailView: View  {
                 .dropShadow(on: settings.shadows, opacity: 0.15, radius: 15)
         }.padding(.bottom)
         .background(Color("background"))
-        .ignoresSafeArea(edges: /*@START_MENU_TOKEN@*/.bottom/*@END_MENU_TOKEN@*/)
+        .ignoresSafeArea(edges: .bottom)
     }
 }
 /// ``ReceiptViewButtons``
@@ -335,10 +335,34 @@ extension Receipt {
     /// Uses a pre-determined array of strings to create receipts. This function generates the receipts at random varying ratios.
     /// Each receipt is saved to the database.
     static func generateRandomReceipts() {
-        let scans = ["Cotton On\n TEE - $12.00, PANTS - $23.99, HOODIE - $33.99",
-                     "JB Hifi\n Airpods - $300.00, Keyboard - $30.99, Monitor - $275.00",
-                     "Countdown\n Lettuce - $2.00, Doritos - $2.99, Milk - $3",
-                     "Invoice\n LABOR $25p/h, HOURS WORKED - 25. TOTAL $625"]
+        let scans = ["Countdown \nLettuce - $2.00, \nDoritos - $2.99, \nMilk - $3", // groceries
+                     
+                     "JB Hifi \nKeyboard - $120.00, \nTablet - $2300.99, \nEar buds - $119.99", // tech
+                     
+                     "Mitre 10 \nAxe - $110.00, \nTimber - $2009.10, \nGlue - $10.00", //hardware
+                     
+                     "Kitchen Things \nWashing Machine - $2560.10", //appliance
+                     
+                     "Animates \nDog Food - $30.00, \nBowl - $20.00", //pets
+                     
+                     "Dunedin Pharmacy \nVitamins - $65.00, \nLip Balm - $4.50", // Health/Beauty
+                     
+                     "Big Save Furniture \nCouch - $1450.00, \nBed Frame - $1000.00", // home
+                     
+                     "Paper Plus \nPaper - $10.00, \nToner - $39.50, \nCalendar - $25.00",
+                     
+                     "Cotton on \n2x Tee - $30.00, \nPants - $45.00", // apparel
+                     
+                     "Paper Plus\nPaint - $25.00, \nClay - $5.99, \nEraser - $3", // arts
+                     
+                     "JetBrains\nJava IDE - $250.00", // software
+                     
+                     "JB Hifi \nPS5 - $500.00, \nPlaystation Game - $120.00", // games
+                     
+                     "Nike \nSoccer Shoes - $150.00, \n Mouthguard - $15.00", // sports
+                     
+                     "SuperCheap Auto \nSteering Wheel - $320.00, \n Battery - $450.00" // vehicles
+        ]
         for _ in 0..<10 {
             Receipt.saveScan(recognizedText: scans.randomElement() ?? "")
         }

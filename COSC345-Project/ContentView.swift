@@ -8,7 +8,6 @@
 import SwiftUI
 import CoreData
 
-
 /// ``ContentView_Previews``
 /// is a PreviewProvider that allows the application to be previewed in the Xcode canvas.
 struct ContentView_Previews: PreviewProvider {

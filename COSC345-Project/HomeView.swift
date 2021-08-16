@@ -82,8 +82,9 @@ struct HomeView: View {
                 
                 // RECEIPTS
                 ScrollView(showsIndicators: false) {
-                    if receipts.count > 0 {
-                        VStack {
+                    VStack {
+                        if receipts.count > 0 {
+                        
                             // If selectedFolder contains something, use it to show receipts in the folder.
                             // Else If userSearch contains something, use it to check for receipts.
                                 // Else show receipts that have any body text (all receipts).
@@ -99,12 +100,11 @@ struct HomeView: View {
                                     .padding(.horizontal)
                                     .padding(.bottom, 5)
                             }
-                        }.padding(.top, 8).padding(.bottom)
-                    } else {
-                        NoReceiptsView()
-                    }
-                }
-                .cornerRadius(0)
+                        } else {
+                            NoReceiptsView()
+                        }
+                    }.padding(.top, 8).padding(.bottom)
+                }.cornerRadius(0)
             }
         }
     }
@@ -161,7 +161,7 @@ struct HomeTitleBar: View {
                     if userSearch.isEmpty {
                         Text("Receipted.")
                             .font(.system(size: 40, weight: .semibold))
-                            .foregroundColor(Color.accentColor)
+                            .foregroundColor(Color("text"))
                             .transition(AnyTransition.opacity.combined(with: .move(edge: .bottom)))
                     }
                     TextField("", text: $userSearch)

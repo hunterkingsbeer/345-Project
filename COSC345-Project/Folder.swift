@@ -35,7 +35,7 @@ struct FolderView: View {
                     
                     HStack {
                         Image(systemName: folder.icon ?? "folder")
-                        Text("\(folder.receiptCount) \(folder.title ?? " Default")")
+                        Text("\(folder.receiptCount) \(folder.title ?? " Default").")
                         Spacer()
                     }.font(.system(size: 16, weight: .bold))
                     .foregroundColor(Color("background"))
@@ -71,31 +71,21 @@ extension Folder {
     /// ``folders``
     /// Defines the title of folders, with their respective icons and colours. NEEDS UPDATING TO HAVE NEW FOLDERS WE HAVE CREATED.
     static let folders = [(title: "Default", icon: "doc.plaintext", color: "text"),
-                              (title: "Retail", icon: "tag", color: "lightYellow"),
+                              //(title: "Retail", icon: "tag", color: "lightYellow"), too vague
                               (title: "Groceries", icon: "cart", color: "green"),
                               (title: "Technology", icon: "desktopcomputer", color: "blue"),
-                              (title: "Clothing", icon: "bag", color: "pink"),
-                              (title: "Hardware", icon: "", color:
-                                  ""),
-                              (title: "Appliance", icon: "", color:
-                                  ""),
-                              (title: "Pets", icon: "", color:
-                                  ""),
-                              (title: "Baby & Toddler", icon: "",
-                               color: ""),
-                              (title: "Luggage", icon: "", color:
-                                  ""),
-                              (title: "Health & Beauty", icon: "", color: ""),
-                              (title: "Home & Garden", icon: "", color: ""),
-                              (title: "Office Supplies", icon: "",
-                               color: ""),
-                              (title: "Apparel & Accessories", icon: "", color: ""),
-                              (title: "Arts & Entertainment", icon: "",
-                               color: ""),
-                              (title: "Software", icon: "", color: ""),
-                              (title: "Toys & Games", icon: "", color: ""),
-                              (title: "Sports", icon: "", color: ""),
-                              (title: "Vehicles", icon: "", color: "")
+                              (title: "Hardware", icon: "wrench", color: "earth"),
+                              (title: "Appliance", icon: "shippingbox", color: "grass"),
+                              (title: "Pets", icon: "hare", color: "lightPink"),
+                              (title: "Health & Beauty", icon: "bandage", color: "teal"),
+                              (title: "Home & Garden", icon: "bed.double", color: "neonGreen"),
+                              (title: "Office Supplies", icon: "printer", color: "paleBlue"),
+                              (title: "Apparel", icon: "bag", color: "pink"),
+                              (title: "Arts & Entertainment", icon: "pencil.and.outline", color: "purple"),
+                              (title: "Software", icon: "chevron.left.slash.chevron.right", color: "darkBlue"),
+                              (title: "Toys & Games", icon: "gamecontroller", color: "neonPink"),
+                              (title: "Sports", icon: "figure.walk", color: "red"),
+                              (title: "Vehicles", icon: "car", color: "yellow")
     ]
     
     ///``getIcon``
@@ -117,7 +107,7 @@ extension Folder {
     /// - Returns: A string that can be placed inside a Color(), e.g. Color("green").
     static func getColor(title: String?) -> String {
         for match in folders where match.title.lowercased() == title?.lowercased(){
-            return match.color
+            return match.color != "" ? match.color : "text"
         }
         return "text"
     }
