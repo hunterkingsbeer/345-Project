@@ -25,4 +25,4 @@ To generate random receipts, navigate to the settings tab and select "Generate r
 ### Previews:
 Home Screen | Selected Folder | Searching
 :-------------------------:|:-------------------------:|:-------------------------: 
-<img src="https://i.imgur.com/pauyVax.jpg" width="250"> | <img src="https://i.imgur.com/xD9XTih.jpg" width="250"> | <img src="https://i.imgur.com/YY6VCSL.jpg" width="250">
+<img src="https://i.imgur.com/pauyVax.jpg" width="300"> | <img src="https://i.imgur.com/xD9XTih.jpg" width="300"> | <img src="https://i.imgur.com/YY6VCSL.jpg" width="300">
