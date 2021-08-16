@@ -8,7 +8,7 @@ Made for COSC345's full year project.
 
 ### Running the application:
 This app has been developed using an iPhone 11 Pro, however it should run on any device running iOS 7 and above.
-To use the camera or gallery, you must have a physical phone.
+To use the camera or gallery, you MUST have a physical phone. This app is designed to be run on a physical device, without one you should not expect to experience the apps full functionality.
 
 Start the app using the Xcode simulator running an iOS phone.
 To generate random receipts, navigate to hte settings tab and select "Generate receipts". This will generate 10 random receipts to preview.
