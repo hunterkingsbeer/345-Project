@@ -28,4 +28,4 @@ Rhys Davie - Administration and Content.
 ### Previews:
 Home Screen            |  Selected Folder
 :-------------------------:|:-------------------------:
-<img src="https://i.imgur.com/dgObdhW.jpg" width="500"> | <img src="https://i.imgur.com/RUrsiBh.jpg" width="500">
+<img src="https://i.imgur.com/pauyVax.jpg" width="500"> | <img src="https://i.imgur.com/xD9XTih.jpg" width="500">
