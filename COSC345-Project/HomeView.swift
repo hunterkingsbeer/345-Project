@@ -177,6 +177,7 @@ struct HomeTitleBar: View {
                         .font(.system(size: 30, weight: .semibold))
                     Text("\(selectedFolder).")
                         .font(.system(size: 40, weight: .semibold))
+                        .lineLimit(2).minimumScaleFactor(0.85)
                 }
                 .foregroundColor(Color(selectedFolder.isEmpty ? "text" : "background"))
                 .transition(AnyTransition.opacity.combined(with: .offset(y: -100)))
