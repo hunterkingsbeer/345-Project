@@ -9,23 +9,30 @@ import Foundation
 import CoreData
 import SwiftUI
 
-/// States for the Receipt Detail View. None - no buttons active, Image - Viewing the receipts image, Deleting - pending delete, Editing - Editing the receipt.
+/// ``DetailState``
+/// is an enum that is used to control the state of the DetailReceiptView, relating to each of the buttons present in the view.
 enum DetailState {
+    ///``none``: When this is active it will present the view in its default view, with nothing active.
     case none
+    ///``image``: When this is active it will present the image of the receipt.
     case image
+    ///``deleting``: When this is active it will present the user with a delete confirmation button, allowing them to delete a receipt.
     case deleting
+    ///``editing``: When this is active it will allow the user to edit the receipt they are viewing. NOT IMPLEMENTED YET.
     case editing
 }
 
-/// Receipt view is the template receipt design, that starts minimized then after interaction expands to full size
-/// - Main Parent: ReceiptCollectionView
+/// ``ReceiptView``
+/// is a View struct that displays a small 'preview' receipt which upon interaction will display a sheet holding the ReceiptDetailView.
+/// - Called by HomeView.
 struct ReceiptView: View {
-    /// An induvidual receipt entity that the view will be based on
+    ///``receipt``: is a Receipt variable that is passed to the view which holds the information about the receipt this view will represent.
     @State var receipt: Receipt
-    /// Whether the receipt is selected and displaying further details
+    ///``selected``: is a Bool that controls the visibility of the ReceiptDetailView sheet, when true the sheet is visible, when false the sheet is not visible.
     @State var selected: Bool = false
-    /// Whether the user has held down the receipt (performed the delete action), and is pending delete
+    /// ``pendingDelete``: is a Bool that shows the delete button for a user to confirm a deletion of a receipt.
     @State var pendingDelete = false
+    ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
     
     var body: some View {
@@ -64,7 +71,6 @@ struct ReceiptView: View {
                 .padding(.vertical, 10)
             ).animation(.spring())
             .frame(height: UIScreen.screenHeight * 0.08)
-            .sheet(isPresented: $selected) { ReceiptDetailView(receipt: receipt).colorScheme(settings.darkMode ? .dark : .light) }
             .onTapGesture {
                 selected.toggle()
             }
@@ -80,14 +86,21 @@ struct ReceiptView: View {
                     }
                 }
             })
+            .sheet(isPresented: $selected) {
+                ReceiptDetailView(receipt: receipt).colorScheme(settings.darkMode ? .dark : .light)
+            }
     }
 }
 
- 
+/// ``ReceiptDetailView``
+/// is a View struct that displays the detail view of the Receipt that is passed to it. It shows all the information available about a receipt, usually presented in a sheet.
+/// - Called by ReceiptView.
 struct ReceiptDetailView: View  {
-    /// An induvidual receipt entity that the view will be based on
+    ///``receipt``: is a Receipt variable that is passed to the view which holds the information about the receipt this view will represent.
     @State var receipt: Receipt
+    ///``detailState``: allows the view to update based on how the user desired to interact with the receipt. Allows the user to delete, edit, view the image, and view the receipt.
     @State var detailState: DetailState = .none
+    ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
     
     var body: some View {
@@ -124,8 +137,9 @@ struct ReceiptDetailView: View  {
 
 struct ReceiptViewButtons: View {
     @Environment(\.presentationMode) var presentationMode
-    
+    ///``detailState``:  binds to the parent views detailState, to update it based on the users interaction.
     @Binding var detailState: DetailState
+    ///``receipt``: is a Receipt variable that is passed to the view which allows this view to delete and update it as needed.
     @State var receipt: Receipt
     
     var body: some View {

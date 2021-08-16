@@ -66,7 +66,7 @@ struct HomeView: View {
                     HStack {
                         ForEach(folders) { folder in
                             if selectedFolder != folder.title {
-                                TagView(folder: folder, selectedFolder: $selectedFolder)
+                                FolderView(folder: folder, selectedFolder: $selectedFolder)
                                     .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.9)))
                                     .animation(.spring())
                                 
