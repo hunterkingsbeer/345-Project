@@ -9,7 +9,7 @@ class COSC345_ProjectUITests: XCTestCase {
     override func setUp() {
         super.setUp()
         app.launchArguments = ["testMode"]
-        XCTAssert(isTesting())
+        //XCTAssert(isTesting())
     }
 
     func testHomeView() throws {
@@ -73,16 +73,16 @@ class COSC345_ProjectUITests: XCTestCase {
         XCTAssert(!elementsQuery2.staticTexts["Invoice"].isHittable)
         
         sleep(2)
-        XCUIApplication().buttons["go down"].firstMatch.tap()
+        XCUIApplication().buttons["go down"]tap()
         XCTAssert(elementsQuery2.staticTexts["Invoice"].isHittable)
         elementsQuery2.staticTexts["Invoice"].tap()
         
         app.buttons["photo"].tap()
-        XCTAssert(!app.buttons["go down"].firstMatch.isHittable)
+        XCTAssert(!app.buttons["go down"].isHittable)
        // this should be passing just fine
         
         app.buttons["photo"].tap()
-        XCTAssert(app.buttons["go down"].firstMatch.exists)
+        XCTAssert(app.buttons["go down"].exists)
         
         app.buttons["trash"].tap()
         app.buttons["trash"].tap()
