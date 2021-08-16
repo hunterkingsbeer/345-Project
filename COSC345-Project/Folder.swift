@@ -74,7 +74,29 @@ extension Folder {
                               (title: "Retail", icon: "tag", color: "lightYellow"),
                               (title: "Groceries", icon: "cart", color: "green"),
                               (title: "Technology", icon: "desktopcomputer", color: "blue"),
-                              (title: "Clothing", icon: "bag", color: "pink")]
+                              (title: "Clothing", icon: "bag", color: "pink"),
+                              (title: "Hardware", icon: "", color:
+                                  ""),
+                              (title: "Appliance", icon: "", color:
+                                  ""),
+                              (title: "Pets", icon: "", color:
+                                  ""),
+                              (title: "Baby & Toddler", icon: "",
+                               color: ""),
+                              (title: "Luggage", icon: "", color:
+                                  ""),
+                              (title: "Health & Beauty", icon: "", color: ""),
+                              (title: "Home & Garden", icon: "", color: ""),
+                              (title: "Office Supplies", icon: "",
+                               color: ""),
+                              (title: "Apparel & Accessories", icon: "", color: ""),
+                              (title: "Arts & Entertainment", icon: "",
+                               color: ""),
+                              (title: "Software", icon: "", color: ""),
+                              (title: "Toys & Games", icon: "", color: ""),
+                              (title: "Sports", icon: "", color: ""),
+                              (title: "Vehicles", icon: "", color: "")
+    ]
     
     ///``getIcon``
     /// Gets the icon of the folder you want to check.
