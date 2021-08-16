@@ -73,16 +73,16 @@ class COSC345_ProjectUITests: XCTestCase {
         XCTAssert(!elementsQuery2.staticTexts["Invoice"].isHittable)
         
         sleep(2)
-        XCUIApplication().buttons["chevron.down"].tap()
+        XCUIApplication().buttons["chevron.down"].firstMatch.tap()
         XCTAssert(elementsQuery2.staticTexts["Invoice"].isHittable)
         elementsQuery2.staticTexts["Invoice"].tap()
         
         app.buttons["photo"].tap()
-        XCTAssert(!app.buttons["go down"].isHittable)
+        XCTAssert(!app.buttons["chevron.down"].firstMatch.isHittable)
        // this should be passing just fine
         
         app.buttons["photo"].tap()
-        XCTAssert(app.buttons["go down"].exists)
+        XCTAssert(app.buttons["chevron.down"].firstMatch.exists)
         
         app.buttons["trash"].tap()
         app.buttons["trash"].tap()
