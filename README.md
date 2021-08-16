@@ -23,6 +23,6 @@ To generate random receipts, navigate to the settings tab and select "Generate r
 [Click Here!](https://hunterkingsbeer.github.io/345-Project/index.html)
 
 ### Previews:
-Home Screen            |  Selected Folder
-:-------------------------:|:-------------------------:
-<img src="https://i.imgur.com/pauyVax.jpg" width="500"> | <img src="https://i.imgur.com/xD9XTih.jpg" width="500">
+Home Screen | Selected Folder | Searching
+:-------------------------:|:-------------------------:|:-------------------------: 
+<img src="https://i.imgur.com/pauyVax.jpg" width="250"> | <img src="https://i.imgur.com/xD9XTih.jpg" width="250"> | <img src="https://i.imgur.com/YY6VCSL.jpg" width="250">
