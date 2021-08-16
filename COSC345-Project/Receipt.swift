@@ -356,7 +356,6 @@ extension Receipt {
         for index in 0..<4 {
             Receipt.saveScan(recognizedText: scans[index])
         }
-        
     }
 
     ///``save``

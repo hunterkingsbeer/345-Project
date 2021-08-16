@@ -142,6 +142,7 @@ struct SettingsView: View  {
                         
                         Button(action: {
                             Receipt.deleteAll(receipts: receipts)
+                            Folder.deleteAll()
                             UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                         }){
                             Text("Delete All")

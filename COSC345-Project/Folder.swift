@@ -122,20 +122,6 @@ extension Folder {
         return "text"
     }
     
-    ///``folderExists``
-    /// Lets you know if a folder exists or not.
-    /// Performs this by doing a for loop, checking each folder until the matching folder title (and folder) is found, where it returns the bool.
-    /// - Parameter title: The title of the folder you want to check the existance of.
-    /// - Returns:
-    ///     - True if the folder exists.
-    ///     - False if the folder doesn't exist.
-    static func folderExists(title: String?) -> Bool {
-        for match in getFolders() where match.title ?? "Default".lowercased() == title?.lowercased() {
-            return true
-        }
-        return false
-    }
-    
     ///``getFolders``
     /// Gets an array of folders from the database.
     /// It creates a fetch request and calls in the CoreData database's collection of Folder entities, returning them as an array.
@@ -205,6 +191,15 @@ extension Folder {
         }
     }
     
+    ///``deleteAll``
+    /// Deletes all the folders in the database.
+    /// - Parameter receipts: The receipts you want to delete.
+    static func deleteAll() {
+        for folder in getFolders() {
+            delete(folder: folder)
+        }
+    }
+    
     ///``ifEmptyDelete``
     /// Used to check if a folder is empty, if it is empty then delete it.
     /// Checks if a folders receipt count is 0.
@@ -226,6 +221,21 @@ extension Folder {
         } else {
             addFolder(title: title, icon: "folder")
         }
+    }
+    
+    ///``folderExists``
+    /// Lets you know if a folder exists or not.
+    /// Performs this by doing a for loop, checking each folder until the matching folder title (and folder) is found, where it returns the bool.
+    /// - Parameter title: The title of the folder you want to check the existance of.
+    /// - Returns:
+    ///     - True if the folder exists.
+    ///     - False if the folder doesn't exist.
+    static func folderExists(title: String) -> Bool {
+        let folders = Folder.getFolders()
+        for folder in folders where folder.title?.capitalized == title.capitalized {
+            return true
+        }
+        return false
     }
     
     ///``save``
