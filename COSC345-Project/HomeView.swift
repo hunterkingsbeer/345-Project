@@ -96,7 +96,7 @@ struct HomeView: View {
                             }
                         }.padding(.top, 8).padding(.bottom)
                     } else {
-                        noReceiptsView()
+                        NoReceiptsView()
                     }
                 }
                 .cornerRadius(0)
@@ -122,7 +122,7 @@ struct HomeView: View {
     }
 }
 
-struct noReceiptsView: View {
+struct NoReceiptsView: View {
     @EnvironmentObject var selectedTab: TabSelection
     @EnvironmentObject var settings: UserSettings
     

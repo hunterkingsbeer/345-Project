@@ -67,7 +67,7 @@ struct Prediction {
     /// Collections of keywords associated with each category.
     /// Format : [("TitleOfCategory1", ["key", "words"]), ("TitleOfCategory2", ["key", "words"])]
     
-    // TODO: rework these into overshadowing categories and then into subcategories
+    // rework these into overshadowing categories and then into subcategories
     static let categoryKeywords = [(title: "groceries",
                                     keywords: ["grocer", "grocery", "supermarket", "market",
                                               "grcoeries", "new world", "countdown", "veggie boys",
