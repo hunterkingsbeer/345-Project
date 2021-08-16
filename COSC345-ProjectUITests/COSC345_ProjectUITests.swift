@@ -26,7 +26,6 @@ class COSC345_ProjectUITests: XCTestCase {
     }
     
     func testSettingsView() throws {
-                        
         app.launch()
         
         let tabBar = app.tabBars["Tab Bar"]
@@ -42,8 +41,6 @@ class COSC345_ProjectUITests: XCTestCase {
     }
 
     func testFolderView() throws {
-        
-        
         app.launch()
         let tabBar = app.tabBars["Tab Bar"]
         tabBar.buttons["Settings"].tap()
@@ -84,13 +81,9 @@ class COSC345_ProjectUITests: XCTestCase {
         app.buttons["trash"].tap()
         
         XCTAssert(!elementsQuery2.staticTexts["Invoice"].isHittable)
-        
-
     }
     
     func testSearchView() throws {
-        
-        
         app.launch()
         let tabBar = app.tabBars["Tab Bar"]
         tabBar.buttons["Settings"].tap()
@@ -108,8 +101,6 @@ class COSC345_ProjectUITests: XCTestCase {
         XCTAssert(app.staticTexts["Jb Hifi"].exists)
         app.textFields["SearchBar"].typeText("I")
         XCTAssert(!app.staticTexts["Jb Hifi"].exists)
-                        
-       
     }
     
     func testScanView() throws {
@@ -140,7 +131,6 @@ class COSC345_ProjectUITests: XCTestCase {
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
-    
 
     public func isTesting() -> Bool {
         return (ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil || ProcessInfo().arguments.contains("testMode"))
