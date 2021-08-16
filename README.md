@@ -22,4 +22,10 @@ Caitlin Jillybelle - Design and Research.
 
 Rhys Davie - Administration and Content.
 
-### [Documentation](https://hunterkingsbeer.github.io/345-Project/index.html)
+### Documentation:
+[Click Here!](https://hunterkingsbeer.github.io/345-Project/index.html)
+
+### Previews:
+Home Screen            |  Selected Folder
+:-------------------------:|:-------------------------:
+<img src="https://i.imgur.com/pauyVax.jpg" width="500"> | <img src="https://i.imgur.com/xD9XTih.jpg" width="500">
