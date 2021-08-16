@@ -5,7 +5,6 @@
 
 Receipted is a receipt scanning application that intuitively categorizes receipts based on the body text within. 
 Made for COSC345's full year project. 
-Active Branch: UI Redesign.
 
 ### Running the application:
 This app has been developed using an iPhone 11 Pro, however it should run on any device running iOS 7 and above.
