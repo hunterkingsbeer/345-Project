@@ -45,6 +45,7 @@ class COSC345_ProjectUITests: XCTestCase {
                 
     }
     
+
     func testFolderView() throws {
         
         

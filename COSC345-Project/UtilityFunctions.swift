@@ -102,7 +102,7 @@ struct ShrinkingButton: ButtonStyle {
 }
 
 extension UIApplication {
-    /// ```endEditing```
+    /// ``endEditing``
     /// is a function that can be called to dismiss the keyboard. This is useful when needing a button to dismiss the keyboard.
     func endEditing() {
         sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)

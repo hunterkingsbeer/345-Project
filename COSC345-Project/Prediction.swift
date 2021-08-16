@@ -12,33 +12,34 @@ import SwiftUI
 /// is a View struct that displays the home page of the application. This homepage shows the user its receipts, the folders, the title bar (doubling as a search bar).
 /// - Called by ContentView.
 struct Prediction {
+    /* NEEDS TO BE STREAMLINED TO FIRST VIEW MINIMAL KEY WORDS
+    IF MATCHES MINIMAL KEY WORDS IN CATEGORY, ONLY SEARCH CATEGORIES THAT IT MATCHS
+        ELSE SEARCH ALL CATEGORIES
+    THIS SHOULD CUT DOWN ON SEARCHING ALL CATEGORY KEYWORDS WHEN UN-NEEDED IN THE FINAL VERSION */
     
-    /// Text is passed through keywords, in order to find category with most matches
-    /// Parameter : body text of receipt to predict
+    ///``pointPrediction``
+    /// is the parent function that manages the processing of the receipt text to predict it's folder assignment.
+    /// It first uses predictedCategories to to get an idea of the various categories it may be associated with, then checks each category's number of matches and assigns a best prediction based on the matches.
+    /// - Parameter text: the body of text (extracted from a receipt) to be processed and have the category predicted from.
+    /// - Returns: A string holding the predicted folder title the receipt should be assigned to.
     static func pointPrediction(text: String) -> String {
-        // NEEDS TO BE STREAMLINED TO FIRST VIEW MINIMAL KEY WORDS
-        // IF MATCHES MINIMAL KEY WORDS IN CATEGORY, ONLY SEARCH CATEGORIES THAT IT MATCHS
-            // ELSE SEARCH ALL CATEGORIES
-        // THIS SHOULD CUT DOWN ON SEARCHING ALL CATEGORY KEYWORDS WHEN UN-NEEDED
-        
-        // Gets the possible predicted categories based on keywords
+        ///``predictionTypes`` gets an array of the possible predicted folders that may apply to the text being predicted.
         let predictedTypes: [(title: String, matches: Int)] = predictedCategories(text: text)
-        // Holds the index of the prediction with most matches. Format =(count, index)
+        ///``bestPrediction`` holds the title and number of matches of the best predicted folder.
         var bestPrediction = (title: "Default", matches: 0)
         
         for prediction in predictedTypes where prediction.matches > bestPrediction.matches {
-            // if current prediction has higher num of matches, becomes new highest index
+            // if current prediction has higher num of matches, it becomes new bestPrediction
             bestPrediction.title = prediction.title.capitalized
             bestPrediction.matches = prediction.matches
         }
-        // return prediction with highest num of matches
-        //print("Final Prediction: \(bestPrediction.title)")
         return bestPrediction.title
     }
     
-    /// Input text is compared against keywords in order to find matching words to make our prediction.
-    /// Parameter : Body text of the receipt to predict.
-    /// Return : [String] of predicted category titles.
+    ///``predictedCategories``
+    /// is a function that takes a text input, and compares it against the categoryKeywords array to assign a point to each category depending on if it matches with it's keywords.
+    /// - Parameter text: the body of text (extracted from a receipt) to be processed to form the number of folder predictions.
+    /// - Returns: [(String, Int)] of tuples, which contain the Categories title, along with the number of matches the text had with its keywords.
     static func predictedCategories(text: String) -> [(String, Int)] {
         var predictedType: [(title: String, matches: Int)] = [("", 0)]
         
@@ -52,9 +53,11 @@ struct Prediction {
         return predictedType
     }
     
-    /// Counts the number of words in the receipt text input that match the category's keywords.
-    /// Parameter : Keywords - array of keywords to search, Input - text to match against keywords
-    /// Return : The number of matched words.
+    ///``matchString``
+    /// is a function that counts how many matches a word .
+    /// It functions by looping over each word in the categories keywords, incrementing a counter for each matching word. The count is returns at the end of the loop.
+    /// - Parameter text: the body of text (extracted from a receipt) to be processed to form the number of folder predictions.
+    /// - Returns: [(String, Int)] of tuples, which contain the Category title, along with the number of matches the input text had with its keywords.
     static func matchString(keywords: [String], input: String) -> Int {
         var count = 0
         for keyword in keywords {
@@ -66,10 +69,11 @@ struct Prediction {
         return count
     }
     
-    /// Collections of keywords associated with each category.
-    /// Format : [("TitleOfCategory1", ["key", "words"]), ("TitleOfCategory2", ["key", "words"])]
-    
     // rework these into overshadowing categories and then into subcategories
+    ///``categoryKeywords`` is an array of tuples that are used as the basis for the folder prediction process.
+    /// It is made up of a title of the category, along with its keywords associated with the category.
+    /// - Tuple format
+    ///     - (title: "Categories Title", keywords:["keywords", "associated", "with", "the", "category"])
     static let categoryKeywords = [(title: "groceries",
                                     keywords: ["grocer", "grocery", "supermarket", "market",
                                               "grcoeries", "new world", "countdown", "veggie boys",
@@ -271,12 +275,13 @@ struct Prediction {
                                    
     ]
     
-    /// Searches through keywordLists. Checking the title (category.0) until it matches, upon which it returns said category.
-    /// Parameter : Title - the title of the desired category.
-    /// Return : The category that is requested.
+    ///``getCategory``
+    /// Returns a category with the matching title passed to it in the parameter.
+    /// - Parameter title: the title of the category you want to get.
+    /// - Returns: the category that matches the title parameter. Returns an empty object if there are no matches.
     static func getCategory(title: String) -> (String, [String]) {
         for category in categoryKeywords {
-            if category.0.lowercased() == title.lowercased() {
+            if category.title.lowercased() == title.lowercased() {
                 return category
             }
         }

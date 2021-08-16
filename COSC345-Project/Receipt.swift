@@ -138,6 +138,7 @@ struct ReceiptDetailView: View  {
 /// is a View struct that displays the buttons at the bottom of the ReceiptDetailView, allowing the receipt to be modified as needed.
 /// - Called by ReceiptDetailView.
 struct ReceiptViewButtons: View {
+    ///``presentationMode``: Controls the presentation of the sheet the receipt is being displayed on. Specifically used in the dismiss button
     @Environment(\.presentationMode) var presentationMode
     ///``detailState``:  binds to the parent views detailState, to update it based on the users interaction.
     @Binding var detailState: DetailState
