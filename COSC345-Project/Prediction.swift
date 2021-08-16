@@ -8,7 +8,9 @@
 import Foundation
 import SwiftUI
 
-/// Determines the category of a receipt via specific key words present in the body text.
+/// ``HomeView``
+/// is a View struct that displays the home page of the application. This homepage shows the user its receipts, the folders, the title bar (doubling as a search bar).
+/// - Called by ContentView.
 struct Prediction {
     
     /// Text is passed through keywords, in order to find category with most matches

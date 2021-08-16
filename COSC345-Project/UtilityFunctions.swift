@@ -10,8 +10,6 @@ import SwiftUI
 import CoreData
 import Swift
 
-// --------------------------------------------------------- UTILITIES
-
 /// ``getDate``
 /// is used to convert an optional Date value into a formatted date in a String type.
 /// - Format: EEEE, d MMM yyyy. (E.g. : Wednesday, 11 Aug 2021.)
@@ -155,11 +153,12 @@ enum TabPage: Int {
 
 /// ``TabSelection``
 ///  is an Observable Object class that allows application wide control of the active tab.
-///  This class is placed as an environment object in the App struct, allowing all
+///  This class is placed as an environment object in the App struct, allowing all views to update the active tab in sync.
 class TabSelection: ObservableObject {
     ///``selection``: Used to set the active tab of the ContentView's TabView. Controlled either by directly setting, or through the changeTab function.
     @Published var selection: Int
     
+    /// Initializes the selection to the index,
     init() {
         self.selection = 0
     }

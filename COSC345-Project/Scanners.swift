@@ -22,9 +22,9 @@ class RecognizedContent: ObservableObject {
 class ReceiptItem: Identifiable {
     ///``id`` holds a unique ID that allows the object to be identifiable
     var id: UUID = UUID()
-    ///``text`` is the text extracted from the image.
+    ///``text`` is the text extracted from the image of the receipt the user has scanned.
     var text: String = ""
-    ///``image`` is the UI Image the receipt is based on.
+    ///``image`` is a UI Image that the user has scanned of their receipt, and which the receipt is based on.
     var image: UIImage = UIImage()
 }
 

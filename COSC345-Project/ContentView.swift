@@ -8,8 +8,9 @@
 import SwiftUI
 import CoreData
 
-// -------------------------------------------------------------------------- PREVIEW
-/// ContentView_Previews is what xCode uses to preview the app in the IDE.
+
+/// ``ContentView_Previews``
+/// is a PreviewProvider that allows the application to be previewed in the Xcode canvas.
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
@@ -18,8 +19,6 @@ struct ContentView_Previews: PreviewProvider {
             .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
     }
 }
-
-// -------------------------------------------------------------------------- VIEWS
 
 /// ``ContentView``
 /// is a View struct that is first called in the application. It is the highest parent of all other called structs It holds a TabView that forms the basis of the apps UI.
@@ -30,7 +29,6 @@ struct ContentView_Previews: PreviewProvider {
 ///     - HomeView: is the home screen of the app, displaying the receipts, folders, and search bar/title.
 ///     - ScanView: displays and provides the option of scanning receipts via gallery or camera.
 ///     - SettingsView: holds the controls for the various settings of the application.
-///
 struct ContentView: View {
     ///``selectedTab`` Controls the TabView's active tab it is viewing. Imports the TabSelection EnvironmentObject, allowing for application wide changing of the selected tab.
     @EnvironmentObject var selectedTab: TabSelection
@@ -165,7 +163,6 @@ struct SettingsView: View  {
 /// is a View struct that holds the background that we see in all the tabs of the app. Usually this is placed in a ZStack behind the specific pages objects.
 /// Consists of a Color with value "background", which automatically updates to be white when in light mode, and almost black in dark mode.
 /// - Called by HomeView, ScanView, and SettingsView.
-///
 struct BackgroundView: View {
     /// ``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings

@@ -352,8 +352,8 @@ extension Receipt {
                      "Countdown\n Lettuce - $2.00, Doritos - $2.99, Milk - $3",
                      "Invoice\n LABOR $25p/h, HOURS WORKED - 25. TOTAL $625"]
         
-        for i in 0..<4 {
-            Receipt.saveScan(recognizedText: scans[i])
+        for index in 0..<4 {
+            Receipt.saveScan(recognizedText: scans[index])
         }
         
     }
