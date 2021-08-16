@@ -14,13 +14,10 @@ Start the app using the Xcode simulator running an iOS phone.
 To generate random receipts, navigate to hte settings tab and select "Generate receipts". This will generate 10 random receipts to preview.
 
 ### Our Team:
-Hunter Kingsbeer - Engineering and Team Lead.
-
-Tane Carney-Stirling - Testing and Technical.
-
-Caitlin Jillybelle - Design and Research.
-
-Rhys Davie - Administration and Content.
+- Hunter Kingsbeer - Engineering and Team Lead.
+- Tane Carney-Stirling - Testing and Technical.
+- Caitlin Jillybelle - Design and Research.
+- Rhys Davie - Administration and Content.
 
 ### Documentation:
 [Click Here!](https://hunterkingsbeer.github.io/345-Project/index.html)
