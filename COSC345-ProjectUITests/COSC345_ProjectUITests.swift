@@ -31,7 +31,7 @@ class COSC345_ProjectUITests: XCTestCase {
         let tabBar = app.tabBars["Tab Bar"]
         tabBar.buttons["Settings"].forceTap()
         
-        if(app.switches["DarkModeToggle: true"].exists) {
+        if app.switches["DarkModeToggle: true"].exists {
             var darkMode = app.switches["DarkModeToggle: true"]
             darkMode.forceTap()
             darkMode = app.switches["DarkModeToggle: false"]
@@ -111,7 +111,6 @@ class COSC345_ProjectUITests: XCTestCase {
         tabBar.buttons["Scan"].forceTap()
         XCTAssertEqual(app.staticTexts["Scan."].exists, app.staticTexts["Scan."].isHittable)
         
-        
         app.tabBars["Tab Bar"].buttons["Scan"].tap()
         app/*@START_MENU_TOKEN@*/.buttons["Add from Gallery"]/*[[".buttons[\"photo\"]",".buttons[\"Add from Gallery\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.forceTap()
         XCTAssert(!app/*@START_MENU_TOKEN@*/.buttons["Add from Gallery"]/*[[".buttons[\"photo\"]",".buttons[\"Add from Gallery\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.exists)
@@ -139,6 +138,6 @@ class COSC345_ProjectUITests: XCTestCase {
 
 extension XCUIElement {
     func forceTap() {
-        coordinate(withNormalizedOffset: CGVector(dx:0.5, dy:0.5)).tap()
+        coordinate(withNormalizedOffset:CGVector(dx:0.5, dy:0.5)).tap()
     }
 }
