@@ -414,8 +414,8 @@ struct ImagePicker: UIViewControllerRepresentable {
 
 /// ``DocumentScanner``
 /// is a UIViewControllerRepresentable struct that initializes the DocumentCamera.
-/// - ImagePicker outputs either didFinishScanning or didCancelScanning.
-///     - didFinishScanning holds a Result containing an array of UI Images and an error. These are the scanned images and whether the scan was a success or not.
+/// - DocumentScanner outputs either didFinishScanning or didCancelScanning.
+///     - didFinishScanning holds a Result containing an array of UI Images and an error type. These are the scanned images and whether the scan was a success or not.
 ///     - didCancelScanning returns empty, allowing error handling.
 ///
 /// - Called by DocumentScannerView.

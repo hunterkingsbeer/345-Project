@@ -21,7 +21,7 @@ struct ContentView_Previews: PreviewProvider {
 }
 
 /// ``ContentView``
-/// is a View struct that is first called in the application. It is the highest parent of all other called structs It holds a TabView that forms the basis of the apps UI.
+/// is a View struct that is first called in the application. It is the highest parent of all other called structs. It holds a TabView that forms the basis of the apps UI.
 /// The applications accent color and light/dark mode is controlled here as this is the highest parent, resulting in it affecting all child views.
 /// - Parameters
 ///     - EnvironmentObjects for TabSelection and UserSettings are required on parent class.
