@@ -8,7 +8,7 @@ Made for COSC345's full year project.
 
 ### Running the application:
 This app has been developed using an iPhone 11 Pro, however it should run on any device running iOS 7 and above.
-To use the camera or gallery, you **MUST** have a physical phone. This app is designed to be run on a physical device, without one you should not expect to experience the apps full functionality.
+To use the camera or gallery, you **MUST** have a physical phone. This app is designed to be run on a physical device, without one you should not expect to experience the apps full functionality. 
 
 Start the app using the Xcode simulator running an iOS phone.
 To generate random receipts, navigate to the settings tab and select "Generate receipts". This will generate 10 random receipts to preview.
@@ -23,6 +23,6 @@ To generate random receipts, navigate to the settings tab and select "Generate r
 [Click Here!](https://hunterkingsbeer.github.io/345-Project/index.html)
 
 ### Previews:
-Home Screen            |  Selected Folder
-:-------------------------:|:-------------------------:
-<img src="https://i.imgur.com/pauyVax.jpg" width="500"> | <img src="https://i.imgur.com/xD9XTih.jpg" width="500">
+Home Screen | Selected Folder | Searching
+:-------------------------:|:-------------------------:|:-------------------------: 
+<img src="https://i.imgur.com/pauyVax.jpg" width="300"> | <img src="https://i.imgur.com/xD9XTih.jpg" width="300"> | <img src="https://i.imgur.com/YY6VCSL.jpg" width="300">
