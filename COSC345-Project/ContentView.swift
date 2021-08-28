@@ -35,6 +35,7 @@ struct ContentView: View {
     @EnvironmentObject var settings: UserSettings
     ///``colors`` Imports an array of tuples containing various colors that are used to style the UI. This is based on the UserSettings 'style' setting, and is an @State to update the UI.
     @State var colors = Color.colors
+    
     var body: some View {
         TabView(selection: $selectedTab.selection){
             HomeView()
@@ -191,7 +192,6 @@ struct TitleText: View {
     let icon: String
     
     var body: some View {
-        
         HStack {
             HStack {
                 Text("\(title.capitalized).")
