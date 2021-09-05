@@ -245,6 +245,8 @@ struct SettingsView: View  {
                                                                     VStack{
                                                                         if settings.accentColor == colors[color]{
                                                                             Image(systemName: "checkmark")
+                                                                                .font(.system(size: 12, weight: .bold))
+                                                                                .foregroundColor(Color("background"))
                                                                                 .transition(AnyTransition.scale(scale: 0.75).combined(with: .opacity))
                                                                         }
                                                                     }
