@@ -82,7 +82,10 @@ struct SettingsView: View  {
                         HStack {
                             //dark mode
                             Button(action: {
-                                settings.darkMode.toggle()
+                                withAnimation(.easeInOut){
+                                    settings.darkMode.toggle()
+                                }
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             }){
                                 Color(settings.shadows ? "shadowObject" : "object")
                                     .cornerRadius(12)
@@ -114,7 +117,10 @@ struct SettingsView: View  {
                             
                             // auto conf
                             Button(action: {
-                                settings.shadows.toggle()
+                                withAnimation(.easeInOut){
+                                    settings.shadows.toggle()
+                                }
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             }){
                                 Color(settings.shadows ? "shadowObject" : "object")
                                     .cornerRadius(12)
@@ -155,6 +161,7 @@ struct SettingsView: View  {
                                             withAnimation(.easeInOut){
                                                 settings.scanDefault = ScanDefault.camera.rawValue
                                             }
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                         }){
                                             Image(systemName: "camera")
                                                 .font(.largeTitle)
@@ -183,6 +190,7 @@ struct SettingsView: View  {
                                             withAnimation(.easeInOut){
                                                 settings.scanDefault = ScanDefault.gallery.rawValue
                                             }
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                         }){
                                             VStack {
                                                 Image(systemName: "photo")
@@ -216,7 +224,9 @@ struct SettingsView: View  {
                                         HStack {
                                             ForEach(0..<colors.count){ color in
                                                 Button(action: {
-                                                    settings.accentColor = colors[color]
+                                                    withAnimation(.easeInOut){
+                                                        settings.accentColor = colors[color]
+                                                    }
                                                 }){
                                                     VStack {
                                                         if color == 0 {
@@ -231,7 +241,14 @@ struct SettingsView: View  {
                                                         } else {
                                                             Circle()
                                                                 .foregroundColor(Color(colors[color]))
-                                                                .frame(width: UIScreen.screenWidth*0.1, height: UIScreen.screenWidth*0.1)
+                                                                .overlay(
+                                                                    VStack{
+                                                                        if settings.accentColor == colors[color]{
+                                                                            Image(systemName: "checkmark")
+                                                                                .transition(AnyTransition.scale(scale: 0.75).combined(with: .opacity))
+                                                                        }
+                                                                    }
+                                                                ).frame(width: UIScreen.screenWidth*0.1, height: UIScreen.screenWidth*0.1)
                                                                 .padding(.horizontal, 5)
                                                                 .scaleEffect(settings.accentColor == colors[color] ? 1.25 : 1)
                                                                 .animation(.spring())
