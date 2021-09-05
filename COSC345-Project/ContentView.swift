@@ -467,6 +467,7 @@ struct TitleText: View {
                         Rectangle()
                             .frame(height: 2)
                             .foregroundColor(Color(settings.accentColor))
+                            .opacity(settings.accentColor == "UIContrast" ? 0.08 : 0.6)
                     }.padding(.bottom, 14)
                     .transition(AnyTransition.opacity.combined(with: .move(edge: .bottom)))
                 })

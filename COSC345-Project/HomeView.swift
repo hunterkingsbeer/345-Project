@@ -182,6 +182,7 @@ struct HomeTitleBar: View {
                             Rectangle()
                                 .frame(height: 2)
                                 .foregroundColor(Color(settings.accentColor))
+                                .opacity(settings.accentColor == "UIContrast" ? 0.08 : 0.6)
                         }.padding(.bottom, 14)
                         .transition(AnyTransition.offset(y: 60).combined(with: .opacity))
                     }
