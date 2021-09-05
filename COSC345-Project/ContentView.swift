@@ -74,7 +74,7 @@ struct SettingsView: View  {
                 
                 ScrollView(showsIndicators: false){
                     VStack (alignment: .leading){
-                        VStack{
+                        VStack {
                             Toggle("", isOn: $settings.darkMode)
                                 .accessibility(identifier: "DarkModeToggle: \(settings.darkMode)")
                                 .contentShape(Rectangle())
@@ -211,13 +211,13 @@ struct TitleText: View {
                         Spacer()
                         Rectangle()
                             .frame(height: 2)
-                            .foregroundColor(Color("object"))
+                            .foregroundColor(Color("UI2"))
                     }.padding(.bottom, 14)
                     .transition(AnyTransition.opacity.combined(with: .move(edge: .bottom)))
                 })
             Image(systemName: icon)
                 .font(.system(size: 19, weight: .bold, design: .rounded))
-                .foregroundColor(Color("text"))
+                .foregroundColor(Color("UI2"))
                 .padding(.horizontal)
                 .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.9)))
         }
