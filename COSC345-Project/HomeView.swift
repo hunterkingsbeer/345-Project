@@ -36,36 +36,9 @@ struct HomeView: View {
             BackgroundView()
             
             VStack {
-                HStack {
-                    HomeTitleBar(selectedFolder: $selectedFolder, userSearch: $userSearch)
-                    
-                    ZStack{
-                        if userSearch.isEmpty && selectedFolder.isEmpty {
-                            Image(systemName: "magnifyingglass")
-                        } else {
-                            // make a down arrow
-                            Button(action: {
-                                withAnimation(.easeInOut(duration: 0.3)){
-                                    userSearch = ""
-                                    selectedFolder = ""
-                                }
-                                UIApplication.shared.endEditing()
-                            }){
-                                if !selectedFolder.isEmpty { // if selecting a folder
-                                    Image(systemName: "chevron.down")
-                                        .transition(AnyTransition.opacity.combined(with: .offset(y: -100)))
-                                } else if !userSearch.isEmpty { // if typing text
-                                    Image(systemName: "xmark")
-                                }
-                            }
-                        }
-                    }
-                    .font(.system(size: 19, weight: .bold, design: .rounded))
-                    .foregroundColor(Color(selectedFolder.isEmpty ? "text" : "background"))
+                HomeTitleBar(selectedFolder: $selectedFolder, userSearch: $userSearch)
                     .padding(.horizontal)
-                    .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.9)))//.animation(.spring())
-                }.padding(.horizontal)
-                
+                    
                 // FOLDERS
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack {
@@ -154,62 +127,92 @@ struct HomeTitleBar: View {
     @Binding var selectedFolder: String
     ///``userSearch``: Filters the search results based on the users search input into the titlebar/search bar. This applies to every section of a receipt.
     @Binding var userSearch: String
+    /// ``colors``: Imports an array of tuples containing various colors that are used to style the UI. This is based on the UserSettings 'style' setting, and is an @State to update the UI.
+    @State var colors = Color.colors
     var body: some View {
         HStack {
-            if selectedFolder.isEmpty {
-                ZStack(alignment: .leading) {
-                    if userSearch.isEmpty {
-                        Text("Receipted.")
-                            .font(.system(size: 40, weight: .semibold))
-                            .foregroundColor(Color("text"))
-                            .transition(AnyTransition.opacity.combined(with: .move(edge: .bottom)))
-                    }
-                    TextField("", text: $userSearch)
-                        .animation(.easeInOut(duration: 0.3))
-                        .accessibility(identifier: "SearchBar")
-                }
-                .transition(AnyTransition.opacity.combined(with: .move(edge: .bottom)))
-                .foregroundColor(Color(selectedFolder.isEmpty ? "text" : "background"))
-                .font(.system(size: 40, weight: .regular))
-            } else {
-                HStack {
-                    Image(systemName: Folder.getIcon(title: selectedFolder))
-                        .font(.system(size: 30, weight: .semibold))
-                    Text("\(selectedFolder).")
-                        .font(.system(size: 40, weight: .semibold))
-                        .lineLimit(2).minimumScaleFactor(0.85)
-                }
-                .foregroundColor(Color(selectedFolder.isEmpty ? "text" : "background"))
-                .transition(AnyTransition.opacity.combined(with: .offset(y: -100)))
-            }
-            Spacer()
-        }.padding(.bottom, 10).padding(.top, 20)
-        .background(
-            ZStack{
-                VStack {
-                    if selectedFolder.isEmpty {
-                        Rectangle()
-                            .fill(Color.clear)
-                    } else {
-                        Rectangle()
-                            .fill(Color(Folder.getColor(title: selectedFolder)))
-                            .transition(AnyTransition.offset(y: -150).combined(with: .opacity))
-                    }
-                }
-                .scaleEffect(x: 1.5)
-                .animation(.easeOut(duration: 0.3))
-                .ignoresSafeArea(edges: .top)
-                
+            HStack {
                 if selectedFolder.isEmpty {
-                    VStack {
-                        Spacer()
-                        Rectangle()
-                            .frame(height: 2)
-                            .foregroundColor(Color("object"))
-                    }.padding(.bottom, 14)
+                    ZStack(alignment: .leading) {
+                        if userSearch.isEmpty {
+                            Text("Receipted.")
+                                .font(.system(size: 40, weight: .semibold))
+                                .foregroundColor(Color("text"))
+                                .transition(AnyTransition.opacity.combined(with: .move(edge: .bottom)))
+                        }
+                        TextField("", text: $userSearch)
+                            .animation(.easeInOut(duration: 0.3))
+                            .accessibility(identifier: "SearchBar")
+                    }
                     .transition(AnyTransition.opacity.combined(with: .move(edge: .bottom)))
+                    .foregroundColor(Color(selectedFolder.isEmpty ? "text" : "background"))
+                    .font(.system(size: 40, weight: .regular))
+                } else {
+                    HStack {
+                        Image(systemName: Folder.getIcon(title: selectedFolder))
+                            .font(.system(size: 30, weight: .semibold))
+                        Text("\(selectedFolder).")
+                            .font(.system(size: 40, weight: .semibold))
+                            .lineLimit(2).minimumScaleFactor(0.85)
+                    }
+                    .foregroundColor(Color("background"))
+                    .transition(AnyTransition.opacity.combined(with: .offset(y: -100)))
+                }
+                Spacer()
+            }.padding(.bottom, 10).padding(.top, 20)
+            .background(
+                ZStack{
+                    VStack {
+                        if selectedFolder.isEmpty {
+                            Rectangle()
+                                .fill(Color.clear)
+                        } else {
+                            Rectangle()
+                                .fill(Color(Folder.getColor(title: selectedFolder)))
+                                .transition(AnyTransition.offset(y: -150).combined(with: .opacity))
+                        }
+                    }
+                    .scaleEffect(x: 1.5)
+                    .animation(.easeOut(duration: 0.3))
+                    .ignoresSafeArea(edges: .top)
+                    
+                    if selectedFolder.isEmpty {
+                        VStack {
+                            Spacer()
+                            Rectangle()
+                                .frame(height: 2)
+                                .foregroundColor(Color(settings.accentColor))
+                        }.padding(.bottom, 14)
+                        .transition(AnyTransition.offset(y: 60).combined(with: .opacity))
+                    }
+                }
+            )
+            
+            ZStack {
+                if userSearch.isEmpty && selectedFolder.isEmpty {
+                    Image(systemName: "magnifyingglass")
+                        .transition(AnyTransition.scale(scale: 0.8).combined(with: .opacity))
+                        .foregroundColor(Color(settings.accentColor))
+                } else {
+                    // make a down arrow
+                    Button(action: {
+                        withAnimation(.easeInOut(duration: 0.3)){
+                            userSearch = ""
+                            selectedFolder = ""
+                        }
+                        UIApplication.shared.endEditing()
+                    }){
+                        if !selectedFolder.isEmpty { // if selecting a folder
+                            Image(systemName: "chevron.down")
+                        } else if !userSearch.isEmpty { // if typing text
+                            Image(systemName: "xmark")
+                        }
+                    }
                 }
             }
-        )
+            .font(.system(size: 19, weight: .bold, design: .rounded))
+            .foregroundColor(Color(selectedFolder.isEmpty ? "text" : "background"))
+            .padding(.horizontal)
+        }
     }
 }

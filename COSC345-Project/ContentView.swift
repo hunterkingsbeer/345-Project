@@ -48,7 +48,7 @@ struct ContentView: View {
                 .tabItem { Label("Settings", systemImage: "hammer.fill").foregroundColor(Color("text")) }
                 .tag(2)
         }
-        .accentColor(colors[settings.style].leading)
+        .accentColor(Color(settings.accentColor))
         .colorScheme(settings.darkMode ? .dark : .light)
     }
 }
@@ -64,15 +64,269 @@ struct SettingsView: View  {
     var receipts: FetchedResults<Receipt>
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
+    ///``colors`` Imports an array of tuples containing various colors that are used to style the UI. This is based on the UserSettings 'style' setting, and is an @State to update the UI.
+    @State var colors = Color.colors
+    
+    var shadowProperties = (opactiy: 0.08, radius: CGFloat(5))
    
     var body: some View {
         ZStack {
             BackgroundView()
             
             VStack {
-                TitleText(title: "settings", icon: "hammer.fill")
+                TitleText(buttonBool: $settings.devMode, title: "settings", icon: "hammer.fill")
+                    .padding(.horizontal)
                 
                 ScrollView(showsIndicators: false){
+                    VStack {
+                        HStack {
+                            //dark mode
+                            Button(action: {
+                                settings.darkMode.toggle()
+                            }){
+                                Color(settings.shadows ? "shadowObject" : "object")
+                                    .cornerRadius(12)
+                                    .overlay(
+                                        VStack {
+                                            Spacer()
+                                            if settings.darkMode {
+                                                Image(systemName: "moon.fill")
+                                                    .font(.largeTitle)
+                                                    .foregroundColor(Color(settings.accentColor))
+                                                    .transition(AnyTransition.scale(scale: 0.25)
+                                                                    .combined(with: .opacity))
+                                            } else {
+                                                Image(systemName: "sun.max.fill")
+                                                    .font(.largeTitle)
+                                                    .transition(AnyTransition.scale(scale: 0.25)
+                                                                    .combined(with: .opacity))
+                                            }
+                                            Spacer()
+                                            Text("\(settings.darkMode ? "DARK" : "LIGHT") MODE")
+                                                .bold()
+                                                .font(.system(.body, design: .rounded))
+                                            Spacer()
+                                        }.padding()
+                                    ).dropShadow(isOn: settings.shadows,
+                                                 opacity: settings.darkMode ? 0.45 : shadowProperties.opactiy,
+                                                 radius: shadowProperties.radius)
+                            }.buttonStyle(ShrinkingButton()).padding(.vertical).padding(.trailing, 5)
+                            
+                            // auto conf
+                            Button(action: {
+                                settings.shadows.toggle()
+                            }){
+                                Color(settings.shadows ? "shadowObject" : "object")
+                                    .cornerRadius(12)
+                                    .overlay(
+                                        VStack {
+                                            Spacer()
+                                            if settings.shadows {
+                                                Image(systemName: "smoke.fill")
+                                                    .font(.largeTitle)
+                                                    .foregroundColor(Color(settings.accentColor))
+                                                    .transition(AnyTransition.opacity)
+                                            } else {
+                                                Image(systemName: "smoke")
+                                                    .font(.largeTitle)
+                                                    .transition(AnyTransition.opacity)
+                                            }
+                                            Spacer()
+                                            Text("SHADOWS \(settings.shadows ? "ON" : "OFF")")
+                                                .bold()
+                                                .font(.system(.body, design: .rounded))
+                                            Spacer()
+                                        }.padding()
+                                    ).dropShadow(isOn: settings.shadows,
+                                                 opacity: settings.darkMode ? 0.45 : shadowProperties.opactiy,
+                                                 radius: shadowProperties.radius)
+                            }.buttonStyle(ShrinkingButton()).padding(.vertical).padding(.leading, 5)
+                        }
+                        
+                        // scan selector
+                        Color(settings.shadows ? "shadowObject" : "object")
+                            .cornerRadius(12)
+                            .overlay(
+                                VStack {
+                                    Spacer()
+                                    HStack {
+                                        Spacer()
+                                        Button(action: {
+                                            withAnimation(.easeInOut){
+                                                settings.scanDefault = ScanDefault.camera.rawValue
+                                            }
+                                        }){
+                                            Image(systemName: "camera")
+                                                .font(.largeTitle)
+                                                .foregroundColor(Color(ScanDefault.camera.rawValue == settings.scanDefault ? settings.accentColor : "accentAlt"))
+                                                .scaleEffect(ScanDefault.camera.rawValue == settings.scanDefault ? 1.25 : 1)
+                                                .transition(AnyTransition.scale(scale: 0.25)
+                                                                .combined(with: .opacity))
+                                                .padding()
+                                        }.buttonStyle(ShrinkingButton())
+                                        Spacer()
+                                        Button(action: {
+                                            withAnimation(.easeInOut){
+                                                settings.scanDefault = ScanDefault.choose.rawValue
+                                            }
+                                        }){
+                                            Image(systemName: "plus")
+                                                .font(.largeTitle)
+                                                .foregroundColor(Color(ScanDefault.choose.rawValue == settings.scanDefault ? settings.accentColor : "accentAlt"))
+                                                .scaleEffect(ScanDefault.choose.rawValue == settings.scanDefault ? 1.25 : 1)
+                                                .transition(AnyTransition.scale(scale: 0.25)
+                                                                .combined(with: .opacity))
+                                                .padding()
+                                        }.buttonStyle(ShrinkingButton())
+                                        Spacer()
+                                        Button(action: {
+                                            withAnimation(.easeInOut){
+                                                settings.scanDefault = ScanDefault.gallery.rawValue
+                                            }
+                                        }){
+                                            VStack {
+                                                Image(systemName: "photo")
+                                                    .font(.largeTitle)
+                                                    .foregroundColor(Color(ScanDefault.gallery.rawValue == settings.scanDefault ? settings.accentColor : "accentAlt"))
+                                                    .scaleEffect(ScanDefault.gallery.rawValue == settings.scanDefault ? 1.25 : 1)
+                                                    .transition(AnyTransition.scale(scale: 0.25)
+                                                                    .combined(with: .opacity))
+                                                    .padding()
+                                            }
+                                        }.buttonStyle(ShrinkingButton())
+                                        Spacer()
+                                    }
+                                    Text("SCAN SCREEN OPTION")
+                                        .bold()
+                                        .font(.system(.body, design: .rounded))
+                                    Spacer()
+                                }.padding()
+                            ).padding(.bottom)
+                            .dropShadow(isOn: settings.shadows,
+                                         opacity: settings.darkMode ? 0.45 : shadowProperties.opactiy,
+                                         radius: shadowProperties.radius)
+                        
+                        // color
+                        Color(settings.shadows ? "shadowObject" : "object")
+                            .cornerRadius(12)
+                            .overlay(
+                                VStack {
+                                    Spacer()
+                                    ScrollView(.horizontal, showsIndicators: false) {
+                                        HStack {
+                                            ForEach(0..<colors.count){ color in
+                                                Button(action: {
+                                                    settings.accentColor = colors[color]
+                                                }){
+                                                    VStack {
+                                                        if color == 0 {
+                                                            Circle()
+                                                                .foregroundColor(Color.clear)
+                                                                .overlay(Image(systemName: "circle.righthalf.fill")
+                                                                            .font(.largeTitle).scaleEffect(1.1))
+                                                                .frame(width: UIScreen.screenWidth*0.1, height: UIScreen.screenWidth*0.1)
+                                                                .padding(.horizontal, 5)
+                                                                .scaleEffect(settings.accentColor == colors[color] ? 1.25 : 1)
+                                                                .animation(.spring())
+                                                        } else {
+                                                            Circle()
+                                                                .foregroundColor(Color(colors[color]))
+                                                                .frame(width: UIScreen.screenWidth*0.1, height: UIScreen.screenWidth*0.1)
+                                                                .padding(.horizontal, 5)
+                                                                .scaleEffect(settings.accentColor == colors[color] ? 1.25 : 1)
+                                                                .animation(.spring())
+                                                        }
+                                                    }.overlay(Image(""))
+                                                }.buttonStyle(ShrinkingButton())
+                                            }
+                                        }.frame(height: UIScreen.screenWidth*0.2)
+                                        .padding(.horizontal)
+                                    }
+                                    Spacer()
+                                    Text("ACCENT COLOR")
+                                        .bold()
+                                        .font(.system(.body, design: .rounded))
+                                    Spacer()
+                                }.padding(.vertical)
+                            ).dropShadow(isOn: settings.shadows,
+                                         opacity: settings.darkMode ? 0.45 : shadowProperties.opactiy,
+                                         radius: shadowProperties.radius)
+                            .padding(.bottom)
+                    }.frame(height: UIScreen.screenHeight * 0.6).padding(.horizontal)
+                    
+                    if settings.devMode {
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Spacer()
+                                Image(systemName: "aqi.medium")
+                                Image(systemName: "hammer.fill")
+                                //Image(systemName: "gyroscope")
+                                Image(systemName: "cloud.moon.bolt")
+                                Image(systemName: "lightbulb")
+                                //Image(systemName: "move.3d")
+                                //Image(systemName: "perspective")
+                                Spacer()
+                            }.padding()
+                            Text("\(receipts.count) receipts.")
+                                .font(.body)
+                            HStack {
+                                Button(action: {
+                                    if isTesting(){
+                                        Receipt.generateKnownReceipts()
+                                    } else {
+                                        Receipt.generateRandomReceipts()
+                                    }
+                                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                                }){
+                                    Color(settings.shadows ? "shadowObject" : "object")
+                                        .cornerRadius(12)
+                                        .overlay(
+                                            VStack {
+                                                Spacer()
+                                                Image(systemName: "doc.badge.plus")
+                                                    .font(.largeTitle)
+                                                    .padding(2)
+                                                Text("+10 RECEIPTS")
+                                                    .bold()
+                                                    .font(.system(.body, design: .rounded))
+                                                Spacer()
+                                            }.padding()
+                                        ).dropShadow(isOn: settings.shadows,
+                                                     opacity: settings.darkMode ? 0.45 : shadowProperties.opactiy,
+                                                     radius: shadowProperties.radius)
+                                }.buttonStyle(ShrinkingButton())
+                                .padding(.trailing, 5)
+                                
+                                Button(action: {
+                                    Receipt.deleteAll(receipts: receipts)
+                                    Folder.deleteAll()
+                                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                                }){
+                                    Color(settings.shadows ? "shadowObject" : "object")
+                                        .cornerRadius(12)
+                                        .overlay(
+                                            VStack {
+                                                Spacer()
+                                                Image(systemName: "trash")
+                                                    .font(.largeTitle)
+                                                    .padding(2)
+                                                Text("DELETE ALL")
+                                                    .bold()
+                                                    .font(.system(.body, design: .rounded))
+                                                Spacer()
+                                            }.padding()
+                                        ).dropShadow(isOn: settings.shadows,
+                                                     opacity: settings.darkMode ? 0.45 : shadowProperties.opactiy,
+                                                     radius: shadowProperties.radius)
+                                }.buttonStyle(ShrinkingButton())
+                                .padding(.leading, 5)
+                            }.frame(height: UIScreen.screenHeight * 0.15)
+                        }.animation(.spring()).transition(AnyTransition.move(edge: .bottom))
+                        .padding(.horizontal).padding(.bottom, 20)
+                    }
+                }
+                
+                /*ScrollView(showsIndicators: false){
                     VStack (alignment: .leading){
                         VStack {
                             Toggle("", isOn: $settings.darkMode)
@@ -154,8 +408,8 @@ struct SettingsView: View  {
                         
                         Spacer()
                     }.frame(minWidth: 0, maxWidth: .infinity).animation(.spring())
-                }.accessibility(identifier: "ReceiptHomeView")
-            }.padding(.horizontal)
+                }.accessibility(identifier: "ReceiptHomeView")*/
+            }
         }
     }
 }
@@ -182,6 +436,7 @@ struct BackgroundView: View {
 ///     - ``title``: String
 ///     - ``icon``: String
 struct TitleText: View {
+    @Binding var buttonBool: Bool
     /// ``settings`` Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
     /// ``colors`` Imports an array of tuples containing various colors that are used to style the UI. This is based on the UserSettings 'style' setting, and is an @State to update the UI.
@@ -211,15 +466,21 @@ struct TitleText: View {
                         Spacer()
                         Rectangle()
                             .frame(height: 2)
-                            .foregroundColor(Color("UI2"))
+                            .foregroundColor(Color(settings.accentColor))
                     }.padding(.bottom, 14)
                     .transition(AnyTransition.opacity.combined(with: .move(edge: .bottom)))
                 })
-            Image(systemName: icon)
-                .font(.system(size: 19, weight: .bold, design: .rounded))
-                .foregroundColor(Color("UI2"))
-                .padding(.horizontal)
-                .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.9)))
+            Button(action: {
+                withAnimation(.spring()){
+                    buttonBool.toggle()
+                }
+            }){
+                Image(systemName: icon)
+                    .font(.system(size: 19, weight: .bold, design: .rounded))
+                    .foregroundColor(Color(settings.accentColor))
+                    .padding(.horizontal)
+                    .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.9)))
+            }.buttonStyle(ShrinkingButton())
         }
     }
 }
