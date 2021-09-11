@@ -47,10 +47,13 @@ extension View {
     /// is a property than can be applied to any View object to provide a predetermined underline to it. However, this is specifically designed to be applied to text.
     /// - Returns
     ///     - A (text) view with an underline.
-    func underlineTextField() -> some View {
+    func underlineTextField(opacity: Double = 1) -> some View {
         self
             .padding(.vertical, 10)
-            .overlay(Rectangle().frame(height: 2).padding(.top, 45))
+            .overlay(Rectangle()
+                        .opacity(opacity)
+                        .frame(height: 2)
+                        .padding(.top, 45))
             .padding(10)
     }
     
@@ -115,10 +118,8 @@ extension Color {
     /// Can be called by using 'Color.colors'
     /// - Usage with UserSettings: colors[userSettings.style].
     /// - Format: (leading: Color(The leading color of a linear gradient), trailing: Color(The trailing color of a linear gradient))
-    static let colors = [(leading: Color("text"), trailing: Color("accent")),
-                         (leading: Color("blue"), trailing: Color("lightBlue")),
-                         (leading: Color("lightPink"), trailing: Color("purple")),
-                         (leading: Color("green"), trailing: Color("grass"))]
+    static let colors = ["UIContrast", "UI1", "UI2", "UI3", "UI4", "UI5", "UI6", "UI7", "UI8", "UI9",
+                         "UI10", "UI11", "UI12", "UI13", "UI14", "UI15", "UI16"]
 }
 
 /// ``Loading``

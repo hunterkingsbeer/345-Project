@@ -37,8 +37,8 @@ struct ReceiptView: View {
     
     var body: some View {
         RoundedRectangle(cornerRadius: 12)
-            .fill(Color(settings.shadows ? "shadowObject" : "accent"))
-            .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.45 : 0.15, radius: 4)
+            .fill(Color(settings.shadows ? "shadowObject" : "object"))
+            .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.45 : 0.075, radius: 4)
             .overlay(
                 // the title and body
                 HStack (alignment: .center){

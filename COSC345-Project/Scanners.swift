@@ -30,13 +30,13 @@ class ReceiptItem: Identifiable {
 
 /// ``ScanSelection``
 /// is an enum with three cases that relate to the active scanning in the ScanView.
-enum ScanSelection {
+enum ScanSelection: Int {
     ///``none``: When none is active, the ScannerSelectView is active. Showing the user the option to pick between camera or gallery to scan.
-    case none
+    case none = 0
     ///``camera``: When camera is active, the DocumentScannerView is active. Showing the user the document scanner to scan with.
-    case camera
+    case camera = 1
     ///``gallery``:  When camera is active, the GalleryScannerView is active. Showing the user the gallery to scan with.
-    case gallery
+    case gallery = 2
 }
 
 /// ``ScanView``
@@ -58,13 +58,14 @@ struct ScanView: View {
     @State var isRecognizing: Bool = false
     ///``invalidAlert`` is used to handle invalid scans (which have too few words). It displays an alert, explaining an invalid scan and then returns the user to scan again.
     @State var invalidAlert: Bool = false
+    @State var unusedBool = false
     
     var body: some View {
         ZStack {
             BackgroundView()
             
             VStack {
-                TitleText(title: "scan", icon: "plus")
+                TitleText(buttonBool: $unusedBool, title: "scan", icon: "plus")
                     .padding(.horizontal)
                 
                 if !isRecognizing {
@@ -95,7 +96,9 @@ struct ScanView: View {
                 message: Text("This image is not valid. Try again."),
                 dismissButton: .default(Text("Okay"))
             )
-        }
+        }.onAppear(perform: {
+            scanSelection = ScanSelection(rawValue: settings.scanDefault) ?? .none
+        })
     }
 }
 
@@ -105,6 +108,8 @@ struct ScanView: View {
 struct ScannerSelectView: View {
     ///``scanSelection`` is used to manage the screens active view. This is @Binding as it controls the parent views value, allowing it to change the screen as desired.
     @Binding var scanSelection: ScanSelection
+    ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
+    @EnvironmentObject var settings: UserSettings
     
     var body: some View {
         VStack {

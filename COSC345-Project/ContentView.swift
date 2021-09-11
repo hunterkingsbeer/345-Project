@@ -35,6 +35,7 @@ struct ContentView: View {
     @EnvironmentObject var settings: UserSettings
     ///``colors`` Imports an array of tuples containing various colors that are used to style the UI. This is based on the UserSettings 'style' setting, and is an @State to update the UI.
     @State var colors = Color.colors
+    
     var body: some View {
         TabView(selection: $selectedTab.selection){
             HomeView()
@@ -47,115 +48,8 @@ struct ContentView: View {
                 .tabItem { Label("Settings", systemImage: "hammer.fill").foregroundColor(Color("text")) }
                 .tag(2)
         }
-        .accentColor(colors[settings.style].leading)
-        .colorScheme(settings.darkMode ? .dark : .light)
-    }
-}
-
-/// ``SettingsView``
-/// is a View struct that imports the UserSettings and displays a range of toggles/buttons/pickers that alter the UserSettings upon user action.
-/// The view is made up of a ZStack allowing the BackgroundView to be placed behind a VStack containing the title view (which says "Settings" with a hammer icon) and various settings to change.
-/// - Called by ContentView.
-struct SettingsView: View  {
-    ///``FetchRequest``: Creates a FetchRequest for the 'Receipt' CoreData entities. Contains a NSSortDescriptor that sorts and orders the receipts as specified by Date.
-    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)], animation: .spring())
-    ///``receipts``: Takes and stores the requested Receipt entities in a FetchedResults variable of type Receipt. This variable is essentially an array of Receipt objects that the user has scanned.
-    var receipts: FetchedResults<Receipt>
-    ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
-    @EnvironmentObject var settings: UserSettings
-   
-    var body: some View {
-        ZStack {
-            BackgroundView()
-            
-            VStack {
-                TitleText(title: "settings", icon: "hammer.fill")
-                
-                ScrollView(showsIndicators: false){
-                    VStack (alignment: .leading){
-                        VStack{
-                            Toggle("", isOn: $settings.darkMode)
-                                .accessibility(identifier: "DarkModeToggle: \(settings.darkMode)")
-                                .contentShape(Rectangle())
-                                .overlay( // Testing taps text instead of toggle, text is put in usual toggle text field. Therefore overlay of text is required for testing.
-                                    HStack{
-                                        Text("Dark Mode")
-                                        Spacer()
-                                    }
-                                ).onChange(of: settings.darkMode, perform: { _ in
-                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                })
-                            Divider()
-                            
-                            Toggle("", isOn: $settings.thinFolders)
-                                .contentShape(Rectangle())
-                                .overlay(
-                                    HStack {
-                                        Text("Thin Folders")
-                                        Spacer()
-                                    }
-                                ).onChange(of: settings.thinFolders, perform: { _ in
-                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                })
-                            Divider()
-                            
-                            Toggle("", isOn: $settings.shadows)
-                                .contentShape(Rectangle())
-                                .overlay(
-                                    HStack {
-                                        Text("Shadows")
-                                        Spacer()
-                                    }
-                                ).onChange(of: settings.shadows, perform: { _ in
-                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                })
-                            Divider()
-                            
-                            Picker("Accent Color", selection: $settings.style) {
-                                ForEach(0..<Color.colors.count){ color in
-                                    Text("Style \(color+1)").tag(color)
-                                }
-                            }.pickerStyle(SegmentedPickerStyle())
-                            .onChange(of: settings.style, perform: { _ in
-                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                            })
-                            Divider()
-                            
-                        }.padding(.horizontal, 2)
-                        
-                        Button(action: {
-                            if isTesting(){
-                                Receipt.generateKnownReceipts()
-                            } else {
-                                Receipt.generateRandomReceipts()
-                            }
-                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                        }){
-                            Text("Generate Receipts")
-                                .padding(.vertical, 10)
-                                .frame(minWidth: 0, maxWidth: .infinity)
-                                .background(Color("accent"))
-                                .cornerRadius(10)
-                        }.buttonStyle(ShrinkingButton())
-                        Divider()
-                        
-                        Button(action: {
-                            Receipt.deleteAll(receipts: receipts)
-                            Folder.deleteAll()
-                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                        }){
-                            Text("Delete All")
-                                .padding(.vertical, 10)
-                                .frame(minWidth: 0, maxWidth: .infinity)
-                                .background(Color("accent"))
-                                .cornerRadius(10)
-                        }.buttonStyle(ShrinkingButton())
-                        
-                        Spacer()
-                    }.frame(minWidth: 0, maxWidth: .infinity).animation(.spring())
-                }.accessibility(identifier: "ReceiptHomeView")
-            }.padding(.horizontal)
-        }
+        .accentColor(Color(settings.accentColor))
+        .preferredColorScheme(settings.darkMode ? .dark : .light)
     }
 }
 
@@ -164,13 +58,10 @@ struct SettingsView: View  {
 /// Consists of a Color with value "background", which automatically updates to be white when in light mode, and almost black in dark mode.
 /// - Called by HomeView, ScanView, and SettingsView.
 struct BackgroundView: View {
-    /// ``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
-    @EnvironmentObject var settings: UserSettings
-    /// ``colors``: Imports an array of tuples containing various colors that are used to style the UI. This is based on the UserSettings 'style' setting, and is an @State to update the UI.
-    @State var colors = Color.colors
-    
     var body: some View {
-        Color("background").ignoresSafeArea(.all)
+        Color("background")
+            .ignoresSafeArea(.all)
+            .animation(.easeInOut)
     }
 }
 
@@ -181,6 +72,7 @@ struct BackgroundView: View {
 ///     - ``title``: String
 ///     - ``icon``: String
 struct TitleText: View {
+    @Binding var buttonBool: Bool
     /// ``settings`` Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
     /// ``colors`` Imports an array of tuples containing various colors that are used to style the UI. This is based on the UserSettings 'style' setting, and is an @State to update the UI.
@@ -191,7 +83,6 @@ struct TitleText: View {
     let icon: String
     
     var body: some View {
-        
         HStack {
             HStack {
                 Text("\(title.capitalized).")
@@ -211,15 +102,22 @@ struct TitleText: View {
                         Spacer()
                         Rectangle()
                             .frame(height: 2)
-                            .foregroundColor(Color("object"))
+                            .foregroundColor(Color(settings.accentColor))
+                            .opacity(settings.accentColor == "UIContrast" ? 0.08 : 0.6)
                     }.padding(.bottom, 14)
                     .transition(AnyTransition.opacity.combined(with: .move(edge: .bottom)))
                 })
-            Image(systemName: icon)
-                .font(.system(size: 19, weight: .bold, design: .rounded))
-                .foregroundColor(Color("text"))
-                .padding(.horizontal)
-                .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.9)))
+            Button(action: {
+                withAnimation(.spring()){
+                    buttonBool.toggle()
+                }
+            }){
+                Image(systemName: icon)
+                    .font(.system(size: 19, weight: .bold, design: .rounded))
+                    .foregroundColor(Color(settings.accentColor))
+                    .padding(.horizontal)
+                    .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.9)))
+            }.buttonStyle(ShrinkingButton())
         }
     }
 }
