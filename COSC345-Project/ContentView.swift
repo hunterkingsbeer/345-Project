@@ -49,7 +49,7 @@ struct ContentView: View {
                 .tag(2)
         }
         .accentColor(Color(settings.accentColor))
-        .colorScheme(settings.darkMode ? .dark : .light)
+        .preferredColorScheme(settings.darkMode ? .dark : .light)
     }
 }
 
@@ -59,7 +59,9 @@ struct ContentView: View {
 /// - Called by HomeView, ScanView, and SettingsView.
 struct BackgroundView: View {
     var body: some View {
-        Color("background").ignoresSafeArea(.all)
+        Color("background")
+            .ignoresSafeArea(.all)
+            .animation(.easeInOut)
     }
 }
 
