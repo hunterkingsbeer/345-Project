@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>UIUserInterfaceStyle</key>
-	<string>Dark</string>
+	<string>Auto</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
