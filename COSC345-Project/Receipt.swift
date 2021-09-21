@@ -38,7 +38,7 @@ struct ReceiptView: View {
     var body: some View {
         RoundedRectangle(cornerRadius: 12)
             .fill(Color(settings.shadows ? "shadowObject" : "object"))
-            .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.45 : 0.075, radius: 4)
+            .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.45 : 0.08, radius: 5)
             .overlay(
                 // the title and body
                 HStack (alignment: .center){
@@ -48,25 +48,28 @@ struct ReceiptView: View {
                         Text("\(getDate(date: receipt.date))")
                             .font(.system(size: 14, weight: .regular, design: .rounded))
                     }
-
+                     
                     Spacer()
-                    Group {
-                        if pendingDelete == true {
-                            RoundedRectangle(cornerRadius: 8)
-                                .fill(Color.red)
-                                .overlay(Image(systemName: "xmark")
-                                            .foregroundColor(Color("background"))
-                                            .font(.system(size: 15, weight: .bold, design: .rounded)))
-                                .frame(height: UIScreen.screenWidth * 0.08)
-                                .onTapGesture {
-                                    Receipt.delete(receipt: receipt)
-                                }
-                        } else {
-                            Image(systemName: Folder.getIcon(title: receipt.folder ?? "doc.plaintext"))
-                                .font(.system(size: 20))
-                        }
-                    }.frame(width: UIScreen.screenWidth * 0.08)
-                    .transition(AnyTransition.scale(scale: 0.0).combined(with: .opacity))
+                    
+                    ZStack {
+                        Group {
+                            if pendingDelete == true {
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(Color.red)
+                                    .overlay(Image(systemName: "xmark")
+                                                .foregroundColor(Color("background"))
+                                                .font(.system(size: 15, weight: .bold, design: .rounded)))
+                                    .frame(height: UIScreen.screenWidth * 0.08)
+                                    .onTapGesture {
+                                        Receipt.delete(receipt: receipt)
+                                    }
+                            } else {
+                                Image(systemName: Folder.getIcon(title: receipt.folder ?? "doc.plaintext"))
+                                    .font(.system(size: 20))
+                            }
+                        }.frame(width: UIScreen.screenWidth * 0.08)
+                        .transition(AnyTransition.scale(scale: 0.0).combined(with: .opacity))
+                    }
                 }.padding(.horizontal)
                 .padding(.vertical, 10)
             ).animation(.spring())
@@ -105,36 +108,58 @@ struct ReceiptDetailView: View  {
     
     var body: some View {
         ZStack {
-            ScrollView(showsIndicators: false) {
-                VStack (alignment: .leading){
-                    HStack {
+            VStack {
+                ZStack {
+                    Blur(effect: UIBlurEffect(style: .systemUltraThinMaterial))
+                        .ignoresSafeArea()
+                        .overlay(getColor()
+                                    .blendMode(.color)
+                                    .opacity(settings.darkMode ? 0.2 : 1.0))
+                    
+                    HStack(alignment: .center){
                         VStack(alignment: .leading) {
-                            Text("\(receipt.title ?? "".trimmingCharacters(in: .whitespacesAndNewlines))")
-                                .font(.system(.title))
                             Text("\(getDate(date: receipt.date))")
                                 .font(.caption)
-                                .opacity(0.5)
+                            Text("\((receipt.title ?? "").trimmingCharacters(in: .whitespacesAndNewlines))")
+                                .font(.system(.title))
+                                //.disabled(detailState == .editing ? false : true)
                             Text("\(receipt.folder ?? "Default").")
-                                .opacity(0.5)
                         }
                         Spacer()
                         Image(systemName: Folder.getIcon(title: receipt.folder))
                             .font(.system(size: 30, weight: .semibold))
-                            .foregroundColor(Color("background"))
                             .padding(10)
-                            .background(Color(Folder.getColor(title: receipt.folder)))
+                            .foregroundColor(getColor())
+                            //.background() // placeholder
                             .cornerRadius(12)
-                    }
-                    Divider()
-                    Text(receipt.body ?? "")
+                    }.foregroundColor(Color("text"))
+                    .padding()
+                }.frame(height: UIScreen.screenHeight * 0.14)
+                Spacer()
+            }.zIndex(1)
+            
+            ScrollView(showsIndicators: false) {
+                HStack {
+                    VStack {
+                        Text(receipt.body ?? "")
+                            .padding(.horizontal)
+                            .padding(.vertical, UIScreen.screenHeight * 0.14)
+                        Spacer()
+                    }//.padding(.top, 125)
                     Spacer()
-                }.padding(.horizontal).padding(.bottom, 50).padding(.top, 20)
-            }
+                }
+            }.zIndex(0)
+            
             ReceiptViewButtons(detailState: $detailState, receipt: receipt)
-                .dropShadow(isOn: settings.shadows, opacity: 0.15, radius: 15)
+                .zIndex(2)
+            
         }.padding(.bottom)
-        .background(Color("background"))
+        .background(Color("object"))
         .ignoresSafeArea(edges: .bottom)
+    }
+    
+    func getColor() -> Color {
+        return Color(Folder.getColor(title: receipt.folder))
     }
 }
 /// ``ReceiptViewButtons``
@@ -147,6 +172,8 @@ struct ReceiptViewButtons: View {
     @Binding var detailState: DetailState
     ///``receipt``: is a Receipt variable that is passed to the view which allows this view to delete and update it as needed.
     @State var receipt: Receipt
+    ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
+    @EnvironmentObject var settings: UserSettings
     
     var body: some View {
         VStack {
@@ -158,15 +185,16 @@ struct ReceiptViewButtons: View {
                     Button(action: {
                         if detailState == .deleting {
                             Receipt.delete(receipt: receipt)
-                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                            hapticFeedback(type: .rigid)
                         } else {
                             detailState = .deleting
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            hapticFeedback(type: .rigid)
                         }
                     }){
                         ZStack {
                             RoundedRectangle(cornerRadius: 15)
-                                .fill(Color(detailState == .deleting ? "red" : "object"))
+                                .fill(Color(detailState == .deleting ? "red" : settings.darkMode ? "shadowObject" : "background"))
+                                .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.1, radius: 12)
                                 .animation(.easeInOut)
                             VStack {
                                 if detailState == .image && !UIDevice.current.inSimulator {
@@ -197,11 +225,12 @@ struct ReceiptViewButtons: View {
                 // Image Button
                 Button(action: {
                     detailState = detailState == .image ? .none : .image
-                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    hapticFeedback(type: .rigid)
                 }){
                     ZStack {
                         RoundedRectangle(cornerRadius: 15)
-                            .fill(Color("object"))
+                            .fill(Color(settings.darkMode ? "shadowObject" : "background"))
+                            .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.1, radius: 12)
                         VStack {
                             if detailState == .image && receipt.image != nil && !UIDevice.current.inSimulator {
                                 (Image(data: receipt.image) ?? Image(""))
@@ -221,12 +250,13 @@ struct ReceiptViewButtons: View {
                 if detailState != .image {
                     Button(action: {
                         detailState = .none
+                        hapticFeedback(type: .rigid)
                         presentationMode.wrappedValue.dismiss()
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     }){
                         ZStack {
                             RoundedRectangle(cornerRadius: 15)
-                                .fill(Color("object"))
+                                .fill(Color(settings.darkMode ? "shadowObject" : "background"))
+                                .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.1, radius: 12)
                             Image(systemName: "chevron.down").padding()
                         }.padding(.vertical)
                         .frame(height: UIScreen.screenHeight * 0.1)
@@ -239,11 +269,12 @@ struct ReceiptViewButtons: View {
                 if detailState != .image {
                     Button(action: {
                         detailState = detailState == .editing ? .none : .editing
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        hapticFeedback(type: .rigid)
                     }){
                         ZStack {
                             RoundedRectangle(cornerRadius: 15)
                                 .fill(Color(detailState == .editing ? "green" : "object"))
+                 .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.1, radius: 12)
                             Image(systemName: "pencil").padding()
                         }.padding(.vertical)
                         .frame(height: UIScreen.screenHeight * 0.1)

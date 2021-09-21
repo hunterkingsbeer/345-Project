@@ -16,7 +16,7 @@ struct SettingsView: View  {
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
     ///``shadowProperties``: Used to uniformly control shadows applied to all the settings buttons/selectors.
-    let shadowProperties = (opactiy: 0.08, radius: CGFloat(4))
+    let shadowProperties = (lightOpacity: 0.15, darkOpacity: 0.15, radius: CGFloat(10))
    
     var body: some View {
         ZStack {
@@ -56,19 +56,19 @@ struct DarkModeButton: View {
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
     ///``shadowProperties``: Used to uniformly control shadows applied to all the settings buttons/selectors.
-    let shadowProperties : (opactiy: Double, radius: CGFloat)
+    let shadowProperties : (lightOpacity: Double, darkOpacity: Double, radius: CGFloat)
     
     var body: some View {
         Button(action: {
             withAnimation(.easeInOut){
                 settings.darkMode.toggle()
             }
-            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            hapticFeedback(type: .rigid)
         }){
             Color(settings.shadows ? "shadowObject" : "object")
                 .cornerRadius(12)
                 .dropShadow(isOn: settings.shadows,
-                             opacity: settings.darkMode ? 0.45 : shadowProperties.opactiy,
+                            opacity: settings.darkMode ? shadowProperties.darkOpacity : shadowProperties.lightOpacity,
                              radius: shadowProperties.radius)
                 .overlay(
                     VStack {
@@ -100,17 +100,20 @@ struct ShadowModeButton: View {
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
     ///``shadowProperties``: Used to uniformly control shadows applied to all the settings buttons/selectors.
-    let shadowProperties : (opactiy: Double, radius: CGFloat)
+    let shadowProperties : (lightOpacity: Double, darkOpacity: Double, radius: CGFloat)
     
     var body: some View {
         Button(action: {
             withAnimation(.easeInOut){
                 settings.shadows.toggle()
             }
-            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            hapticFeedback(type: .rigid)
         }){
             Color(settings.shadows ? "shadowObject" : "object")
                 .cornerRadius(12)
+                .dropShadow(isOn: settings.shadows,
+                             opacity: settings.darkMode ? shadowProperties.darkOpacity : shadowProperties.lightOpacity,
+                             radius: shadowProperties.radius)
                 .overlay(
                     VStack {
                         Spacer()
@@ -130,9 +133,7 @@ struct ShadowModeButton: View {
                             .font(.system(.body, design: .rounded))
                         Spacer()
                     }.padding()
-                ).dropShadow(isOn: settings.shadows,
-                             opacity: settings.darkMode ? 0.45 : shadowProperties.opactiy,
-                             radius: shadowProperties.radius)
+                )
         }.buttonStyle(ShrinkingButton()).padding(.vertical).padding(.leading, 5)
     }
 }
@@ -141,64 +142,73 @@ struct ScanDefaultSelector: View {
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
     ///``shadowProperties``: Used to uniformly control shadows applied to all the settings buttons/selectors.
-    let shadowProperties : (opactiy: Double, radius: CGFloat)
+    let shadowProperties : (lightOpacity: Double, darkOpacity: Double, radius: CGFloat)
     
     var body: some View {
         Color(settings.shadows ? "shadowObject" : "object")
             .cornerRadius(12)
             .dropShadow(isOn: settings.shadows,
-                         opacity: settings.darkMode ? 0.45 : shadowProperties.opactiy,
+                         opacity: settings.darkMode ? shadowProperties.darkOpacity : shadowProperties.lightOpacity,
                          radius: shadowProperties.radius)
             .overlay(
                 VStack {
                     Spacer()
                     HStack {
                         Spacer()
-                        Button(action: {
-                            withAnimation(.easeInOut){
-                                settings.scanDefault = ScanDefault.camera.rawValue
-                            }
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        }){
-                            Image(systemName: "camera")
-                                .font(.largeTitle)
-                                .foregroundColor(Color(ScanDefault.camera.rawValue == settings.scanDefault ? settings.accentColor : "accentAlt"))
-                                .scaleEffect(ScanDefault.camera.rawValue == settings.scanDefault ? 1.25 : 1)
-                                .transition(AnyTransition.scale(scale: 0.25)
-                                                .combined(with: .opacity))
-                                .padding()
-                        }.buttonStyle(ShrinkingButton())
-                        Spacer()
-                        Button(action: {
-                            withAnimation(.easeInOut){
-                                settings.scanDefault = ScanDefault.choose.rawValue
-                            }
-                        }){
-                            Image(systemName: "plus")
-                                .font(.largeTitle)
-                                .foregroundColor(Color(ScanDefault.choose.rawValue == settings.scanDefault ? settings.accentColor : "accentAlt"))
-                                .scaleEffect(ScanDefault.choose.rawValue == settings.scanDefault ? 1.25 : 1)
-                                .transition(AnyTransition.scale(scale: 0.25)
-                                                .combined(with: .opacity))
-                                .padding()
-                        }.buttonStyle(ShrinkingButton())
-                        Spacer()
-                        Button(action: {
-                            withAnimation(.easeInOut){
-                                settings.scanDefault = ScanDefault.gallery.rawValue
-                            }
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        }){
-                            VStack {
-                                Image(systemName: "photo")
+                        VStack {
+                            Button(action: {
+                                withAnimation(.easeInOut){
+                                    settings.scanDefault = ScanDefault.camera.rawValue
+                                }
+                                hapticFeedback(type: .soft)
+                            }){
+                                Image(systemName: "camera")
                                     .font(.largeTitle)
-                                    .foregroundColor(Color(ScanDefault.gallery.rawValue == settings.scanDefault ? settings.accentColor : "accentAlt"))
-                                    .scaleEffect(ScanDefault.gallery.rawValue == settings.scanDefault ? 1.25 : 1)
+                                    .foregroundColor(Color(ScanDefault.camera.rawValue == settings.scanDefault ? settings.accentColor : "accentAlt"))
+                                    .scaleEffect(ScanDefault.camera.rawValue == settings.scanDefault ? 1.25 : 1)
                                     .transition(AnyTransition.scale(scale: 0.25)
                                                     .combined(with: .opacity))
                                     .padding()
-                            }
-                        }.buttonStyle(ShrinkingButton())
+                            }.buttonStyle(ShrinkingButton())
+                        }
+                        
+                        Spacer()
+                        VStack {
+                            Button(action: {
+                                withAnimation(.easeInOut){
+                                    settings.scanDefault = ScanDefault.choose.rawValue
+                                }
+                                hapticFeedback(type: .soft)
+                            }){
+                                Image(systemName: "plus")
+                                    .font(.largeTitle)
+                                    .foregroundColor(Color(ScanDefault.choose.rawValue == settings.scanDefault ? settings.accentColor : "accentAlt"))
+                                    .scaleEffect(ScanDefault.choose.rawValue == settings.scanDefault ? 1.25 : 1)
+                                    .transition(AnyTransition.scale(scale: 0.25)
+                                                    .combined(with: .opacity))
+                                    .padding()
+                            }.buttonStyle(ShrinkingButton())
+                        }
+                        
+                        Spacer()
+                        VStack {
+                            Button(action: {
+                                withAnimation(.easeInOut){
+                                    settings.scanDefault = ScanDefault.gallery.rawValue
+                                }
+                                hapticFeedback(type: .soft)
+                            }){
+                                VStack {
+                                    Image(systemName: "photo")
+                                        .font(.largeTitle)
+                                        .foregroundColor(Color(ScanDefault.gallery.rawValue == settings.scanDefault ? settings.accentColor : "accentAlt"))
+                                        .scaleEffect(ScanDefault.gallery.rawValue == settings.scanDefault ? 1.25 : 1)
+                                        .transition(AnyTransition.scale(scale: 0.25)
+                                                        .combined(with: .opacity))
+                                        .padding()
+                                }
+                            }.buttonStyle(ShrinkingButton())
+                        }
                         Spacer()
                     }
                     Text("SCAN SCREEN OPTION")
@@ -216,13 +226,13 @@ struct AccentColorSelector: View {
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
     ///``shadowProperties``: Used to uniformly control shadows applied to all the settings buttons/selectors.
-    let shadowProperties : (opactiy: Double, radius: CGFloat)
+    let shadowProperties : (lightOpacity: Double, darkOpacity: Double, radius: CGFloat)
     
     var body: some View {
         Color(settings.shadows ? "shadowObject" : "object")
             .cornerRadius(12)
             .dropShadow(isOn: settings.shadows,
-                         opacity: settings.darkMode ? 0.45 : shadowProperties.opactiy,
+                         opacity: settings.darkMode ? shadowProperties.darkOpacity : shadowProperties.lightOpacity,
                          radius: shadowProperties.radius)
             .overlay(
                 VStack {
@@ -234,14 +244,23 @@ struct AccentColorSelector: View {
                                     withAnimation(.easeInOut){
                                         settings.accentColor = colors[color]
                                     }
+                                    hapticFeedback(type: .soft)
                                 }){
                                     VStack {
                                         if color == 0 {
-                                            Circle()
-                                                .foregroundColor(Color.clear)
-                                                .overlay(Image(systemName: "circle.righthalf.fill")
-                                                            .font(.largeTitle).scaleEffect(1.1))
-                                                .frame(width: UIScreen.screenWidth*0.1, height: UIScreen.screenWidth*0.1)
+                                            Image(systemName: "circle.righthalf.fill")
+                                                        .font(.largeTitle).scaleEffect(1.1)
+                                                .foregroundColor(Color("text"))
+                                                .overlay(
+                                                    VStack{
+                                                        if settings.accentColor == colors[color]{
+                                                            Image(systemName: "circle.fill")
+                                                                .font(.system(size: 18, weight: .bold))
+                                                                .foregroundColor(Color("object"))
+                                                                .transition(AnyTransition.scale(scale: 0)/*.combined(with: .opacity)*/)
+                                                        }
+                                                    }
+                                                )
                                                 .padding(.horizontal, 5)
                                                 .scaleEffect(settings.accentColor == colors[color] ? 1.25 : 1)
                                                 .animation(.spring())
@@ -251,10 +270,10 @@ struct AccentColorSelector: View {
                                                 .overlay(
                                                     VStack{
                                                         if settings.accentColor == colors[color]{
-                                                            Image(systemName: "checkmark")
-                                                                .font(.system(size: 12, weight: .bold))
-                                                                .foregroundColor(Color("background"))
-                                                                .transition(AnyTransition.scale(scale: 0.75).combined(with: .opacity))
+                                                            Image(systemName: "circle.fill")
+                                                                .font(.system(size: 18, weight: .bold))
+                                                                .foregroundColor(Color("object"))
+                                                                .transition(AnyTransition.scale(scale: 0.9).combined(with: .opacity))
                                                         }
                                                     }
                                                 ).frame(width: UIScreen.screenWidth*0.1, height: UIScreen.screenWidth*0.1)
@@ -286,7 +305,7 @@ struct DeveloperSettings: View {
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
     ///``shadowProperties``: Used to uniformly control shadows applied to all the settings buttons/selectors.
-    let shadowProperties : (opactiy: Double, radius: CGFloat)
+    let shadowProperties : (lightOpacity: Double, darkOpacity: Double, radius: CGFloat)
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -310,13 +329,13 @@ struct DeveloperSettings: View {
                     } else {
                         Receipt.generateRandomReceipts()
                     }
-                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                    hapticFeedback(type: .rigid)
                 }){
                     Color(settings.shadows ? "shadowObject" : "object")
                         .cornerRadius(12)
                         .dropShadow(isOn: settings.shadows,
-                                     opacity: settings.darkMode ? 0.45 : shadowProperties.opactiy,
-                                     radius: shadowProperties.radius)
+                                    opacity: settings.darkMode ? shadowProperties.darkOpacity : shadowProperties.lightOpacity,
+                                    radius: shadowProperties.radius)
                         .overlay(
                             VStack {
                                 Spacer()
@@ -335,13 +354,13 @@ struct DeveloperSettings: View {
                 Button(action: {
                     Receipt.deleteAll(receipts: receipts)
                     Folder.deleteAll()
-                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                    hapticFeedback(type: .rigid)
                 }){
                     Color(settings.shadows ? "shadowObject" : "object")
                         .cornerRadius(12)
                         .dropShadow(isOn: settings.shadows,
-                                     opacity: settings.darkMode ? 0.45 : shadowProperties.opactiy,
-                                     radius: shadowProperties.radius)
+                                    opacity: settings.darkMode ? shadowProperties.darkOpacity : shadowProperties.lightOpacity,
+                                    radius: shadowProperties.radius)
                         .overlay(
                             VStack {
                                 Spacer()

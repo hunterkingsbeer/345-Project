@@ -71,12 +71,12 @@ struct HomeView: View {
                                 ReceiptView(receipt: receipt)
                                     .transition(.opacity)
                                     .padding(.horizontal)
-                                    .padding(.bottom, 5)
+                                    .padding(.bottom, 8)
                             }
                         } else {
                             NoReceiptsView()
                         }
-                    }.padding(.top, 8).padding(.bottom)
+                    }.padding(.top, 10).padding(.bottom)
                 }.cornerRadius(0)
             }
         }

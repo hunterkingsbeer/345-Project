@@ -130,6 +130,7 @@
 				5A3DCE1B264490EB003442C3 /* Assets.xcassets */,
 				5A3DCE19264490E7003442C3 /* ContentView.swift */,
 				5A59242E26BA51E6008918B0 /* HomeView.swift */,
+				5A7C930726E6E78E0030D8CB /* Settings.swift */,
 				5A59242A26BA2D5D008918B0 /* Scanners.swift */,
 				5AB20BC7265FC3F50055D2AD /* UtilityFunctions.swift */,
 				5A827F9A26AFD98A001A3E2D /* Receipt.swift */,
@@ -138,7 +139,6 @@
 				5A7772A426B95C4100BF54B2 /* ScanTranslation.swift */,
 				5AC3EA1A266107D100891542 /* UserSettings.swift */,
 				5A3DCE20264490EB003442C3 /* Persistence.swift */,
-				5A7C930726E6E78E0030D8CB /* Settings.swift */,
 			);
 			path = "COSC345-Project";
 			sourceTree = "<group>";
