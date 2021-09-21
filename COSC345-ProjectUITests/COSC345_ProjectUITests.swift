@@ -42,14 +42,20 @@ class COSC345_ProjectUITests: XCTestCase {
 
     func testFolderView() throws {
         app.launch()
+        app.launchArguments = ["testMode"]
         let tabBar = app.tabBars["Tab Bar"]
         tabBar.buttons["Settings"].tap()
         
         //generate recepits
-        let elementsQuery = app.scrollViews["ReceiptHomeView"].otherElements
-        elementsQuery.buttons["Delete All"].tap()
-        elementsQuery.buttons["Delete All"].tap()
-        elementsQuery.buttons["Generate Receipts"].tap()
+        var elementsQuery = app.scrollViews["ReceiptHomeView"].otherElements
+        tabBar.buttons["Settings"].tap()
+        
+        let scrollViewsQuery = app.scrollViews
+        XCUIApplication().scrollViews.otherElements.buttons["DELETE ALL"].tap()
+        elementsQuery = scrollViewsQuery.otherElements
+        elementsQuery.images["Build"].tap()
+        scrollViewsQuery.otherElements.containing(.button, identifier:"LIGHT MODE").element/*@START_MENU_TOKEN@*/.swipeLeft()/*[[".swipeUp()",".swipeLeft()"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/
+        elementsQuery.buttons["+10 RECEIPTS"].tap()
         tabBar.buttons["Home"].tap()
         
         //check recepits
@@ -58,27 +64,31 @@ class COSC345_ProjectUITests: XCTestCase {
         
         XCTAssert(elementsQuery2.staticTexts["Jb Hifi"].exists)
         elementsQuery2.buttons["1 Default."].tap()
-        
+        elementsQuery2.buttons["1 Default."].tap()
         XCTAssert(!elementsQuery2.staticTexts["Jb Hifi"].exists)
-        elementsQuery2.staticTexts["Invoice"].tap()
+       
+        app.scrollViews.otherElements.staticTexts["Invoice"].tap()
+                
         sleep(2)
 
         XCTAssert(!elementsQuery2.staticTexts["Invoice"].isHittable)
         
-        sleep(2)
-        XCUIApplication().buttons["chevron.down"].firstMatch.tap()
+        XCUIApplication().buttons["Go Down"].firstMatch.tap()
+        sleep(5)
         XCTAssert(elementsQuery2.staticTexts["Invoice"].isHittable)
-        elementsQuery2.staticTexts["Invoice"].tap()
         
-        app.buttons["photo"].tap()
-        XCTAssert(!app.buttons["chevron.down"].firstMatch.isHittable)
+        
+        elementsQuery2.staticTexts["Invoice"].tap()
+        sleep(2)
+        app.buttons["Photo"].tap()
+        XCTAssert(!XCUIApplication().buttons["Go Down"].firstMatch.isHittable)
        // this should be passing just fine
         
-        app.buttons["photo"].tap()
-        XCTAssert(app.buttons["chevron.down"].firstMatch.exists)
+        app.buttons["Photo"].tap()
+        XCTAssert(XCUIApplication().buttons["Go Down"].firstMatch.exists)
         
-        app.buttons["trash"].tap()
-        app.buttons["trash"].tap()
+        app.buttons["Trash"].tap()
+        app.buttons["Trash"].tap()
         
         XCTAssert(!elementsQuery2.staticTexts["Invoice"].isHittable)
     }
@@ -89,9 +99,13 @@ class COSC345_ProjectUITests: XCTestCase {
         tabBar.buttons["Settings"].tap()
         
         //generate recepits
-        let elementsQuery = app.scrollViews["ReceiptHomeView"].otherElements
-        elementsQuery.buttons["Delete All"].tap()
-        elementsQuery.buttons["Generate Receipts"].tap()
+        var elementsQuery = app.scrollViews["ReceiptHomeView"].otherElements
+        let scrollViewsQuery = app.scrollViews
+        XCUIApplication().scrollViews.otherElements.buttons["DELETE ALL"].tap()
+        elementsQuery = scrollViewsQuery.otherElements
+        elementsQuery.images["Build"].tap()
+        scrollViewsQuery.otherElements.containing(.button, identifier:"LIGHT MODE").element/*@START_MENU_TOKEN@*/.swipeLeft()/*[[".swipeUp()",".swipeLeft()"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/
+        elementsQuery.buttons["+10 RECEIPTS"].tap()
         tabBar.buttons["Home"].tap()
         
         //check searcbar
