@@ -21,10 +21,12 @@ class COSC345_ProjectTests: XCTestCase {
 
     func testReceipt() throws {
         var image = [UIImage()]
+        var image2 =  UIImage()
         let recognizedContent = RecognizedContent()
         let bundle = Bundle(for: COSC345_ProjectTests.self)
         var generatedString = ""
         var testString = ""
+        var recepit = Receipt();
         //var documentView = DocumentScannerView()
         
             // Fetch Image Data
@@ -32,6 +34,7 @@ class COSC345_ProjectTests: XCTestCase {
             do {
                 let data = try Data(contentsOf: URL(fileURLWithPath: path))
                 image[0] = UIImage.init(data: data)!
+                image2 = UIImage.init(data: data)!
 //                print(image[0]) // checking if it is storing the image or not, it will print the size
             } catch {
                 debugPrint("local picture missing")
@@ -56,7 +59,39 @@ class COSC345_ProjectTests: XCTestCase {
         
         print(recognizedContent.items)
         XCTAssert(generatedString == testString)
-
+        
+        Receipt.saveScan(recognizedText: generatedString, image: image2)
+        recepit = Receipt.getReceipt(title: "Blond")
+        let splitString = generatedString.components(separatedBy: CharacterSet.newlines).first!
+        print(splitString)
+        XCTAssert(splitString == recepit.title?.lowercased())
+             var preview: PersistenceController = {
+                let result = PersistenceController(inMemory: true)
+                let viewContext = result.container.viewContext
+                
+                for folder in Folder.folders {
+                    let newFolder = Folder(context: viewContext)
+                    newFolder.title = folder.title.capitalized
+                    newFolder.color = folder.color
+                    newFolder.icon = folder.icon
+                    newFolder.id = UUID()
+                }
+                
+                 PersistenceController.save(viewContext: viewContext)
+                
+                for index in 0..<10 {
+                    let newReceipt = Receipt(context: viewContext)
+                    newReceipt.body = "BODY TEXT EXAMPLE"
+                    newReceipt.date = Date()
+                    newReceipt.id = UUID()
+                    newReceipt.title = "Example Store"
+                    newReceipt.folder = Prediction.pointPrediction(text: ((newReceipt.title ?? "") + (newReceipt.body ?? "")))
+                }
+                        
+                 PersistenceController.save(viewContext: viewContext)
+                return result
+            }()
+            XCTAssert(PersistenceController.preview.getContext() != preview.getContext() )
         }
     }
     
@@ -76,4 +111,5 @@ class COSC345_ProjectTests: XCTestCase {
             }
         }
     }
+    
 }
