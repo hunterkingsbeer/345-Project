@@ -51,7 +51,6 @@ class COSC345_ProjectUITests: XCTestCase {
         tabBar.buttons["Settings"].tap()
         
         let scrollViewsQuery = app.scrollViews
-        XCUIApplication().scrollViews.otherElements.buttons["DELETE ALL"].tap()
         elementsQuery = scrollViewsQuery.otherElements
         elementsQuery.images["Build"].tap()
         scrollViewsQuery.otherElements.containing(.button, identifier:"LIGHT MODE").element/*@START_MENU_TOKEN@*/.swipeLeft()/*[[".swipeUp()",".swipeLeft()"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/
