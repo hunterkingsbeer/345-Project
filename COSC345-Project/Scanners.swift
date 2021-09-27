@@ -282,7 +282,7 @@ struct GalleryScannerView: View {
     /// is a function that is used to save a RecognizedContent objects receipts. It is used in an if statement to determine whether there is actually translated text, and if its at an acceptable number.
     /// - Returns
     ///     - True if the scan is being saved, and passed the validity tests, False if the scan isn't able to be saved, and didn't pass the validity tests.
-    func saveReceipt() -> Bool{
+    func saveReceipt() -> Bool {
         if recognizedContent.items.count > 0 {
             for receipt in recognizedContent.items {
                 if receipt.text.count < 2 {

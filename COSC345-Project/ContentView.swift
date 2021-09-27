@@ -35,6 +35,8 @@ struct ContentView: View {
     @EnvironmentObject var settings: UserSettings
     ///``colors`` Imports an array of tuples containing various colors that are used to style the UI. This is based on the UserSettings 'style' setting, and is an @State to update the UI.
     @State var colors = Color.colors
+    ///``locked`` locks the screen if the user has passcode protection enabled
+    @State var locked = false
     
     var body: some View {
         TabView(selection: $selectedTab.selection){
@@ -47,7 +49,12 @@ struct ContentView: View {
             SettingsView()
                 .tabItem { Label("Settings", systemImage: "hammer.fill").foregroundColor(Color("text")) }
                 .tag(2)
-        }
+        }.onAppear(perform: { locked = settings.passcodeProtection })
+        .fullScreenCover(isPresented: $locked, content: {
+            PasscodeScreen(locked: $locked)
+                .environmentObject(UserSettings())
+                .preferredColorScheme(settings.darkMode ? .dark : .light)
+        })
         .accentColor(Color(settings.accentColor))
         .preferredColorScheme(settings.darkMode ? .dark : .light)
     }

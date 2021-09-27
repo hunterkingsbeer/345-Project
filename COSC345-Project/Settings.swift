@@ -16,7 +16,7 @@ struct SettingsView: View  {
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
     ///``shadowProperties``: Used to uniformly control shadows applied to all the settings buttons/selectors.
-    let shadowProperties = (lightOpacity: 0.15, darkOpacity: 0.15, radius: CGFloat(10))
+    let shadowProperties = (lightOpacity: 0.06, darkOpacity: 0.3, radius: CGFloat(5))
    
     var body: some View {
         ZStack {
@@ -31,17 +31,25 @@ struct SettingsView: View  {
                         HStack {
                             //dark mode
                             DarkModeButton(shadowProperties: shadowProperties)
+                                .frame(height: UIScreen.screenHeight * 0.2)
                             
                             // shadows
                             ShadowModeButton(shadowProperties: shadowProperties)
+                                .frame(height: UIScreen.screenHeight * 0.2)
                         }
                         
                         // scan selector
                         ScanDefaultSelector(shadowProperties: shadowProperties)
+                            .frame(height: UIScreen.screenHeight * 0.2)
+                        
+                        // passcode selector
+                        PasscodeSelector(shadowProperties: shadowProperties)
+                            .frame(height: UIScreen.screenHeight * 0.2)
                         
                         // color
                         AccentColorSelector(shadowProperties: shadowProperties)
-                    }.frame(height: UIScreen.screenHeight * 0.6).padding(.horizontal)
+                            .frame(height: UIScreen.screenHeight * 0.2)
+                    }.padding(.horizontal)
                     
                     if settings.devMode {
                         DeveloperSettings(shadowProperties: shadowProperties)
@@ -49,6 +57,108 @@ struct SettingsView: View  {
                 }.animation(.easeInOut)
             }
         }
+    }
+}
+
+enum PassEditingState: String {
+    case none = "none"
+    case updating = "updating"
+    case creating = "creating"
+    case removing = "removing"
+}
+
+enum PassSuccess {
+    case none
+    case success
+    case failure
+}
+
+struct PasscodeSelector: View {
+    ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
+    @EnvironmentObject var settings: UserSettings
+    let shadowProperties : (lightOpacity: Double, darkOpacity: Double, radius: CGFloat)
+    @State var passState : PassEditingState = .none
+    @State var passEditScreen = (editing: false, expectedCode: "0000")
+    @State var passcodeSuccess = (success: false, code: "")
+    
+    var body: some View {
+        Color(settings.shadows ? "shadowObject" : "object")
+            .cornerRadius(12)
+            .dropShadow(isOn: settings.shadows,
+                         opacity: settings.darkMode ? shadowProperties.darkOpacity : shadowProperties.lightOpacity,
+                         radius: shadowProperties.radius)
+            .overlay(
+                VStack {
+                    HStack {
+                        if settings.passcodeProtection { Spacer() }
+                        
+                        Button(action: {
+                            if settings.passcodeProtection { // remove protection
+                                passcodeSuccess.code = ""
+                                passcodeSuccess.success = false
+                                
+                                passState = .removing
+                                passEditScreen.expectedCode = settings.passcode
+                                passEditScreen.editing = true
+                            } else { // enable protection
+                                passcodeSuccess.code = ""
+                                passcodeSuccess.success = false
+                                
+                                passState = .creating
+                                passEditScreen.expectedCode = passState.rawValue
+                                passEditScreen.editing = true
+                            }
+                        }){
+                            Image(systemName: settings.passcodeProtection ? "lock.fill" : "lock.slash")
+                                .foregroundColor(Color(settings.passcodeProtection ? settings.accentColor : "text"))
+                                .font(.system(size: 45))
+                                .animation(.easeInOut)
+                        }.buttonStyle(ShrinkingButton())
+                        
+                        if settings.passcodeProtection {
+                            Spacer()
+                            Button(action: { // update passcode
+                                passcodeSuccess.code = ""
+                                passcodeSuccess.success = false
+                                
+                                passState = .updating
+                                passEditScreen.expectedCode = passState.rawValue
+                                passEditScreen.editing = true
+                            }){
+                                Image(systemName: "lock.rotation")
+                                    .font(.system(size: 45))
+                                    .animation(.easeInOut)
+                            }.buttonStyle(ShrinkingButton())
+                            .transition(AnyTransition.offset(x: -35).combined(with: .opacity))
+                            Spacer()
+                        }
+                    }.padding(.bottom).animation(.spring())
+                    Text("PASSCODE \(settings.passcodeProtection ? "ENABLED" : "DISABLED") \(settings.devMode ? "[\(settings.passcode)]" : "")")
+                        .bold()
+                        .font(.system(.body, design: .rounded))
+                }.padding()
+            ).padding(.bottom)
+            .onChange(of: passcodeSuccess.success){ _ in
+                if passcodeSuccess.success {
+                    if passState == .updating || passState == .creating { // new code
+                        settings.passcodeProtection = true
+                        settings.passcode = passcodeSuccess.code
+                    } else if passState == .removing { // remove code
+                        settings.passcodeProtection = false
+                        settings.passcode = ""
+                    }
+                    passState = .none
+                    passEditScreen.editing = false
+                }
+            }
+            .fullScreenCover(isPresented: $passEditScreen.editing, content: {
+                PasscodeEdit(result: $passcodeSuccess, expectedCode: passEditScreen.expectedCode)
+                    .environmentObject(UserSettings())
+                    .preferredColorScheme(settings.darkMode ? .dark : .light)
+                    .onDisappear(perform: {
+                        passState = .none
+                    })
+            })
     }
 }
 
@@ -252,7 +362,7 @@ struct AccentColorSelector: View {
                                                         .font(.largeTitle).scaleEffect(1.1)
                                                 .foregroundColor(Color("text"))
                                                 .overlay(
-                                                    VStack{
+                                                    VStack {
                                                         if settings.accentColor == colors[color]{
                                                             Image(systemName: "circle.fill")
                                                                 .font(.system(size: 18, weight: .bold))
@@ -268,11 +378,11 @@ struct AccentColorSelector: View {
                                             Circle()
                                                 .foregroundColor(Color(colors[color]))
                                                 .overlay(
-                                                    VStack{
+                                                    VStack {
                                                         if settings.accentColor == colors[color]{
                                                             Image(systemName: "circle.fill")
                                                                 .font(.system(size: 18, weight: .bold))
-                                                                .foregroundColor(Color("object"))
+                                                                .foregroundColor(Color(settings.shadows ? "shadowObject" : "object"))
                                                                 .transition(AnyTransition.scale(scale: 0.9).combined(with: .opacity))
                                                         }
                                                     }

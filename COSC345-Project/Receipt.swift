@@ -38,7 +38,7 @@ struct ReceiptView: View {
     var body: some View {
         RoundedRectangle(cornerRadius: 12)
             .fill(Color(settings.shadows ? "shadowObject" : "object"))
-            .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.45 : 0.08, radius: 5)
+            .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.06, radius: 5)
             .overlay(
                 // the title and body
                 HStack (alignment: .center){
@@ -95,6 +95,21 @@ struct ReceiptView: View {
     }
 }
 
+/// ``ReceiptSaveItem``
+/// is
+class ReceiptEditObject: Identifiable {
+    ///``title`` is
+    @State var title: String = ""
+    ///``body`` is
+    @State var body: String = ""
+    ///``image`` is
+    @State var image: Data = Data()
+    ///``folder`` is
+    @State var folder: String = ""
+    ///``date`` is
+    @State var date: Date = Date()
+}
+
 /// ``ReceiptDetailView``
 /// is a View struct that displays the detail view of the Receipt that is passed to it. It shows all the information available about a receipt, usually presented in a sheet.
 /// - Called by ReceiptView.
@@ -105,6 +120,8 @@ struct ReceiptDetailView: View  {
     @State var detailState: DetailState = .none
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
+    ///``editedReceipt`` is
+    @State var editedReceipt: ReceiptEditObject = ReceiptEditObject()
     
     var body: some View {
         ZStack {
@@ -120,9 +137,12 @@ struct ReceiptDetailView: View  {
                         VStack(alignment: .leading) {
                             Text("\(getDate(date: receipt.date))")
                                 .font(.caption)
-                            Text("\((receipt.title ?? "").trimmingCharacters(in: .whitespacesAndNewlines))")
-                                .font(.system(.title))
-                                //.disabled(detailState == .editing ? false : true)
+                            TextField("", text: editedReceipt.$title)
+                                .disabled(detailState == .editing ? false : true)
+                                .placeholder(when: editedReceipt.title == ""){
+                                    Text("\((receipt.title ?? "").trimmingCharacters(in: .whitespacesAndNewlines))")
+                                        .foregroundColor(Color("text"))
+                                }.font(.title)
                             Text("\(receipt.folder ?? "Default").")
                         }
                         Spacer()
@@ -145,23 +165,38 @@ struct ReceiptDetailView: View  {
                             .padding(.horizontal)
                             .padding(.vertical, UIScreen.screenHeight * 0.14)
                         Spacer()
-                    }//.padding(.top, 125)
+                    }
                     Spacer()
                 }
             }.zIndex(0)
-            
-            ReceiptViewButtons(detailState: $detailState, receipt: receipt)
+
+            ReceiptViewButtons(detailState: $detailState, receipt: receipt, editedReceipt: $editedReceipt)
                 .zIndex(2)
-            
         }.padding(.bottom)
         .background(Color("object"))
         .ignoresSafeArea(edges: .bottom)
+        .onAppear(perform: fetchEditReceipt)
+    }
+    
+    func fetchEditReceipt() {
+        editedReceipt.title = receipt.title ?? ""
+        editedReceipt.body = receipt.body ?? ""
+        editedReceipt.folder = receipt.folder ?? ""
+        editedReceipt.date = receipt.date ?? Date()
+        editedReceipt.image = receipt.image ?? Data()
     }
     
     func getColor() -> Color {
         return Color(Folder.getColor(title: receipt.folder))
     }
 }
+
+enum EditingState {
+    case confirming
+    case discarding
+    case none
+}
+
 /// ``ReceiptViewButtons``
 /// is a View struct that displays the buttons at the bottom of the ReceiptDetailView, allowing the receipt to be modified as needed.
 /// - Called by ReceiptDetailView.
@@ -174,6 +209,11 @@ struct ReceiptViewButtons: View {
     @State var receipt: Receipt
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
+    ///``editedReceipt`` is
+    @Binding var editedReceipt: ReceiptEditObject
+    ///``editingState`` is
+    @State var editingState: EditingState = .none
+    
     
     var body: some View {
         VStack {
@@ -183,27 +223,36 @@ struct ReceiptViewButtons: View {
                 // Deleting Button
                 if detailState != .image {
                     Button(action: {
-                        if detailState == .deleting {
-                            Receipt.delete(receipt: receipt)
-                            hapticFeedback(type: .rigid)
+                        if detailState == .editing {
+                            // discard
+                            if editingState == .discarding {
+                                // discard edit
+                                detailState = .none
+                                editingState = .none
+                                fetchEditReceipt()
+                            } else {
+                                editingState = .discarding
+                            }
                         } else {
-                            detailState = .deleting
-                            hapticFeedback(type: .rigid)
+                            if detailState == .deleting {
+                                Receipt.delete(receipt: receipt)
+                                hapticFeedback(type: .rigid)
+                            } else {
+                                detailState = .deleting
+                                hapticFeedback(type: .rigid)
+                            }
                         }
                     }){
                         ZStack {
                             RoundedRectangle(cornerRadius: 15)
-                                .fill(Color(detailState == .deleting ? "red" : settings.darkMode ? "shadowObject" : "background"))
-                                .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.1, radius: 12)
+                                .fill(Color(detailState == .deleting || editingState == .discarding ? "red" : settings.darkMode ? "shadowObject" : "background"))
+                                .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.06, radius: 12)
                                 .animation(.easeInOut)
-                            VStack {
-                                if detailState == .image && !UIDevice.current.inSimulator {
-                                    Image(data: receipt.image)! // find some way to not use !, causes crashes by forcing a view with an optional variable (which is nil)
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fit)
-                                } else {
-                                    Image(systemName: "trash").scaleEffect(detailState == .deleting ? 1.25 : 1)
-                                }
+                            
+                            if detailState == .editing {
+                                Image(systemName: "xmark").scaleEffect(editingState == .discarding ? 1.25 : 1)
+                            } else {
+                                Image(systemName: "trash").scaleEffect(detailState == .deleting ? 1.25 : 1)
                             }
                         }.padding(.vertical)
                         .frame(height: UIScreen.screenHeight * 0.1)
@@ -230,7 +279,7 @@ struct ReceiptViewButtons: View {
                     ZStack {
                         RoundedRectangle(cornerRadius: 15)
                             .fill(Color(settings.darkMode ? "shadowObject" : "background"))
-                            .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.1, radius: 12)
+                            .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.06, radius: 12)
                         VStack {
                             if detailState == .image && receipt.image != nil && !UIDevice.current.inSimulator {
                                 (Image(data: receipt.image) ?? Image(""))
@@ -246,6 +295,40 @@ struct ReceiptViewButtons: View {
                     .frame(height: UIScreen.screenHeight * (detailState == .image ? 0.6 : 0.1))
                 }.buttonStyle(ShrinkingButton())
                 
+                // Editing Button
+                if detailState != .image {
+                    Button(action: {
+                        if detailState == .editing {
+                            // confirming
+                            if editingState == .confirming {
+                                // save edit
+                                detailState = .none
+                                editingState = .none
+                                updateReceipt()
+                            } else {
+                                editingState = .confirming
+                            }
+                        } else {
+                            detailState = detailState == .editing ? .none : .editing
+                        }
+                        hapticFeedback(type: .rigid)
+                    }){
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 15)
+                                .fill(Color(editingState == .confirming ? "green" : "object"))
+                                .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.06, radius: 10)
+                            if detailState == .editing {
+                                Image(systemName: "checkmark").scaleEffect(editingState == .confirming ? 1.25 : 1)
+                            } else {
+                                Image(systemName: "pencil").padding()
+                            }
+                        }.padding(.vertical)
+                        .frame(height: UIScreen.screenHeight * 0.1)
+                    }.buttonStyle(ShrinkingButton())
+                    .transition(.offset(x: 150))
+                }
+                
+                /*
                 // temporary dismiss button, replace with functioning edit button
                 if detailState != .image {
                     Button(action: {
@@ -262,27 +345,25 @@ struct ReceiptViewButtons: View {
                         .frame(height: UIScreen.screenHeight * 0.1)
                     }.buttonStyle(ShrinkingButton())
                     .transition(.offset(x: 150))
-                }
-                
-                /*
-                // Editing Button
-                if detailState != .image {
-                    Button(action: {
-                        detailState = detailState == .editing ? .none : .editing
-                        hapticFeedback(type: .rigid)
-                    }){
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 15)
-                                .fill(Color(detailState == .editing ? "green" : "object"))
-                 .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.1, radius: 12)
-                            Image(systemName: "pencil").padding()
-                        }.padding(.vertical)
-                        .frame(height: UIScreen.screenHeight * 0.1)
-                    }.buttonStyle(ShrinkingButton())
-                    .transition(.offset(x: 150))
                 }*/
             }.padding(.horizontal)
         }
+    }
+    
+    func updateReceipt(){
+        receipt.title = editedReceipt.title
+        receipt.body = editedReceipt.body
+        receipt.folder = editedReceipt.folder
+        receipt.date = editedReceipt.date
+        receipt.image = editedReceipt.image
+    }
+    
+    func fetchEditReceipt() {
+        editedReceipt.title = receipt.title ?? ""
+        editedReceipt.body = receipt.body ?? ""
+        editedReceipt.folder = receipt.folder ?? ""
+        editedReceipt.date = receipt.date ?? Date()
+        editedReceipt.image = receipt.image ?? Data()
     }
 }
 
@@ -303,7 +384,7 @@ extension Receipt {
         newReceipt.title = title
         print("New Receipt Saving: \(title)")
         newReceipt.body = String(recognizedText.dropFirst((newReceipt.title ?? "").count)).capitalized
-        newReceipt.image = image.jpegData(compressionQuality: 0.5) // warning is incorrect, this is only true when a default value is applied. Valid images are passed.
+        newReceipt.image = imageToData(image: image)
         // image cant be compared to nil, but it can be compared to an empty UIImage
         newReceipt.date = Date()
         newReceipt.folder = Prediction.pointPrediction(text: (title + (newReceipt.body ?? "")))

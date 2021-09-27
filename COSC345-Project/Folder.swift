@@ -23,7 +23,7 @@ struct FolderView: View {
     var body: some View {
         Button(action: {
             withAnimation(.spring()){
-                selectedFolder = selectedFolder == folder.title ? "" : folder.title ?? "Default"
+                selectedFolder = selectedFolder == folder.title ?? "" ? "" : folder.title ?? "Default"
             }
         }){
             if settings.thinFolders {
@@ -31,7 +31,7 @@ struct FolderView: View {
                 ZStack {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(Color(Folder.getColor(title: folder.title ?? "default")))
-                        .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.6 : 0.075, radius: 4)
+                        .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.3 : 0.06, radius: 10)
                     
                     HStack {
                         Image(systemName: folder.icon ?? "folder")
@@ -47,7 +47,7 @@ struct FolderView: View {
                 ZStack {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(Color(Folder.getColor(title: folder.title ?? "default")))
-                        .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.6 : 0.075, radius: 4)
+                        .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.3 : 0.06, radius: 10)
                     
                     VStack {
                         HStack {

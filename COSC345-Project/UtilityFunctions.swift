@@ -42,6 +42,10 @@ struct Blur: UIViewRepresentable {
     func updateUIView(_ uiView: UIVisualEffectView, context: UIViewRepresentableContext<Self>) { uiView.effect = effect }
 }
 
+func imageToData(image: UIImage) -> Data {
+    return image.jpegData(compressionQuality: 0.5) ?? Data()
+}
+
 func hapticFeedback(type: UIImpactFeedbackGenerator.FeedbackStyle){
     UIImpactFeedbackGenerator(style: type).impactOccurred()
 }
@@ -79,6 +83,19 @@ extension UIScreen {
 }
 
 extension View {
+    
+    func placeholder<Content: View>(
+        when shouldShow: Bool,
+        alignment: Alignment = .leading,
+        @ViewBuilder placeholder: () -> Content) -> some View {
+
+        ZStack(alignment: alignment) {
+            placeholder().opacity(shouldShow ? 1 : 0)
+            self
+        }
+    }
+    
+    
     /// ``underlineTextField``
     /// is a property than can be applied to any View object to provide a predetermined underline to it. However, this is specifically designed to be applied to text.
     /// - Returns
@@ -136,7 +153,7 @@ struct ShrinkingButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .scaleEffect(configuration.isPressed ? 0.98 : 1)
-            .animation(.easeInOut)
+            .animation(.spring())
     }
 }
 

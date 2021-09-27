@@ -63,6 +63,27 @@ class UserSettings: ObservableObject {
             UserDefaults.standard.set(scanDefault, forKey: "scanDefault")
         }
     }
+    
+    ///``firstUse`` is a Boolean that holds whether a user is using the app for the first time. True if its a first use, false if not.
+    @Published var firstUse: Bool {
+        didSet {
+            UserDefaults.standard.set(firstUse, forKey: "firstUse")
+        }
+    }
+    
+    ///``passcodeProtection`` is a Boolean that enabled passcode protection, requiring a passcode for access.
+    @Published var passcodeProtection: Bool {
+        didSet {
+            UserDefaults.standard.set(passcodeProtection, forKey: "passcodeProtection")
+        }
+    }
+    
+    ///``passcode`` holds the users passcode used for passcode protection.
+    @Published var passcode: String {
+        didSet {
+            UserDefaults.standard.set(passcode, forKey: "passcode")
+        }
+    }
 
     ///Initializes the variables to their default variables if not already set.
     init() {
@@ -80,5 +101,11 @@ class UserSettings: ObservableObject {
         self.devMode = UserDefaults.standard.object(forKey: "devMode") as? Bool ?? false
         /// Scan Default defaults to choose. Allows user to choose their scan method.
         self.scanDefault = UserDefaults.standard.object(forKey: "scanDefault") as? Int ?? 0
+        /// First Use defaults to true, once the user loads up the app for its first use its set to false.
+        self.firstUse = UserDefaults.standard.object(forKey: "firstUse") as? Bool ?? true
+        /// Passcode Protection defaults to false, requiring the user to enable it if desired.
+        self.passcodeProtection = UserDefaults.standard.object(forKey: "passcodeProtection") as? Bool ?? false
+        /// Passcode defaults to 0000, in a temporary disabled state.
+        self.passcode = UserDefaults.standard.object(forKey: "passcode") as? String ?? "0000"
     }
 }
