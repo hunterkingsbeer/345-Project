@@ -11,11 +11,6 @@
 		255A436626C947E800287F16 /* test.txt in Resources */ = {isa = PBXBuildFile; fileRef = 255A436526C947E800287F16 /* test.txt */; };
 		25CB38C626C5EFE2003F5152 /* ExpectedOutput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25CB38C526C5EFE2003F5152 /* ExpectedOutput.swift */; };
 		5A07749E2660BA4F008E3909 /* Prediction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A07749D2660BA4F008E3909 /* Prediction.swift */; };
-		5A2CC275270168380082B48C /* OnboardingView_01.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2CC270270168380082B48C /* OnboardingView_01.swift */; };
-		5A2CC276270168380082B48C /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2CC271270168380082B48C /* OnboardingView.swift */; };
-		5A2CC277270168380082B48C /* OnboardingView_02.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2CC272270168380082B48C /* OnboardingView_02.swift */; };
-		5A2CC278270168380082B48C /* OnboardingView_00.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2CC273270168380082B48C /* OnboardingView_00.swift */; };
-		5A2CC279270168380082B48C /* OnboardingView_03.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2CC274270168380082B48C /* OnboardingView_03.swift */; };
 		5A2CC29C270179850082B48C /* Passcode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2CC29B270179850082B48C /* Passcode.swift */; };
 		5A3DCE18264490E7003442C3 /* COSC345_ProjectApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A3DCE17264490E7003442C3 /* COSC345_ProjectApp.swift */; };
 		5A3DCE1A264490E7003442C3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A3DCE19264490E7003442C3 /* ContentView.swift */; };
@@ -57,11 +52,6 @@
 		255A436526C947E800287F16 /* test.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test.txt; sourceTree = "<group>"; };
 		25CB38C526C5EFE2003F5152 /* ExpectedOutput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpectedOutput.swift; sourceTree = "<group>"; };
 		5A07749D2660BA4F008E3909 /* Prediction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prediction.swift; sourceTree = "<group>"; };
-		5A2CC270270168380082B48C /* OnboardingView_01.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnboardingView_01.swift; sourceTree = "<group>"; };
-		5A2CC271270168380082B48C /* OnboardingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
-		5A2CC272270168380082B48C /* OnboardingView_02.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnboardingView_02.swift; sourceTree = "<group>"; };
-		5A2CC273270168380082B48C /* OnboardingView_00.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnboardingView_00.swift; sourceTree = "<group>"; };
-		5A2CC274270168380082B48C /* OnboardingView_03.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnboardingView_03.swift; sourceTree = "<group>"; };
 		5A2CC29B270179850082B48C /* Passcode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Passcode.swift; sourceTree = "<group>"; };
 		5A3DCE14264490E7003442C3 /* COSC345-Project.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "COSC345-Project.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A3DCE17264490E7003442C3 /* COSC345_ProjectApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = COSC345_ProjectApp.swift; sourceTree = "<group>"; };
@@ -112,18 +102,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		5A2CC27A270168430082B48C /* Onboarding */ = {
-			isa = PBXGroup;
-			children = (
-				5A2CC273270168380082B48C /* OnboardingView_00.swift */,
-				5A2CC270270168380082B48C /* OnboardingView_01.swift */,
-				5A2CC272270168380082B48C /* OnboardingView_02.swift */,
-				5A2CC274270168380082B48C /* OnboardingView_03.swift */,
-				5A2CC271270168380082B48C /* OnboardingView.swift */,
-			);
-			path = Onboarding;
-			sourceTree = "<group>";
-		};
 		5A3DCE0B264490E7003442C3 = {
 			isa = PBXGroup;
 			children = (
@@ -164,7 +142,6 @@
 				5A7772A426B95C4100BF54B2 /* ScanTranslation.swift */,
 				5AC3EA1A266107D100891542 /* UserSettings.swift */,
 				5A3DCE20264490EB003442C3 /* Persistence.swift */,
-				5A2CC27A270168430082B48C /* Onboarding */,
 			);
 			path = "COSC345-Project";
 			sourceTree = "<group>";
@@ -334,10 +311,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				5A3DCE21264490EB003442C3 /* Persistence.swift in Sources */,
-				5A2CC277270168380082B48C /* OnboardingView_02.swift in Sources */,
 				5A59242F26BA51E6008918B0 /* HomeView.swift in Sources */,
 				5A7C930826E6E78E0030D8CB /* Settings.swift in Sources */,
-				5A2CC276270168380082B48C /* OnboardingView.swift in Sources */,
 				5A07749E2660BA4F008E3909 /* Prediction.swift in Sources */,
 				5A3DCE1A264490E7003442C3 /* ContentView.swift in Sources */,
 				5A7772A526B95C4100BF54B2 /* ScanTranslation.swift in Sources */,
@@ -345,10 +320,7 @@
 				5A3DCE24264490EB003442C3 /* COSC345_Project.xcdatamodeld in Sources */,
 				5A59242B26BA2D5D008918B0 /* Scanners.swift in Sources */,
 				5AC3EA1B266107D100891542 /* UserSettings.swift in Sources */,
-				5A2CC278270168380082B48C /* OnboardingView_00.swift in Sources */,
 				5A827F9B26AFD98A001A3E2D /* Receipt.swift in Sources */,
-				5A2CC275270168380082B48C /* OnboardingView_01.swift in Sources */,
-				5A2CC279270168380082B48C /* OnboardingView_03.swift in Sources */,
 				5AB20BC8265FC3F50055D2AD /* UtilityFunctions.swift in Sources */,
 				5A3DCE18264490E7003442C3 /* COSC345_ProjectApp.swift in Sources */,
 				5A7C930626E498F90030D8CB /* Folder.swift in Sources */,
