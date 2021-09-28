@@ -65,7 +65,7 @@ struct ScanView: View {
             BackgroundView()
             
             VStack {
-                TitleText(buttonBool: $unusedBool, title: "scan", icon: "plus")
+                TitleText(buttonBool: $unusedBool, title: "scan", icon: getIcon())
                     .padding(.horizontal)
                 
                 if !isRecognizing {
@@ -99,6 +99,14 @@ struct ScanView: View {
         }.onAppear(perform: {
             scanSelection = ScanSelection(rawValue: settings.scanDefault) ?? .none
         })
+    }
+    func getIcon() -> String {
+        if scanSelection == .camera {
+            return "camera"
+        } else if scanSelection == .gallery {
+            return "photo"
+        }
+        return "plus"
     }
 }
 
@@ -141,7 +149,7 @@ struct ScannerSelectView: View {
                             .padding()
                     }
                 }.contentShape(Rectangle())
-            }.buttonStyle(ShrinkingButton())
+            }.buttonStyle(ShrinkingButtonSpring())
             .accessibility(identifier: "Add from Camera")
             Spacer()
         }

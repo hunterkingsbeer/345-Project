@@ -114,6 +114,7 @@ struct TitleText: View {
                     }.padding(.bottom, 14)
                     .transition(AnyTransition.opacity.combined(with: .move(edge: .bottom)))
                 })
+            Spacer()
             Button(action: {
                 withAnimation(.spring()){
                     buttonBool.toggle()
@@ -123,8 +124,8 @@ struct TitleText: View {
                     .font(.system(size: 19, weight: .bold, design: .rounded))
                     .foregroundColor(Color(settings.accentColor))
                     .padding(.horizontal)
-                    .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.9)))
             }.buttonStyle(ShrinkingButton())
+            .frame(width: UIScreen.screenWidth * 0.16)
         }
     }
 }

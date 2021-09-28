@@ -95,21 +95,6 @@ struct ReceiptView: View {
     }
 }
 
-/// ``ReceiptSaveItem``
-/// is
-class ReceiptEditObject: Identifiable {
-    ///``title`` is
-    @State var title: String = ""
-    ///``body`` is
-    @State var body: String = ""
-    ///``image`` is
-    @State var image: Data = Data()
-    ///``folder`` is
-    @State var folder: String = ""
-    ///``date`` is
-    @State var date: Date = Date()
-}
-
 /// ``ReceiptDetailView``
 /// is a View struct that displays the detail view of the Receipt that is passed to it. It shows all the information available about a receipt, usually presented in a sheet.
 /// - Called by ReceiptView.
@@ -121,7 +106,7 @@ struct ReceiptDetailView: View  {
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
     ///``editedReceipt`` is
-    @State var editedReceipt: ReceiptEditObject = ReceiptEditObject()
+    @State var editedReceipt: Receipt = Receipt()
     
     var body: some View {
         ZStack {
@@ -133,16 +118,18 @@ struct ReceiptDetailView: View  {
                                     .blendMode(.color)
                                     .opacity(settings.darkMode ? 0.2 : 1.0))
                     
-                    HStack(alignment: .center){
+                    HStack(alignment: .center) {
                         VStack(alignment: .leading) {
                             Text("\(getDate(date: receipt.date))")
                                 .font(.caption)
-                            TextField("", text: editedReceipt.$title)
+                            
+                            TextField("\(editedReceipt.title)", text: $editedReceipt.title)
                                 .disabled(detailState == .editing ? false : true)
-                                .placeholder(when: editedReceipt.title == ""){
+                                .placeholder(when: editedReceipt.title == receipt.title){
                                     Text("\((receipt.title ?? "").trimmingCharacters(in: .whitespacesAndNewlines))")
                                         .foregroundColor(Color("text"))
                                 }.font(.title)
+                            
                             Text("\(receipt.folder ?? "Default").")
                         }
                         Spacer()
@@ -175,15 +162,16 @@ struct ReceiptDetailView: View  {
         }.padding(.bottom)
         .background(Color("object"))
         .ignoresSafeArea(edges: .bottom)
-        .onAppear(perform: fetchEditReceipt)
+        .onAppear(){
+            editedReceipt.update(receipt: receipt)
+            print("updated")
+        }.onChange(of: editedReceipt.save){ _ in
+            Receipt.updateReceipt(receipt: receipt)
+        }
     }
     
-    func fetchEditReceipt() {
-        editedReceipt.title = receipt.title ?? ""
-        editedReceipt.body = receipt.body ?? ""
-        editedReceipt.folder = receipt.folder ?? ""
-        editedReceipt.date = receipt.date ?? Date()
-        editedReceipt.image = receipt.image ?? Data()
+    func update(){
+        
     }
     
     func getColor() -> Color {
@@ -229,7 +217,7 @@ struct ReceiptViewButtons: View {
                                 // discard edit
                                 detailState = .none
                                 editingState = .none
-                                fetchEditReceipt()
+                                editedReceipt.update(receipt: receipt)
                             } else {
                                 editingState = .discarding
                             }
@@ -256,7 +244,7 @@ struct ReceiptViewButtons: View {
                             }
                         }.padding(.vertical)
                         .frame(height: UIScreen.screenHeight * 0.1)
-                    }.buttonStyle(ShrinkingButton())
+                    }.buttonStyle(ShrinkingButtonSpring())
                     .transition(.offset(x: -150))
                     .onChange(of: detailState, perform: { _ in
                         withAnimation(.spring()){
@@ -293,7 +281,7 @@ struct ReceiptViewButtons: View {
                         .cornerRadius(12)
                     }.padding(.vertical)
                     .frame(height: UIScreen.screenHeight * (detailState == .image ? 0.6 : 0.1))
-                }.buttonStyle(ShrinkingButton())
+                }.buttonStyle(ShrinkingButtonSpring())
                 
                 // Editing Button
                 if detailState != .image {
@@ -304,7 +292,7 @@ struct ReceiptViewButtons: View {
                                 // save edit
                                 detailState = .none
                                 editingState = .none
-                                updateReceipt()
+                                editedReceipt.save = true
                             } else {
                                 editingState = .confirming
                             }
@@ -315,7 +303,7 @@ struct ReceiptViewButtons: View {
                     }){
                         ZStack {
                             RoundedRectangle(cornerRadius: 15)
-                                .fill(Color(editingState == .confirming ? "green" : "object"))
+                                .fill(Color(editingState == .confirming ? "green" : settings.darkMode ? "shadowObject" : "background"))
                                 .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.06, radius: 10)
                             if detailState == .editing {
                                 Image(systemName: "checkmark").scaleEffect(editingState == .confirming ? 1.25 : 1)
@@ -324,7 +312,7 @@ struct ReceiptViewButtons: View {
                             }
                         }.padding(.vertical)
                         .frame(height: UIScreen.screenHeight * 0.1)
-                    }.buttonStyle(ShrinkingButton())
+                    }.buttonStyle(ShrinkingButtonSpring())
                     .transition(.offset(x: 150))
                 }
                 
@@ -343,27 +331,11 @@ struct ReceiptViewButtons: View {
                             Image(systemName: "chevron.down").padding()
                         }.padding(.vertical)
                         .frame(height: UIScreen.screenHeight * 0.1)
-                    }.buttonStyle(ShrinkingButton())
+                    }.buttonStyle(ShrinkingButtonSpring())
                     .transition(.offset(x: 150))
                 }*/
             }.padding(.horizontal)
         }
-    }
-    
-    func updateReceipt(){
-        receipt.title = editedReceipt.title
-        receipt.body = editedReceipt.body
-        receipt.folder = editedReceipt.folder
-        receipt.date = editedReceipt.date
-        receipt.image = editedReceipt.image
-    }
-    
-    func fetchEditReceipt() {
-        editedReceipt.title = receipt.title ?? ""
-        editedReceipt.body = receipt.body ?? ""
-        editedReceipt.folder = receipt.folder ?? ""
-        editedReceipt.date = receipt.date ?? Date()
-        editedReceipt.image = receipt.image ?? Data()
     }
 }
 
@@ -391,6 +363,23 @@ extension Receipt {
         Folder.verifyFolder(title: newReceipt.folder ?? "Default")
         save()
         print("Receipt saved!")
+    }
+    
+    static func updateReceipt(receipt: Receipt, title: String = "", body: String = "", folder: String = "", image: Data = Data()) {
+        let receiptFinal = Receipt.getReceipt(title: receipt.title ?? "")
+        if !title.isEmpty {
+            receiptFinal.title = title
+        }
+        if !body.isEmpty {
+            receiptFinal.body = body
+        }
+        if !folder.isEmpty {
+            receiptFinal.folder = folder
+        }
+        if !image.isEmpty {
+            receiptFinal.image = image
+        }
+        Receipt.save()
     }
     
     ///``getReceipts``

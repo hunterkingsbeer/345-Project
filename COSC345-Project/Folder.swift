@@ -61,7 +61,7 @@ struct FolderView: View {
                     .foregroundColor(Color("background"))
                 }.fixedSize()
             }
-        }.buttonStyle(ShrinkingButton())
+        }.buttonStyle(ShrinkingButtonSpring())
     }
 }
 

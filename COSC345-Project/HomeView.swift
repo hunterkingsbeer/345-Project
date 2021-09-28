@@ -161,34 +161,19 @@ struct HomeTitleBar: View {
                 Spacer()
             }.padding(.bottom, 10).padding(.top, 20)
             .background(
-                ZStack{
-                    VStack {
-                        if selectedFolder.isEmpty {
-                            Rectangle()
-                                .fill(Color.clear)
-                        } else {
-                            Rectangle()
-                                .fill(Color(Folder.getColor(title: selectedFolder)))
-                                .transition(AnyTransition.offset(y: -150).combined(with: .opacity))
-                        }
-                    }
-                    .scaleEffect(x: 1.5)
-                    .animation(.easeOut(duration: 0.3))
-                    .ignoresSafeArea(edges: .top)
-                    
+                VStack {
                     if selectedFolder.isEmpty {
-                        VStack {
-                            Spacer()
-                            Rectangle()
-                                .frame(height: 2)
-                                .foregroundColor(Color(settings.accentColor))
-                                .opacity(settings.accentColor == "UIContrast" ? 0.08 : 0.6)
-                        }.padding(.bottom, 14)
-                        .transition(AnyTransition.offset(y: 60).combined(with: .opacity))
+                        Spacer()
+                        Rectangle()
+                            .frame(height: 2)
+                            .foregroundColor(Color(settings.accentColor))
+                            .opacity(settings.accentColor == "UIContrast" ? 0.08 : 0.6)
                     }
-                }
+                }.padding(.bottom, 14)
+                .transition(AnyTransition.offset(y: 60).combined(with: .opacity))
+                
             )
-            
+            Spacer()
             ZStack {
                 if userSearch.isEmpty && selectedFolder.isEmpty {
                     Image(systemName: "magnifyingglass")
@@ -208,12 +193,28 @@ struct HomeTitleBar: View {
                         } else if !userSearch.isEmpty { // if typing text
                             Image(systemName: "xmark")
                         }
-                    }
+                    }.buttonStyle(ShrinkingButtonSpring())
                 }
             }
             .font(.system(size: 19, weight: .bold, design: .rounded))
             .foregroundColor(Color(selectedFolder.isEmpty ? "text" : "background"))
-            .padding(.horizontal)
-        }
+            .padding(.horizontal).frame(width: UIScreen.screenWidth * 0.16)
+        }.background(
+            ZStack{ // (folder's) drop in color block
+                VStack {
+                    if selectedFolder.isEmpty {
+                        Rectangle()
+                            .fill(Color.clear)
+                    } else {
+                        Rectangle()
+                            .fill(Color(Folder.getColor(title: selectedFolder)))
+                            .transition(AnyTransition.offset(y: -150).combined(with: .opacity))
+                    }
+                }
+                .scaleEffect(x: 1.5)
+                .animation(.easeOut(duration: 0.3))
+                .ignoresSafeArea(edges: .top)
+            }
+        )
     }
 }

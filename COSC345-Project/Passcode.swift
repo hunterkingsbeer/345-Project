@@ -23,7 +23,7 @@ struct PasscodeScreen: View {
                 .animation(.spring())
                 .ignoresSafeArea(.all)
             VStack(alignment: .center) {
-                TitleText(buttonBool: $settings.devMode, title: "Receipted", icon: "lock")
+                TitleText(buttonBool: $settings.devMode, title: "Receipted", icon: backgroundColor == "UI2" ? "lock.open" : "lock")
                 Text("Enter your passcode\(settings.devMode ? " [\(settings.passcode)]" : "").")
                 HStack {
                     Circle()
@@ -69,7 +69,7 @@ struct PasscodeScreen: View {
                                     .foregroundColor(Color("text"))
                                     .font(.system(size: 16, weight: .bold, design: .rounded))
                             )
-                    }
+                    }.buttonStyle(ShrinkingOpacityButton())
                     
                     Spacer()
                     PasscodeButton(number: 0, passcodeIn: $userInput)
@@ -90,7 +90,7 @@ struct PasscodeScreen: View {
                                     .foregroundColor(Color("text"))
                                     .font(.system(size: 16, weight: .bold, design: .rounded))
                             )
-                    }
+                    }.buttonStyle(ShrinkingOpacityButton())
                     Spacer()
                 }.padding(.bottom, 50).padding(.horizontal, 12)
             }.padding(.horizontal)
@@ -102,8 +102,6 @@ struct PasscodeScreen: View {
                     hapticFeedback(type: .light)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { hapticFeedback(type: .light) }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        backgroundColor = "background"
-                        userInput = ""
                         locked = false
                     }
                 } else {
@@ -137,11 +135,15 @@ struct PasscodeEdit: View {
                 .animation(.spring())
                 .ignoresSafeArea(.all)
             VStack(alignment: .center) {
+                Image(systemName: getIcon())
+                    .font(.title)
+                    .animation(.spring())
                 Text(expectedCode == "creating" ? "Create a new passcode." :
                     expectedCode == "updating" ? "Update your passcode." : "Remove passcode protection.")
                     .font(.system(.title, design: .rounded)).bold()
                     .foregroundColor(Color(settings.accentColor))
-                    .multilineTextAlignment(.center)
+                    .multilineTextAlignment(.center).lineLimit(1)
+                    .minimumScaleFactor(0.8)
                 Text((expectedCode == "creating" || expectedCode == "updating") && !confirmPass.isEmpty ? "Confirm your passcode." :
                         expectedCode == "creating" && confirmPass.isEmpty ? "If you forget your password, your data will be lost." :
                         expectedCode == "updating" ? "Enter a new passcode." : "Enter your current passcode.")
@@ -192,7 +194,7 @@ struct PasscodeEdit: View {
                                     .foregroundColor(Color("text"))
                                     .font(.system(size: 16, weight: .bold, design: .rounded))
                             )
-                    }
+                    }.buttonStyle(ShrinkingOpacityButton())
                     
                     Spacer()
                     PasscodeButton(number: 0, passcodeIn: $result.code)
@@ -212,7 +214,7 @@ struct PasscodeEdit: View {
                                     .foregroundColor(Color("text"))
                                     .font(.system(size: 16, weight: .bold, design: .rounded))
                             )
-                    }
+                    }.buttonStyle(ShrinkingOpacityButton())
                     Spacer()
                 }.padding(.horizontal, 12).padding(.bottom)
                 Button(action: {
@@ -226,7 +228,7 @@ struct PasscodeEdit: View {
                                 .foregroundColor(Color("text"))
                                 .font(.system(.body, design: .rounded)).bold()
                         )
-                }.buttonStyle(ShrinkingButton())
+                }.buttonStyle(ShrinkingOpacityButton())
             }.padding()
             .padding(.bottom, 30)
         }.onChange(of: result.code, perform: { _ in
@@ -237,8 +239,8 @@ struct PasscodeEdit: View {
                         result.code = ""
                     } else if result.code == confirmPass { // if users second code matches, successfully set new pin
                         success()
-                    } else { // otherwise fail and remove code
-                        incorrect()
+                    } else { // otherwise fail, user will redo input
+                        incorrect(dismiss: false)
                     }
                 } else {
                     if result.code == expectedCode {
@@ -246,11 +248,23 @@ struct PasscodeEdit: View {
                         success()
                     } else {
                         // incorrect pass
-                        incorrect()
+                        incorrect(dismiss: false)
                     }
                 }
             }
         })
+    }
+    
+    func getIcon() -> String {
+        let update = backgroundColor == "UI2"
+        if expectedCode == "creating" { // new code
+            return update ? "lock" : "lock.open"
+        } else if expectedCode == "updating" { // update code
+            return update ? "checkmark" : "lock.rotation"
+        } else if expectedCode == settings.passcode { // remove code
+            return update ? "xmark" : "lock.slash"
+        }
+        return "lock"
     }
     
     func success(dismiss: Bool = true){
@@ -258,20 +272,22 @@ struct PasscodeEdit: View {
         hapticFeedback(type: .light)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { hapticFeedback(type: .light) }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            backgroundColor = "background"
             result.success = true
             if dismiss {
                 presentationMode.wrappedValue.dismiss()
             }
         }
     }
+    
     func incorrect(dismiss: Bool = true){
         backgroundColor = "red"
         hapticFeedback(type: .heavy)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            backgroundColor = "background"
             result.code = ""
+            confirmPass = ""
             result.success = false
+            backgroundColor = "background"
+            hapticFeedback(type: .medium)
             if dismiss {
                 presentationMode.wrappedValue.dismiss()
             }
@@ -298,7 +314,7 @@ struct PasscodeButton: View {
                             .foregroundColor(Color("text"))
                             .font(.system(.title, design: .rounded)).bold()
                     )
-        }
+        }.buttonStyle(ShrinkingOpacityButton())
     }
     
     func addNumber(numIn: Int){

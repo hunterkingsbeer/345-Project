@@ -83,14 +83,13 @@ extension UIScreen {
 }
 
 extension View {
-    
     func placeholder<Content: View>(
         when shouldShow: Bool,
         alignment: Alignment = .leading,
         @ViewBuilder placeholder: () -> Content) -> some View {
 
         ZStack(alignment: alignment) {
-            placeholder().opacity(shouldShow ? 1 : 0)
+            if shouldShow { placeholder() }
             self
         }
     }
@@ -153,6 +152,29 @@ struct ShrinkingButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .scaleEffect(configuration.isPressed ? 0.98 : 1)
+            .animation(.easeInOut)
+    }
+}
+
+/// ``ShrinkingButtonSpring``
+/// is a ButtonStyle that transforms a button when tapped, with a bouncy look.
+/// It scales the button from 1 to 0.95 its size, to give a shrinking effect.
+struct ShrinkingButtonSpring: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.95 : 1)
+            .animation(.spring())
+    }
+}
+
+/// ``ShrinkingOpacityButton``
+/// is a ButtonStyle that transforms a button when tapped, with a bouncy look.
+/// It scales the button from 1 to 0.95 its size, to give a shrinking effect.
+struct ShrinkingOpacityButton: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.98 : 1)
+            .opacity(configuration.isPressed ? 0.5 : 1)
             .animation(.spring())
     }
 }
@@ -211,8 +233,7 @@ enum TabPage: Int {
 class TabSelection: ObservableObject {
     ///``selection``: Used to set the active tab of the ContentView's TabView. Controlled either by directly setting, or through the changeTab function.
     @Published var selection: Int
-    
-    /// Initializes the selection to the index,
+    /// Initializes the selection to the index
     init() {
         self.selection = 0
     }
