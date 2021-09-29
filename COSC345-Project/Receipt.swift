@@ -123,11 +123,11 @@ struct ReceiptDetailView: View  {
                             
                             EditableReceiptText(placeholder: receipt.title ?? "Title",
                                                 editedItem: $editedReceipt.title,
-                                                editing: editing, font: .title)// title
+                                                editing: editing, font: .title) // title
                             
                             EditableReceiptText(placeholder: receipt.folder ?? "Folder",
                                                 editedItem: $editedReceipt.folder,
-                                                editing: false)// folder
+                                                editing: false) // folder
                         }
                         Spacer()
                         Image(systemName: Folder.getIcon(title: receipt.folder))
@@ -189,10 +189,21 @@ struct ReceiptViewButtons: View {
     ///``editingState`` is
     @State var editingState: EditingState = .none
     
-    
     var body: some View {
+        let buttonSize = UIScreen.screenHeight * 0.06
         VStack {
             Spacer()
+            if detailState == .editing {
+                HStack {
+                    Spacer()
+                    Text("Currently Editing.")
+                        .padding(10)
+                    Spacer()
+                }.background(Blur(effect: UIBlurEffect(style: .systemMaterial)))
+                .cornerRadius(12)
+                .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.06, radius: 12)
+                .transition(AnyTransition.move(edge: .bottom))
+            }
             
             HStack {
                 // Deleting Button
@@ -220,6 +231,7 @@ struct ReceiptViewButtons: View {
                     }){
                         ZStack {
                             Blur(effect: UIBlurEffect(style: .systemMaterial))
+                                .background(editingState == .discarding || detailState == .deleting ? Color("red") : Color.clear)
                                 .cornerRadius(12)
                                 .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.06, radius: 12)
                                 .animation(.easeInOut)
@@ -229,16 +241,26 @@ struct ReceiptViewButtons: View {
                             } else {
                                 Image(systemName: "trash").scaleEffect(detailState == .deleting ? 1.25 : 1)
                             }
-                        }.padding(.vertical)
-                        .frame(height: UIScreen.screenHeight * 0.1)
+                        }
+                        .frame(height: buttonSize)
                     }.buttonStyle(ShrinkingButtonSpring())
                     .transition(.offset(x: -150))
                     .onChange(of: detailState, perform: { _ in
                         withAnimation(.spring()){
                             if detailState == .deleting {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
                                     if detailState == .deleting {
                                         detailState = .none // turns off delete button after 3 secs
+                                    }
+                                }
+                            }
+                        }
+                    }).onChange(of: editingState, perform: { state in
+                        withAnimation(.spring()){
+                            if state == .discarding {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                                    if state == .discarding { // if still discarding (user may have selected another option)
+                                        editingState = .none // turns off delete button after 3 secs
                                     }
                                 }
                             }
@@ -266,8 +288,8 @@ struct ReceiptViewButtons: View {
                             }
                         }.transition(AnyTransition.scale(scale: 0.1).combined(with: .opacity))
                         .cornerRadius(12)
-                    }.padding(.vertical)
-                    .frame(height: UIScreen.screenHeight * (detailState == .image ? 0.6 : 0.1))
+                    }
+                    .frame(height: detailState == .image ? UIScreen.screenHeight * 0.6 : buttonSize)
                 }.buttonStyle(ShrinkingButtonSpring())
                 
                 // Editing Button
@@ -290,6 +312,7 @@ struct ReceiptViewButtons: View {
                     }){
                         ZStack {
                             Blur(effect: UIBlurEffect(style: .systemMaterial))
+                                .background(editingState == .confirming ? Color("UI2") : Color.clear)
                                 .cornerRadius(12)
                                 .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.06, radius: 10)
                             if detailState == .editing {
@@ -297,12 +320,21 @@ struct ReceiptViewButtons: View {
                             } else {
                                 Image(systemName: "pencil").padding()
                             }
-                        }.padding(.vertical)
-                        .frame(height: UIScreen.screenHeight * 0.1)
+                        }.frame(height: buttonSize)
                     }.buttonStyle(ShrinkingButtonSpring())
                     .transition(.offset(x: 150))
+                    .onChange(of: editingState, perform: { state in
+                        withAnimation(.spring()){
+                            if state == .confirming {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                                    if state == .confirming {
+                                        editingState = .none // turns off delete button after 3 secs
+                                    }
+                                }
+                            }
+                        }
+                    })
                 }
-                
                 /*
                 // temporary dismiss button, replace with functioning edit button
                 if detailState != .image {
@@ -321,8 +353,9 @@ struct ReceiptViewButtons: View {
                     }.buttonStyle(ShrinkingButtonSpring())
                     .transition(.offset(x: 150))
                 }*/
-            }.padding(.horizontal)
-        }.onAppear(perform: updateEditedReceipt)
+            }
+        }.padding(.horizontal).padding(.bottom)
+        .onAppear(perform: updateEditedReceipt)
     }
     
     func updateEditedReceipt(){

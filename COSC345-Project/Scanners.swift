@@ -269,7 +269,7 @@ struct GalleryScannerView: View {
                 print(recognizedContent.items.count)
                 ScanTranslation(scannedImages: scannedImages,
                                 recognizedContent: recognizedContent) {
-                    if saveReceipt(){ // if save receipt returns true (valid scan), exit the scanner
+                    if saveReceipt() { // if save receipt returns true (valid scan), exit the scanner
                         scanSelection = .none
                         selectedTab.changeTab(tabPage: .home)
                     } else { // else stay in the scanner and alert them to scan again
@@ -293,11 +293,13 @@ struct GalleryScannerView: View {
     func saveReceipt() -> Bool {
         if recognizedContent.items.count > 0 {
             for receipt in recognizedContent.items {
-                if receipt.text.count < 2 {
-                    return false
-                } else {
+                if receipt.text.count > 2 { // if the text in receipt is a suitable size
+                    
                     Receipt.saveScan(recognizedText: receipt.text)
                     return true
+                } else {
+                   
+                    return false
                 }
             }
             scanSelection = .none
@@ -392,72 +394,119 @@ struct DocumentScanner: UIViewControllerRepresentable {
     }
 }
 
-/*
+
 /// ``ConfirmationView``
 /// is a View struct that shows the user its scanned receipt(s) and then provides them with an option of editing, discarding, or confirming the scan.
 /// - Called by DocumentScannerView and GalleryScannerView.
 struct ConfirmationView: View {
+    ///``receipt``: is a Receipt variable that is passed to the view which allows this view to delete and update it as needed.
+    @State var receipt: Receipt
     ///``isConfirming`` is used to display a confirmation/edit screen when confirming the users scans as correct. (CURRENTLY NOT IN USE, IMPLEMENTATION IS PLANNED).
     @State var isConfirming: Bool = false
     ///``recognizedContent`` is an object that holds an array of ReceiptItems that hold the information about the scan performed by the user.
     @ObservedObject var recognizedContent: RecognizedContent = RecognizedContent()
+    ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
+    @EnvironmentObject var settings: UserSettings
+    
+    //@State var unusedBool = false
     
     var body: some View {
         VStack {
-            TitleText(title: "Confirm", icon: "confirm")
-            ScrollView(showsIndicators: false) {
-                //ForEach(recognizedContent.items){ receipt in
-                    VStack (alignment: .leading){
-                        Text("Title")
-                            .font(.system(.title))
-                        Text("15/10/2021")
-                            .font(.caption)
-                        Divider()
-                        Text("body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text body text")
-                    }.padding()
-                    .background(Color("object")).cornerRadius(15)
-                    .padding()
-                    .frame(width: UIScreen.screenWidth * 0.85)
-                //}
+            Text("Is this correct?")
+                .font(.system(.title, design: .rounded)).bold()
+            ZStack { // receipt
+                VStack {
+                    ZStack (alignment: .top) {
+                        Blur(effect: UIBlurEffect(style: .systemThinMaterial))
+                            .ignoresSafeArea()
+                            .overlay(Color(Folder.getColor(title: "software"))
+                                        .blendMode(.color)
+                                        .opacity(settings.darkMode ? 0.2 : 1.0))
+                        
+                        HStack(alignment: .center) {
+                            VStack(alignment: .leading) {
+                                Text("\(getDate(date: receipt.date))")
+                                    .font(.caption)
+                                
+                                Text(receipt.title ?? "")
+                                    .font(.title)
+                                
+                                Text(receipt.folder ?? "")
+                            }
+                            Spacer()
+                            Image(systemName: Folder.getIcon(title: receipt.folder))
+                                .font(.system(size: 30, weight: .semibold))
+                                .padding(10)
+                                .foregroundColor(Color(Folder.getColor(title: receipt.folder)))
+                                .cornerRadius(12)
+                        }.foregroundColor(Color("text"))
+                        .padding()
+                    }.frame(height: UIScreen.screenHeight * 0.14)
+                    Spacer()
+                }
+                .zIndex(1)
+                
+                ScrollView(showsIndicators: false) {
+                    HStack(alignment: .top) {
+                        VStack {
+                            Text(receipt.body ?? "")
+                        }
+                        Spacer()
+                    }.padding(.horizontal)
+                    .padding(.top, UIScreen.screenHeight * 0.14)
+                    .fixedSize(horizontal: false, vertical: true)
+                }.background(Color("object"))
+                .frame(height: UIScreen.screenHeight * 0.675)
+                .zIndex(0)
+            }.cornerRadius(12)
+            
+            VStack { // buttons
+                HStack (alignment: .center){
+                    Button(action:{
+                        // cancel scan
+                    }){
+                        Blur(effect: UIBlurEffect(style: .systemMaterial))
+                            .cornerRadius(12)
+                            .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.06, radius: 10)
+                            .overlay(Image(systemName: "xmark"))
+                    }.buttonStyle(ShrinkingButton())
+                    
+                    Button(action:{
+                        // view image of scan
+                    }){
+                        Blur(effect: UIBlurEffect(style: .systemMaterial))
+                            .cornerRadius(12)
+                            .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.06, radius: 10)
+                            .overlay(Image(systemName: "photo"))
+                    }.buttonStyle(ShrinkingButton())
+                    
+                    Button(action:{
+                        // edit scan
+                    }){
+                        Blur(effect: UIBlurEffect(style: .systemMaterial))
+                            .cornerRadius(12)
+                            .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.06, radius: 10)
+                            .overlay(Image(systemName: "pencil"))
+                    }.buttonStyle(ShrinkingButton())
+                    
+                    Button(action:{
+                        // confirm scan
+                    }){
+                        Blur(effect: UIBlurEffect(style: .systemMaterial))
+                            .cornerRadius(12)
+                            .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.06, radius: 10)
+                            .overlay(Image(systemName: "checkmark"))
+                    }.buttonStyle(ShrinkingButton())
+                }
             }
-            HStack {
-                let buttonHeight = UIScreen.screenHeight * 0.06
-                Button(action:{
-                    // cancel scan
-                }){
-                    RoundedRectangle(cornerRadius: 15)
-                        .foregroundColor(Color("object"))
-                        .frame(height: buttonHeight)
-                        .overlay(Image(systemName: "xmark"))
-                }.buttonStyle(ShrinkingButton())
-                
-                Button(action:{
-                    // view image of scan
-                }){
-                    RoundedRectangle(cornerRadius: 15)
-                        .foregroundColor(Color("object"))
-                        .frame(height: buttonHeight)
-                        .overlay(Image(systemName: "photo"))
-                }.buttonStyle(ShrinkingButton())
-                
-                Button(action:{
-                    // edit scan
-                }){
-                    RoundedRectangle(cornerRadius: 15)
-                        .foregroundColor(Color("object"))
-                        .frame(height: buttonHeight)
-                        .overlay(Image(systemName: "pencil"))
-                }.buttonStyle(ShrinkingButton())
-                
-                Button(action:{
-                    // confirm scan
-                }){
-                    RoundedRectangle(cornerRadius: 15)
-                        .foregroundColor(Color("object"))
-                        .frame(height: buttonHeight)
-                        .overlay(Image(systemName: "checkmark"))
-                }.buttonStyle(ShrinkingButton())
-            }
-        }.padding(.horizontal)
+        }.padding()
     }
-}*/
+    
+    func discard(){
+        // send cancel signal to parent view
+    }
+    
+    func save(){
+        // send save signal to parent view
+    }
+}
