@@ -31,7 +31,7 @@ struct FolderView: View {
                 ZStack {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(Color(Folder.getColor(title: folder.title ?? "default")))
-                        .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.3 : 0.06, radius: 10)
+                        .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.3 : 0.06, radius: 6)
                     
                     HStack {
                         Image(systemName: folder.icon ?? "folder")
@@ -47,7 +47,7 @@ struct FolderView: View {
                 ZStack {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(Color(Folder.getColor(title: folder.title ?? "default")))
-                        .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.3 : 0.06, radius: 10)
+                        .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.3 : 0.06, radius: 6)
                     
                     VStack {
                         HStack {

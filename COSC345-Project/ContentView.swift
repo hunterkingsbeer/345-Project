@@ -53,7 +53,7 @@ struct ContentView: View {
         .fullScreenCover(isPresented: $locked, content: {
             PasscodeScreen(locked: $locked)
                 .environmentObject(UserSettings())
-                .preferredColorScheme(settings.darkMode ? .dark : .light)
+                .preferredColorScheme(settings.darkMode ? .dark : .light) // weirdly needs this
         })
         .accentColor(Color(settings.accentColor))
         .preferredColorScheme(settings.darkMode ? .dark : .light)
@@ -96,7 +96,7 @@ struct TitleText: View {
                     .font(.system(size: 40, weight: .semibold))
                     .foregroundColor(Color("text"))
                     .transition(AnyTransition.opacity.combined(with: .move(edge: .bottom)))
-                    .padding(.bottom, 10).padding(.top, 21)
+                    .padding(.bottom, 10).padding(.top, 20)
                 Spacer()
             }.background(
                 ZStack {

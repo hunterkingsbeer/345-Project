@@ -25,6 +25,10 @@ struct PasscodeScreen: View {
             VStack(alignment: .center) {
                 TitleText(buttonBool: $settings.devMode, title: "Receipted", icon: backgroundColor == "UI2" ? "lock.open" : "lock")
                 Text("Enter your passcode\(settings.devMode ? " [\(settings.passcode)]" : "").")
+                    .font(.system(.body, design: .rounded))
+                    .animation(.spring())
+                    .multilineTextAlignment(.center).lineLimit(1)
+                    .minimumScaleFactor(0.8)
                 HStack {
                     Circle()
                         .padding(userInput.count >= 1 ? 5 : 15)
@@ -107,10 +111,11 @@ struct PasscodeScreen: View {
                 } else {
                     // incorrect pass
                     backgroundColor = "red"
+                    hapticFeedback(type: .heavy)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        hapticFeedback(type: .medium)
                         backgroundColor = "background"
                         userInput = ""
+                        hapticFeedback(type: .medium)
                     }
                 }
                 
@@ -118,6 +123,14 @@ struct PasscodeScreen: View {
         })
     }
 }
+
+enum PassEditingState: String {
+    case none = "none"
+    case updating = "updating"
+    case creating = "creating"
+    case removing = "removing"
+}
+
 
 /// Used in adding/editing/removing the passcode
 struct PasscodeEdit: View {
@@ -127,7 +140,8 @@ struct PasscodeEdit: View {
     @State var backgroundColor = "background"
     @Binding var result: (success: Bool, code: String)
     @State var expectedCode: String
-    @State var confirmPass: String = ""
+    @State var repeatPass: String = ""
+    @State var confirmedPass: Bool = false
     
     var body: some View {
         ZStack {
@@ -138,15 +152,12 @@ struct PasscodeEdit: View {
                 Image(systemName: getIcon())
                     .font(.title)
                     .animation(.spring())
-                Text(expectedCode == "creating" ? "Create a new passcode." :
-                    expectedCode == "updating" ? "Update your passcode." : "Remove passcode protection.")
+                Text(getTitle())
                     .font(.system(.title, design: .rounded)).bold()
                     .foregroundColor(Color(settings.accentColor))
                     .multilineTextAlignment(.center).lineLimit(1)
                     .minimumScaleFactor(0.8)
-                Text((expectedCode == "creating" || expectedCode == "updating") && !confirmPass.isEmpty ? "Confirm your passcode." :
-                        expectedCode == "creating" && confirmPass.isEmpty ? "If you forget your password, your data will be lost." :
-                        expectedCode == "updating" ? "Enter a new passcode." : "Enter your current passcode.")
+                Text(getSubtext())
                     .font(.system(.body, design: .rounded))
                     .animation(.spring())
                     .multilineTextAlignment(.center).lineLimit(1)
@@ -233,36 +244,74 @@ struct PasscodeEdit: View {
             .padding(.bottom, 30)
         }.onChange(of: result.code, perform: { _ in
             if result.code.count == 4 {
-                if expectedCode == "creating" || expectedCode == "updating" {
-                    if confirmPass.isEmpty { // first entering a code, sets it so the user can confirm it
-                        confirmPass = result.code
+                if expectedCode == "creating" { // new pass
+                    if repeatPass.isEmpty { // saves first code so the user can repeat it
+                        repeatPass = result.code
+                        hapticFeedback(type: .light)
                         result.code = ""
-                    } else if result.code == confirmPass { // if users second code matches, successfully set new pin
+                    } else if result.code == repeatPass { // if users second code matches, successfully set new pin
                         success()
-                    } else { // otherwise fail, user will redo input
-                        incorrect(dismiss: false)
+                    } else if result.code != repeatPass{ // otherwise fail, user will redo input
+                        incorrect()
                     }
-                } else {
+                } else if expectedCode == "updating" { // updating pass
+                    if confirmedPass == false && result.code == settings.passcode { // entered current pass
+                        confirmedPass = true
+                        hapticFeedback(type: .light)
+                        result.code = ""
+                    } else if confirmedPass == false && result.code != settings.passcode {
+                        incorrect()
+                    } else if confirmedPass == true {
+                        if repeatPass.isEmpty { // first entering a code, sets it so the user can confirm it
+                            repeatPass = result.code
+                            result.code = ""
+                        } else if result.code == repeatPass { // if users second code matches, successfully set new pin
+                            success()
+                        } else { // otherwise fail, user will redo input
+                            incorrect()
+                        }
+                    }
+                } else { // removing pass
                     if result.code == expectedCode {
                         // unlock
                         success()
                     } else {
                         // incorrect pass
-                        incorrect(dismiss: false)
+                        incorrect()
                     }
                 }
             }
         })
     }
     
+    func getTitle() -> String {
+        if expectedCode == "creating" {
+            return "Create a new passcode."
+        } else if expectedCode == "updating" {
+            return "Update your passcode."
+        } else {
+            return "Disable Passcode Protection."
+        }
+    }
+    
+    func getSubtext() -> String {
+        if expectedCode == "creating" {
+            return repeatPass.isEmpty ? "If you forget your passcode, your data will be lost." : "Confirm your passcode."
+        } else if expectedCode == "updating" {
+            return confirmedPass == false ? "Enter your current passcode." :
+                repeatPass.isEmpty ? "Set a new passcode." : "Confirm your new passcode."
+        }
+        return "Enter your current passcode."
+    }
+    
     func getIcon() -> String {
         let update = backgroundColor == "UI2"
-        if expectedCode == "creating" { // new code
+        if expectedCode == "creating" { // new pass
             return update ? "lock" : "lock.open"
-        } else if expectedCode == "updating" { // update code
+        } else if expectedCode == "updating" { // update pass
             return update ? "checkmark" : "lock.rotation"
-        } else if expectedCode == settings.passcode { // remove code
-            return update ? "xmark" : "lock.slash"
+        } else if expectedCode == settings.passcode { // remove pass
+            return update ? "lock.slash.fill" : "lock.slash"
         }
         return "lock"
     }
@@ -279,12 +328,13 @@ struct PasscodeEdit: View {
         }
     }
     
-    func incorrect(dismiss: Bool = true){
+    func incorrect(dismiss: Bool = false){
         backgroundColor = "red"
         hapticFeedback(type: .heavy)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             result.code = ""
-            confirmPass = ""
+            repeatPass = ""
+            confirmedPass = false
             result.success = false
             backgroundColor = "background"
             hapticFeedback(type: .medium)

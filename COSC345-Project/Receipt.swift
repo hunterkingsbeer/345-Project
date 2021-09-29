@@ -27,7 +27,7 @@ enum DetailState {
 /// - Called by HomeView.
 struct ReceiptView: View {
     ///``receipt``: is a Receipt variable that is passed to the view which holds the information about the receipt this view will represent.
-    @State var receipt: Receipt
+    @ObservedObject var receipt: Receipt
     ///``selected``: is a Bool that controls the visibility of the ReceiptDetailView sheet, when true the sheet is visible, when false the sheet is not visible.
     @State var selected: Bool = false
     /// ``pendingDelete``: is a Bool that shows the delete button for a user to confirm a deletion of a receipt.
@@ -48,9 +48,7 @@ struct ReceiptView: View {
                         Text("\(getDate(date: receipt.date))")
                             .font(.system(size: 14, weight: .regular, design: .rounded))
                     }
-                     
                     Spacer()
-                    
                     ZStack {
                         Group {
                             if pendingDelete == true {
@@ -76,11 +74,9 @@ struct ReceiptView: View {
             .frame(height: UIScreen.screenHeight * 0.08)
             .onTapGesture {
                 selected.toggle()
-            }
-            .onLongPressGesture(minimumDuration: 0.25, maximumDistance: 2, perform: {
+            }.onLongPressGesture(minimumDuration: 0.25, maximumDistance: 2, perform: {
                 pendingDelete.toggle()
-            })
-            .onChange(of: pendingDelete, perform: { _ in
+            }).onChange(of: pendingDelete, perform: { _ in
                 withAnimation(.spring()){
                     if pendingDelete == true {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
@@ -88,9 +84,10 @@ struct ReceiptView: View {
                         }
                     }
                 }
-            })
-            .sheet(isPresented: $selected) {
-                ReceiptDetailView(receipt: receipt).colorScheme(settings.darkMode ? .dark : .light)
+            }).sheet(isPresented: $selected) {
+                ReceiptDetailView(receipt: receipt)
+                    .colorScheme(settings.darkMode ? .dark : .light)
+                    .environmentObject(UserSettings())
             }
     }
 }
@@ -106,13 +103,14 @@ struct ReceiptDetailView: View  {
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
     ///``editedReceipt`` is
-    @State var editedReceipt: Receipt = Receipt()
+    @State var editedReceipt = (title: "", folder: "", body: "", date: Date())
     
     var body: some View {
+        let editing = detailState == .editing
         ZStack {
             VStack {
                 ZStack {
-                    Blur(effect: UIBlurEffect(style: .systemUltraThinMaterial))
+                    Blur(effect: UIBlurEffect(style: .systemThinMaterial))
                         .ignoresSafeArea()
                         .overlay(getColor()
                                     .blendMode(.color)
@@ -123,21 +121,19 @@ struct ReceiptDetailView: View  {
                             Text("\(getDate(date: receipt.date))")
                                 .font(.caption)
                             
-                            TextField("\(editedReceipt.title)", text: $editedReceipt.title)
-                                .disabled(detailState == .editing ? false : true)
-                                .placeholder(when: editedReceipt.title == receipt.title){
-                                    Text("\((receipt.title ?? "").trimmingCharacters(in: .whitespacesAndNewlines))")
-                                        .foregroundColor(Color("text"))
-                                }.font(.title)
+                            EditableReceiptText(placeholder: receipt.title ?? "Title",
+                                                editedItem: $editedReceipt.title,
+                                                editing: editing, font: .title)// title
                             
-                            Text("\(receipt.folder ?? "Default").")
+                            EditableReceiptText(placeholder: receipt.folder ?? "Folder",
+                                                editedItem: $editedReceipt.folder,
+                                                editing: false)// folder
                         }
                         Spacer()
                         Image(systemName: Folder.getIcon(title: receipt.folder))
                             .font(.system(size: 30, weight: .semibold))
                             .padding(10)
                             .foregroundColor(getColor())
-                            //.background() // placeholder
                             .cornerRadius(12)
                     }.foregroundColor(Color("text"))
                     .padding()
@@ -148,13 +144,13 @@ struct ReceiptDetailView: View  {
             ScrollView(showsIndicators: false) {
                 HStack {
                     VStack {
-                        Text(receipt.body ?? "")
-                            .padding(.horizontal)
-                            .padding(.vertical, UIScreen.screenHeight * 0.14)
+                        Text(editedReceipt.body)
+                        //TextEditor(text: $editedReceipt.body) doesnt work :(
                         Spacer()
                     }
                     Spacer()
-                }
+                }.padding(.horizontal)
+                .padding(.vertical, UIScreen.screenHeight * 0.14)
             }.zIndex(0)
 
             ReceiptViewButtons(detailState: $detailState, receipt: receipt, editedReceipt: $editedReceipt)
@@ -162,16 +158,6 @@ struct ReceiptDetailView: View  {
         }.padding(.bottom)
         .background(Color("object"))
         .ignoresSafeArea(edges: .bottom)
-        .onAppear(){
-            editedReceipt.update(receipt: receipt)
-            print("updated")
-        }.onChange(of: editedReceipt.save){ _ in
-            Receipt.updateReceipt(receipt: receipt)
-        }
-    }
-    
-    func update(){
-        
     }
     
     func getColor() -> Color {
@@ -198,7 +184,8 @@ struct ReceiptViewButtons: View {
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
     ///``editedReceipt`` is
-    @Binding var editedReceipt: ReceiptEditObject
+    @Binding var editedReceipt: (title: String, folder: String, body: String,
+                                 date: Date)
     ///``editingState`` is
     @State var editingState: EditingState = .none
     
@@ -217,7 +204,7 @@ struct ReceiptViewButtons: View {
                                 // discard edit
                                 detailState = .none
                                 editingState = .none
-                                editedReceipt.update(receipt: receipt)
+                                updateEditedReceipt()
                             } else {
                                 editingState = .discarding
                             }
@@ -232,8 +219,8 @@ struct ReceiptViewButtons: View {
                         }
                     }){
                         ZStack {
-                            RoundedRectangle(cornerRadius: 15)
-                                .fill(Color(detailState == .deleting || editingState == .discarding ? "red" : settings.darkMode ? "shadowObject" : "background"))
+                            Blur(effect: UIBlurEffect(style: .systemMaterial))
+                                .cornerRadius(12)
                                 .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.06, radius: 12)
                                 .animation(.easeInOut)
                             
@@ -265,8 +252,8 @@ struct ReceiptViewButtons: View {
                     hapticFeedback(type: .rigid)
                 }){
                     ZStack {
-                        RoundedRectangle(cornerRadius: 15)
-                            .fill(Color(settings.darkMode ? "shadowObject" : "background"))
+                        Blur(effect: UIBlurEffect(style: .systemMaterial))
+                            .cornerRadius(12)
                             .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.06, radius: 12)
                         VStack {
                             if detailState == .image && receipt.image != nil && !UIDevice.current.inSimulator {
@@ -292,7 +279,7 @@ struct ReceiptViewButtons: View {
                                 // save edit
                                 detailState = .none
                                 editingState = .none
-                                editedReceipt.save = true
+                                Receipt.updateReceipt(receipt: receipt, editedReceipt: editedReceipt)
                             } else {
                                 editingState = .confirming
                             }
@@ -302,8 +289,8 @@ struct ReceiptViewButtons: View {
                         hapticFeedback(type: .rigid)
                     }){
                         ZStack {
-                            RoundedRectangle(cornerRadius: 15)
-                                .fill(Color(editingState == .confirming ? "green" : settings.darkMode ? "shadowObject" : "background"))
+                            Blur(effect: UIBlurEffect(style: .systemMaterial))
+                                .cornerRadius(12)
                                 .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.06, radius: 10)
                             if detailState == .editing {
                                 Image(systemName: "checkmark").scaleEffect(editingState == .confirming ? 1.25 : 1)
@@ -335,7 +322,22 @@ struct ReceiptViewButtons: View {
                     .transition(.offset(x: 150))
                 }*/
             }.padding(.horizontal)
-        }
+        }.onAppear(perform: updateEditedReceipt)
+    }
+    
+    func updateEditedReceipt(){
+        editedReceipt.title = receipt.title ?? ""
+        editedReceipt.folder = receipt.folder ?? ""
+        editedReceipt.body = receipt.body ?? ""
+        editedReceipt.date = receipt.date ?? Date()
+    }
+    
+    func saveReceipt(){
+        receipt.title = editedReceipt.title
+        receipt.folder = editedReceipt.folder
+        receipt.body = editedReceipt.body
+        receipt.date = editedReceipt.date
+        Receipt.save()
     }
 }
 
@@ -365,20 +367,14 @@ extension Receipt {
         print("Receipt saved!")
     }
     
-    static func updateReceipt(receipt: Receipt, title: String = "", body: String = "", folder: String = "", image: Data = Data()) {
+    static func updateReceipt(receipt: Receipt, editedReceipt: (title: String, folder: String, body: String, date: Date)) {
         let receiptFinal = Receipt.getReceipt(title: receipt.title ?? "")
-        if !title.isEmpty {
-            receiptFinal.title = title
-        }
-        if !body.isEmpty {
-            receiptFinal.body = body
-        }
-        if !folder.isEmpty {
-            receiptFinal.folder = folder
-        }
-        if !image.isEmpty {
-            receiptFinal.image = image
-        }
+        
+        receiptFinal.title = editedReceipt.title
+        receiptFinal.body = editedReceipt.body
+        receiptFinal.folder = editedReceipt.folder
+        receiptFinal.date = editedReceipt.date
+        
         Receipt.save()
     }
     
@@ -440,33 +436,33 @@ extension Receipt {
     /// Uses a pre-determined array of strings to create receipts. This function generates the receipts at random varying ratios.
     /// Each receipt is saved to the database.
     static func generateRandomReceipts() {
-        let scans = ["Countdown \nLettuce - $2.00,\nDoritos - $2.99,\nMilk - $3", // groceries
+        let scans = ["Countdown\nLettuce - $2.00,\nDoritos - $2.99,\nMilk - $3", // groceries
                      
-                     "JB Hifi \nKeyboard - $120.00,\nTablet - $2300.99,\nEar buds - $119.99", // tech
+                     "JB Hifi\nKeyboard - $120.00,\nTablet - $2300.99,\nEar buds - $119.99", // tech
                      
-                     "Mitre 10 \nAxe - $110.00,\nTimber - $2009.10,\nGlue - $10.00", //hardware
+                     "Mitre 10\nAxe - $110.00,\nTimber - $2009.10,\nGlue - $10.00", //hardware
                      
-                     "Kitchen Things \nWashing Machine - $2560.10", //appliance
+                     "Kitchen Things\nWashing Machine - $2560.10", //appliance
                      
-                     "Animates \nDog Food - $30.00,\nBowl - $20.00", //pets
+                     "Animates\nDog Food - $30.00,\nBowl - $20.00", //pets
                      
-                     "Dunedin Pharmacy \nVitamins - $65.00,\nLip Balm - $4.50", // Health/Beauty
+                     "Dunedin Pharmacy\nVitamins - $65.00,\nLip Balm - $4.50", // Health/Beauty
                      
-                     "Big Save Furniture \nCouch - $1450.00,\nBed Frame - $1000.00", // home
+                     "Big Save Furniture\nCouch - $1450.00,\nBed Frame - $1000.00", // home
                      
-                     "Paper Plus \nPaper - $10.00,\nToner - $39.50,\nCalendar - $25.00",
+                     "Paper Plus\nPaper - $10.00,\nToner - $39.50,\nCalendar - $25.00",
                      
-                     "Cotton on \n2x Tee - $30.00,\nPants - $45.00", // apparel
+                     "Cotton on\n2x Tee - $30.00,\nPants - $45.00", // apparel
                      
                      "Paper Plus\nPaint - $25.00,\nClay - $5.99,\nEraser - $3.00", // arts
                      
                      "JetBrains\nJava IDE - $250.00", // software
                      
-                     "JB Hifi \nPS5 - $500.00,\nPlaystation Game - $120.00", // games
+                     "JB Hifi\nPS5 - $500.00,\nPlaystation Game - $120.00", // games
                      
-                     "Nike \nSoccer Shoes - $150.00,\n Mouthguard - $15.00", // sports
+                     "Nike\nSoccer Shoes - $150.00,\n Mouthguard - $15.00", // sports
                      
-                     "SuperCheap Auto \nSteering Wheel - $320.00,\n Battery - $450.00,\nRims - $75.00" // vehicles
+                     "SuperCheap Auto\nSteering Wheel - $320.00,\n Battery - $450.00,\nRims - $75.00" // vehicles
         ]
         for _ in 0..<10 {
             Receipt.saveScan(recognizedText: scans.randomElement() ?? "")
@@ -501,3 +497,21 @@ extension Receipt {
         }
     }
 }
+
+struct EditableReceiptText: View {
+    @State var placeholder: String
+    @Binding var editedItem: String
+    var editing: Bool
+    var font: Font = .body
+    
+    var body: some View {
+        TextField(placeholder, text: $editedItem)
+            .disabled(editing ? false : true)
+            .placeholder(when: editedItem == placeholder){
+                Text(placeholder)
+                    .foregroundColor(Color("text"))
+            }.font(font)
+    }
+}
+
+

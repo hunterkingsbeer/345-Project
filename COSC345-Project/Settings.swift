@@ -49,7 +49,7 @@ struct SettingsView: View  {
                         // color
                         AccentColorSelector(shadowProperties: shadowProperties)
                             .frame(height: UIScreen.screenHeight * 0.2)
-                    }.padding(.horizontal)
+                    }.padding(.horizontal).padding(.bottom)
                     
                     if settings.devMode {
                         DeveloperSettings(shadowProperties: shadowProperties)
@@ -58,13 +58,6 @@ struct SettingsView: View  {
             }
         }
     }
-}
-
-enum PassEditingState: String {
-    case none = "none"
-    case updating = "updating"
-    case creating = "creating"
-    case removing = "removing"
 }
 
 enum PassSuccess {
@@ -395,7 +388,7 @@ struct AccentColorSelector: View {
                                 }.buttonStyle(ShrinkingButton())
                             }
                         }.frame(height: UIScreen.screenWidth*0.2)
-                        .padding(.horizontal)
+                        .padding(.horizontal, 20)
                     }
                     Spacer()
                     Text("ACCENT COLOR")
