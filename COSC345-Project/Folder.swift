@@ -42,25 +42,26 @@ struct FolderView: View {
                     .padding(10)
                     .padding(.vertical, 4)
                 }.fixedSize()
-            } else {
-                // New Bigger Folders
-                ZStack {
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Color(Folder.getColor(title: folder.title ?? "default")))
-                        .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.3 : 0.06, radius: 6)
-                    
-                    VStack {
-                        HStack {
-                            Image(systemName: folder.icon ?? "folder")
-                            Spacer()
-                            Text("\(folder.receiptCount)")
-                        }.padding(.trailing, 8)
-                        Text("\(folder.title ?? " Default")")
-                    }.padding(10)
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundColor(Color("background"))
-                }.fixedSize()
             }
+//            else {
+//                // New Bigger Folders
+//                ZStack {
+//                    RoundedRectangle(cornerRadius: 12)
+//                        .fill(Color(Folder.getColor(title: folder.title ?? "default")))
+//                        .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.3 : 0.06, radius: 6)
+//                    
+//                    VStack {
+//                        HStack {
+//                            Image(systemName: folder.icon ?? "folder")
+//                            Spacer()
+//                            Text("\(folder.receiptCount)")
+//                        }.padding(.trailing, 8)
+//                        Text("\(folder.title ?? " Default")")
+//                    }.padding(10)
+//                    .font(.system(size: 16, weight: .bold))
+//                    .foregroundColor(Color("background"))
+//                }.fixedSize()
+//            }
         }.buttonStyle(ShrinkingButtonSpring())
     }
 }
@@ -236,7 +237,7 @@ extension Folder {
         do {
             try  viewContext.save()
         } catch {
-            // Replace this implementation with code to handle the error appropriately.
+            ///Replace this implementation with code to handle the error appropriately.
             let nserror = error as NSError
             fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
         }
