@@ -8,6 +8,7 @@
 import XCTest
 import CoreData
 @testable import COSC345_Project
+import SwiftUI
 
 class COSC345_ProjectTests: XCTestCase {
 
@@ -58,7 +59,9 @@ class COSC345_ProjectTests: XCTestCase {
             }
         
         print(recognizedContent.items)
-        XCTAssert(generatedString == testString)
+            let genString = generatedString.components(separatedBy: CharacterSet.newlines).first
+            let testGen = testString.components(separatedBy:  CharacterSet.newlines).first
+            XCTAssert(genString == testGen )
         
         Receipt.saveScan(recognizedText: generatedString, image: image2)
         recepit = Receipt.getReceipt(title: "Blond")
@@ -112,4 +115,102 @@ class COSC345_ProjectTests: XCTestCase {
         }
     }
     
+    func testUserSettings() throws {
+        let userSet = UserSettings()
+        userSet.darkMode = true
+        var testVar = UserDefaults.standard.bool(forKey: "darkMode")
+        var testString = ""
+        var testInt = 0
+        XCTAssert(testVar == userSet.darkMode)
+        userSet.darkMode = false
+        testVar = UserDefaults.standard.bool(forKey: "darkMode")
+        XCTAssert(testVar == userSet.darkMode)
+        
+        userSet.accentColor = "0000"
+        testString = UserDefaults.standard.string(forKey: "accentColor")!
+        XCTAssert(testString == userSet.accentColor)
+        userSet.accentColor = "0001"
+        testString = UserDefaults.standard.string(forKey: "accentColor")!
+        XCTAssert(testString == userSet.accentColor)
+
+        userSet.thinFolders = true
+        testVar = UserDefaults.standard.bool(forKey: "thinFolders")
+        XCTAssert(testVar == userSet.thinFolders)
+        userSet.thinFolders = false
+        testVar = UserDefaults.standard.bool(forKey: "thinFolders")
+        XCTAssert(testVar == userSet.thinFolders)
+
+        userSet.shadows = true
+        testVar = UserDefaults.standard.bool(forKey: "shadows")
+        XCTAssert(testVar == userSet.shadows)
+        userSet.shadows = false
+        testVar = UserDefaults.standard.bool(forKey: "shadows")
+        XCTAssert(testVar == userSet.shadows)
+
+        userSet.autocomplete = true
+        testVar = UserDefaults.standard.bool(forKey: "autocomplete")
+        XCTAssert(testVar == userSet.autocomplete)
+        userSet.autocomplete = false
+        testVar = UserDefaults.standard.bool(forKey: "autocomplete")
+        XCTAssert(testVar == userSet.autocomplete)
+
+        userSet.devMode = true
+        testVar = UserDefaults.standard.bool(forKey: "devMode")
+        XCTAssert(testVar == userSet.devMode)
+        userSet.devMode = false
+        testVar = UserDefaults.standard.bool(forKey: "devMode")
+        XCTAssert(testVar == userSet.devMode)
+
+        userSet.scanDefault = 1
+        testInt = UserDefaults.standard.integer(forKey: "scanDefault")
+        XCTAssert(testInt == userSet.scanDefault)
+        userSet.scanDefault = 2
+        testInt = UserDefaults.standard.integer(forKey: "scanDefault")
+        XCTAssert(testInt == userSet.scanDefault)
+
+        userSet.firstUse = true
+        testVar = UserDefaults.standard.bool(forKey: "firstUse")
+        XCTAssert(testVar == userSet.firstUse)
+        userSet.firstUse = false
+        testVar = UserDefaults.standard.bool(forKey: "firstUse")
+        XCTAssert(testVar == userSet.firstUse)
+        
+        userSet.passcodeProtection = true
+        testVar = UserDefaults.standard.bool(forKey: "passcodeProtection")
+        XCTAssert(testVar == userSet.passcodeProtection)
+        userSet.passcodeProtection = false
+        testVar = UserDefaults.standard.bool(forKey: "passcodeProtection")
+        XCTAssert(testVar == userSet.passcodeProtection)
+        
+        userSet.passcode = "0001"
+        testString = UserDefaults.standard.string(forKey: "passcode")!
+        XCTAssert(testString == userSet.passcode)
+        userSet.passcode = "0002"
+        testString = UserDefaults.standard.string(forKey: "passcode")!
+        XCTAssert(testString == userSet.passcode)
+
+    }
+    
+    func testRandomFunctions() throws {
+        let image: Image!
+        let bundle = Bundle(for: COSC345_ProjectTests.self)
+        if let path = bundle.path(forResource: "testRec", ofType: "jpg"){
+            do {
+                let data = try Data(contentsOf: URL(fileURLWithPath: path))
+                image = Image.init(data: data)!
+                XCTAssert(image != nil)
+//                print(image[0]) // checking if it is storing the image or not, it will print the size
+            } catch {
+                debugPrint("local picture missing")
+                
+            }
+        }
+        
+        let tab = TabSelection.init()
+        tab.selection = 0
+        XCTAssert(tab.selection == 0)
+        tab.changeTab(tabPage: TabPage.scan)
+        XCTAssert(tab.selection == 1)
+        
+    }
 }

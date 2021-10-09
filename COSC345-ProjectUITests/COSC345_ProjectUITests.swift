@@ -216,6 +216,42 @@ class COSC345_ProjectUITests: XCTestCase {
         
         XCTAssert(app/*@START_MENU_TOKEN@*/.staticTexts["CameraSimCheck"]/*[[".staticTexts[\"Camera not supported in the simulator!\\n\\nPlease use a physical device.\"]",".staticTexts[\"CameraSimCheck\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.exists)
     }
+    
+    func testGalleryView() throws {
+        let app = XCUIApplication()
+        app.launch()
+        passcodeCheck()
+        
+        XCUIDevice.shared.press(XCUIDevice.Button.home)
+        let app2 = XCUIApplication(bundleIdentifier: "com.apple.mobilesafari")
+        app2.launch()
+        app2/*@START_MENU_TOKEN@*/.otherElements["URL"]/*[[".otherElements[\"SafariWindow?View=Narrow&BarsKeptMinimized=false&UUID=DE97B6C6-8E1F-4A40-804D-780FB54E9C0D&SupportsTabBar=false\"]",".otherElements[\"TopBrowserBar\"]",".buttons[\"Address\"]",".otherElements[\"Address\"]",".otherElements[\"URL\"]",".buttons[\"URL\"]"],[[[-1,4],[-1,3],[-1,5,3],[-1,2,3],[-1,1,2],[-1,0,1]],[[-1,4],[-1,3],[-1,5,3],[-1,2,3],[-1,1,2]],[[-1,4],[-1,3],[-1,5,3],[-1,2,3]],[[-1,4],[-1,3]]],[0]]@END_MENU_TOKEN@*/.tap()
+        app2.textFields["URL"].typeText("https://i.ibb.co/Xp2C5k6/testRec.jpg")
+        app2.buttons["Go"].tap()
+        app2.tapCoordinate(at: CGPoint(x: 200, y: 200) )
+        app2.collectionViews/*@START_MENU_TOKEN@*/.buttons["Add to Photos"]/*[[".cells.buttons[\"Add to Photos\"]",".buttons[\"Add to Photos\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
+        XCUIDevice.shared.press(XCUIDevice.Button.home)
+        app2.terminate()
+        app.launch()
+        passcodeCheck()
+        app.tabBars["Tab Bar"].buttons["Scan"].tap()
+        app/*@START_MENU_TOKEN@*/.buttons["Add from Gallery"]/*[[".buttons[\"photo.fill\"]",".buttons[\"Add from Gallery\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
+        sleep(5)
+        app.scrollViews.otherElements.images.element(boundBy: 0).tap()
+        sleep(1)
+        XCTAssert(app.staticTexts["Saving..."].exists)
+        while app.staticTexts["Saving..."].exists{ continue }
+        let tabBar = XCUIApplication().tabBars["Tab Bar"]
+        tabBar.buttons["Home"].tap()
+        sleep(2)
+        
+        let scrollViewsQuery = app.scrollViews
+        let blondStaticText = scrollViewsQuery.otherElements.containing(.staticText, identifier:"Blond").children(matching: .staticText).matching(identifier: "Blond").element(boundBy: 0)
+        XCTAssert(blondStaticText.exists)
+ 
+        
+    }
+    
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
@@ -239,5 +275,15 @@ class COSC345_ProjectUITests: XCTestCase {
 extension XCUIElement {
     func forceTap() {
         coordinate(withNormalizedOffset:CGVector(dx:0.5, dy:0.5)).tap()
+    }
+}
+
+
+extension XCUIApplication {
+    func tapCoordinate(at point: CGPoint) {
+        let normalized = coordinate(withNormalizedOffset: .zero)
+        let offset = CGVector(dx: point.x, dy: point.y)
+        let coordinate = normalized.withOffset(offset)
+        coordinate.press(forDuration: 4)
     }
 }

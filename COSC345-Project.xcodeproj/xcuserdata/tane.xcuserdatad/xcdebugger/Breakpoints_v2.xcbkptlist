@@ -14,8 +14,8 @@
             filePath = "COSC345-ProjectTests/COSC345_ProjectTests.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "23"
-            endingLineNumber = "23"
+            startingLineNumber = "24"
+            endingLineNumber = "24"
             landmarkName = "testReceipt()"
             landmarkType = "7">
          </BreakpointContent>
@@ -78,8 +78,8 @@
             filePath = "COSC345-ProjectTests/COSC345_ProjectTests.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "46"
-            endingLineNumber = "46"
+            startingLineNumber = "47"
+            endingLineNumber = "47"
             landmarkName = "testReceipt()"
             landmarkType = "7">
          </BreakpointContent>
@@ -145,6 +145,22 @@
             startingLineNumber = "58"
             endingLineNumber = "58"
             landmarkName = "testFolderView()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "EB6442BA-48A1-4FC9-ACA7-D86CF0B6DE48"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "COSC345-ProjectUITests/COSC345_ProjectUITests.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "221"
+            endingLineNumber = "221"
+            landmarkName = "testGalleryView()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
