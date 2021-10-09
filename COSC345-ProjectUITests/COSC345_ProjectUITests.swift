@@ -16,7 +16,7 @@ class COSC345_ProjectUITests: XCTestCase {
     func testHomeView() throws {
         app.launchArguments = ["testMode"]
         app.launch()
-        
+        passcodeCheck()
         let tabBar = XCUIApplication().tabBars["Tab Bar"]
         
         XCTAssertEqual(app.images["Search"].exists, app.images["Search"].isHittable)
@@ -31,6 +31,7 @@ class COSC345_ProjectUITests: XCTestCase {
     func testSettingsView() throws {
         app.launchArguments = ["testMode"]
         app.launch()
+        passcodeCheck()
         
         let tabBar = app.tabBars["Tab Bar"]
         tabBar.buttons["Settings"].forceTap()
@@ -49,15 +50,7 @@ class COSC345_ProjectUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = ["testMode"]
         app.launch()
-        sleep(2)
-        if(XCUIApplication().staticTexts["Enter your passcode."].exists){
-            app.buttons["1"].tap()
-            app.buttons["2"].tap()
-            app.buttons["3"].tap()
-            app.buttons["4"].tap()
-        }
-        sleep(2)
-        
+        passcodeCheck()
         let tabBar = app.tabBars["Tab Bar"]
         tabBar.buttons["Settings"].tap()
         
@@ -120,7 +113,7 @@ class COSC345_ProjectUITests: XCTestCase {
         app.launchArguments = ["testMode"]
     
         app.launch()
-        
+        passcodeCheck()
         let tabBar = app.tabBars["Tab Bar"]
         let settingsButton = tabBar.buttons["Settings"]
         settingsButton.tap()
@@ -150,12 +143,7 @@ class COSC345_ProjectUITests: XCTestCase {
         app.terminate()
         app.launchArguments = ["testMode"]
         app.launch()
-        sleep(2)
-        app.buttons["1"].tap()
-        app.buttons["2"].tap()
-        app.buttons["3"].tap()
-        app.buttons["4"].tap()
-        sleep(2)
+        passcodeCheck()
         XCTAssert(app.images["magnifyingglass"].exists)
     }
     
@@ -163,8 +151,12 @@ class COSC345_ProjectUITests: XCTestCase {
         app.launchArguments = ["testMode"]
         app.launch()
         let tabBar = app.tabBars["Tab Bar"]
+        passcodeCheck()
+        
         
         app.launchArguments = ["testMode"]
+        
+        sleep(2)
         tabBar.buttons["Settings"].tap()
         
         
@@ -200,6 +192,7 @@ class COSC345_ProjectUITests: XCTestCase {
     func testScanView() throws {
         app.launchArguments = ["testMode"]
         app.launch()
+        passcodeCheck()
         let tabBar = XCUIApplication().tabBars["Tab Bar"]
         
         tabBar.buttons["Scan"].forceTap()
@@ -212,6 +205,7 @@ class COSC345_ProjectUITests: XCTestCase {
         app.terminate()
         app.launchArguments = ["testMode"]
         app.launch()
+        passcodeCheck()
         
         tabBar.buttons["Scan"].forceTap()
         XCTAssertEqual(app.staticTexts["Scan."].exists, app.staticTexts["Scan."].isHittable)
@@ -228,6 +222,17 @@ class COSC345_ProjectUITests: XCTestCase {
 
     public func isTesting() -> Bool {
         return (ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil || ProcessInfo().arguments.contains("testMode"))
+    }
+    func passcodeCheck(){
+        sleep(2)
+        let app = XCUIApplication()
+        if( XCUIApplication().buttons["lock"].exists){
+            app.buttons["1"].tap()
+            app.buttons["2"].tap()
+            app.buttons["3"].tap()
+            app.buttons["4"].tap()
+            sleep(2)
+        }
     }
 }
 
