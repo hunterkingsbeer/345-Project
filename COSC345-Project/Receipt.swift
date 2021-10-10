@@ -139,9 +139,13 @@ struct ReceiptDetailView: View  {
                             (Image(data: receipt.image) ?? Image(""))
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
+                                .cornerRadius(12)
                                 .padding(.top)
                         }
-                        Text(receipt.body ?? "")
+                        HStack {
+                            Text(receipt.body ?? "")
+                            Spacer()
+                        }
                         Spacer()
                     }
                     Spacer()
@@ -303,7 +307,6 @@ extension Receipt {
         print("New Receipt Saving: \(title)")
         newReceipt.body = String(recognizedText.dropFirst((newReceipt.title ?? "").count)).capitalized
         newReceipt.image = imageToData(image: image)
-        // image cant be compared to nil, but it can be compared to an empty UIImage
         newReceipt.date = Date()
         newReceipt.folder = Prediction.pointPrediction(text: (title + (newReceipt.body ?? "")))
         Folder.verifyFolder(title: newReceipt.folder ?? "Default")

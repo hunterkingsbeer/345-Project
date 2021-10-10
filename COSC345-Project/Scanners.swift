@@ -136,7 +136,6 @@ struct ScannerSelectView: View {
                                     .font(.system(size: 14, weight: .regular, design: .rounded))
                                     .frame(width: UIScreen.screenWidth * 0.35)
                                     .multilineTextAlignment(.center)
-                                    .padding(.top, 10)
                             }
                             Spacer()
                         }.padding()
@@ -166,7 +165,6 @@ struct ScannerSelectView: View {
                                     .font(.system(size: 14, weight: .regular, design: .rounded))
                                     .multilineTextAlignment(.center)
                                     .frame(width: UIScreen.screenWidth * 0.3)
-                                    .padding(.top, 10)
                             }
                             Spacer()
                         }.padding()
@@ -240,9 +238,13 @@ struct ConfirmationView: View {
                                 (Image(data: receipt.image) ?? Image(""))
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
+                                    .cornerRadius(12)
                                     .padding(.top)
                             }
-                            Text(receipt.body ?? "")
+                            HStack {
+                                Text(receipt.body ?? "")
+                                Spacer()
+                            }
                             Spacer()
                         }
                         Spacer()
@@ -250,9 +252,10 @@ struct ConfirmationView: View {
                     .padding(.top, UIScreen.screenHeight * 0.14)
                     .fixedSize(horizontal: false, vertical: true)
                 }.background(Color("object"))
-                .frame(height: UIScreen.screenHeight * 0.675)
+                .frame(height: UIScreen.screenHeight * 0.7)
                 .zIndex(0)
-            }.cornerRadius(12)
+            }.background(Color("background"))
+            .cornerRadius(12)
             
             VStack { // buttons
                 HStack (alignment: .center){
@@ -262,14 +265,6 @@ struct ConfirmationView: View {
                         Blur(effect: UIBlurEffect(style: .systemMaterial))
                             .cornerRadius(12)
                             .overlay(Image(systemName: "xmark"))
-                    }.buttonStyle(ShrinkingButton())
-                    
-                    Button(action:{ // view image of scan
-                        
-                    }){
-                        Blur(effect: UIBlurEffect(style: .systemMaterial))
-                            .cornerRadius(12)
-                            .overlay(Image(systemName: "photo"))
                     }.buttonStyle(ShrinkingButton())
                     
                     Button(action:{ // edit scan
@@ -335,8 +330,6 @@ struct GalleryScannerView: View {
                 ScanTranslation(scannedImages: scannedImages, recognizedContent: recognizedContent) {
                     if saveReceipt() { // if save receipt returns true (valid scan), exit the scanner
                         saveState = .saving // set the state to saving
-                    } else { // else stay in the scanner and alert them to scan again
-                        invalidAlert = true
                     }
                 }.recognizeText()
             case .failure(let error):
@@ -345,10 +338,10 @@ struct GalleryScannerView: View {
         } didCancelScanning: {
             // Dismiss the scanner
             scanSelection = .none
-        }.sheet(isPresented: $isConfirming, content: {
+        }.sheet(isPresented: $isConfirming, onDismiss: { Receipt.delete(receipt: receipt) }){
             ConfirmationView(receipt: Receipt.getReceipt(title: getTitle(text: recognizedContent.items[recognizedContent.items.count-1].text)),
                              scanSelection: $scanSelection, saveState: $saveState, isConfirming: $isConfirming)
-        }).alert(isPresented: $invalidAlert) {
+        }.alert(isPresented: $invalidAlert) {
             Alert(
                 title: Text("Receipt Not Saved!"),
                 message: Text("This image is not valid. Try again."),
@@ -366,19 +359,14 @@ struct GalleryScannerView: View {
     /// - Returns
     ///     - True if the scan is being saved, and passed the validity tests, False if the scan isn't able to be saved, and didn't pass the validity tests.
     func saveReceipt() -> Bool {
-        if recognizedContent.items.count > 0 {
-            for receiptIn in recognizedContent.items {
-                if receiptIn.text.count > 2 { // if the text in receipt is a suitable size
-                    receipt = Receipt.returnScan(recognizedText: receiptIn.text)
-                    return true
-                } else {
-                   
-                    return false
-                }
-            }
-            scanSelection = .none
+        let recognizedContentIn = recognizedContent.items[recognizedContent.items.count-1]
+        if recognizedContentIn.text.count > 2 {
+            receipt = Receipt.returnScan(recognizedText: recognizedContentIn.text, image: recognizedContentIn.image)
+            return true
+        } else {
+            invalidAlert = true
+            return false
         }
-        return false
     }
 }
 
@@ -390,14 +378,18 @@ struct GalleryScannerView: View {
 ///     - A success holds scanned images, which are passed to ScanTranslation which extracts the information from the images and applies it into the recognizedContent variable. ScanTranslation holds the saveReceipt function which saves the receipt to the database.
 ///     - A failure prints an error to the debug console and places the user back on the document scanner.
 struct DocumentScannerView: View {
+    ///``selectedTab`` Controls the TabView's active tab it is viewing. Imports the TabSelection EnvironmentObject, allowing for application wide changing of the selected tab.
+    @EnvironmentObject var selectedTab: TabSelection
     ///``scanSelection`` is used to manage the screens active view. This is @Binding as it controls the parent views value, allowing it to change the screen as desired.
     @Binding var scanSelection: ScanSelection
     ///``SaveState`` is used to manage the receipts save states while its being saved and processed. (via ScanTranslation).
     @Binding var saveState: SaveState
-    ///``isConfirming`` is a bool used to control the confirmation screens sheet.
-    @State var isConfirming: Bool = false
+    
+    @State var receipt: Receipt = Receipt()
     ///``invalidAlert`` is used to set whether the scan is valid or not. This links with the parent ScanView which actually displays the error.
     @State var invalidAlert: Bool = false
+    ///``isConfirming`` is a bool used to control the confirmation screens sheet.
+    @State var isConfirming: Bool = false
     ///``recognizedContent`` is an object that holds an array of ReceiptItems, holding the information about the scan performed by the user.
     @ObservedObject var recognizedContent: RecognizedContent  = RecognizedContent()
     
@@ -406,44 +398,31 @@ struct DocumentScannerView: View {
             DocumentScanner { result in
                 switch result {
                 case .success(let scannedImages):
-                    saveState = .confirming
-                    print(recognizedContent.items.count)
-                    if saveState == .recognizing {
-                        ScanTranslation(scannedImages: scannedImages, recognizedContent: recognizedContent) {
-                            if saveReceipt() { // if save receipt returns true (valid scan), exit the scanner
-                                saveState = .saving // set the state to saving
-                            } else { // else stay in the scanner and alert them to scan again
-                                invalidAlert = true
-                            }
-                        }.recognizeText()
-                    }
-                    if saveState == .saving { // is the receipt was able to save then make the user confirm it. (receipt needs to be saved first, to make sure there is a database entry to edit.)
-                        saveState = .confirming
-                    }
+                    ScanTranslation(scannedImages: scannedImages, recognizedContent: recognizedContent) {
+                        if saveReceipt() { // if save receipt returns true (valid scan), exit the scanner
+                            saveState = .saving // set the state to saving
+                        }
+                    }.recognizeText()
                 case .failure(let error):
                     print(error.localizedDescription)
                 }
             } didCancelScanning: {
                 // Dismiss the scanner
                 scanSelection = .none
-            }.onChange(of: saveState, perform: { _ in
-                if saveState == .confirming {
-                    isConfirming = true
-                } else {
-                    isConfirming = false
-                }
-            })
-            .sheet(isPresented: $isConfirming, content: {
-                ConfirmationView(receipt: Receipt.getReceipt(title: getTitle(text: recognizedContent.items[0].text)),
+            }.sheet(isPresented: $isConfirming, onDismiss: { Receipt.delete(receipt: receipt) }){
+                ConfirmationView(receipt: Receipt.getReceipt(title: getTitle(text: recognizedContent.items[recognizedContent.items.count-1].text)),
                                  scanSelection: $scanSelection, saveState: $saveState, isConfirming: $isConfirming)
-            }).alert(isPresented: $invalidAlert) {
+            }.alert(isPresented: $invalidAlert) {
                 Alert(
                     title: Text("Receipt Not Saved!"),
                     message: Text("This image is not valid. Try again."),
                     dismissButton: .default(Text("Okay"))
                 )
-            }
-            
+            }.onChange(of: receipt, perform: { _ in
+                if (receipt.body ?? "").count > 10 {
+                    isConfirming = true
+                }
+            })
         } else { // else if its in the simulator (no camera)
             Text("Camera not supported in the simulator!\n\nPlease use a physical device.")
                 .font(.system(.title, design: .rounded))
@@ -467,20 +446,14 @@ struct DocumentScannerView: View {
     /// - Returns
     ///     - True if the scan is being saved, and passed the validity tests, False if the scan isn't able to be saved, and didn't pass the validity tests.
     func saveReceipt() -> Bool {
-        if recognizedContent.items.count > 0 {
-            for receipt in recognizedContent.items {
-                if receipt.text.count > 2 { // if the text in receipt is a suitable size
-                    
-                    Receipt.saveScan(recognizedText: receipt.text)
-                    return true
-                } else {
-                   
-                    return false
-                }
-            }
-            scanSelection = .none
+        let recognizedContentIn = recognizedContent.items[recognizedContent.items.count-1]
+        if recognizedContentIn.text.count > 2 {
+            receipt = Receipt.returnScan(recognizedText: recognizedContentIn.text, image: recognizedContentIn.image)
+            return true
+        } else {
+            invalidAlert = true
+            return false
         }
-        return false
     }
 }
 
