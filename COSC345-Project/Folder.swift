@@ -214,7 +214,7 @@ extension Folder {
         do {
             try  viewContext.save()
         } catch {
-            // Replace this implementation with code to handle the error appropriately.
+            ///Replace this implementation with code to handle the error appropriately.
             let nserror = error as NSError
             fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
         }

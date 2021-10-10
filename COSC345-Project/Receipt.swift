@@ -390,7 +390,7 @@ extension Receipt {
     ///``generateRandomReceipts``
     /// Uses a pre-determined array of strings to create receipts. This function generates the receipts at random varying ratios.
     /// Each receipt is saved to the database.
-    static func generateRandomReceipts() {
+    static func generateRandomReceipts() -> String {
         let scans = ["Countdown\nLettuce - $2.00,\nDoritos - $2.99,\nMilk - $3", // groceries
                      
                      "JB Hifi\nKeyboard - $120.00,\nTablet - $2300.99,\nEar buds - $119.99", // tech
@@ -419,9 +419,12 @@ extension Receipt {
                      
                      "SuperCheap Auto\nOil - $120.00,\nBattery - $350.00,\nRims - $75.00" // vehicles
         ]
-        for _ in 0..<10 {
-            Receipt.saveScan(recognizedText: scans.randomElement() ?? "")
+        if !isTesting(){
+            for _ in 0..<10 {
+                Receipt.saveScan(recognizedText: scans.randomElement() ?? "")
+            }
         }
+        return scans.randomElement()!
     }
     
     ///``generateKnownReceipts``
