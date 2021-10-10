@@ -40,7 +40,6 @@ struct ContentView: View {
     
     var body: some View {
         TabView(selection: $selectedTab.selection){
-            //ConfirmationView(receipt: receipts[0])
             HomeView()
                 .tabItem { Label("Home", systemImage: "magnifyingglass") }
                 .tag(0)
@@ -50,7 +49,7 @@ struct ContentView: View {
             SettingsView()
                 .tabItem { Label("Settings", systemImage: "hammer.fill").foregroundColor(Color("text")) }
                 .tag(2)
-        }.onAppear(perform: { locked = settings.passcodeProtection }) // passcode protection if settings enabled
+        }//.onAppear(perform: { locked = settings.passcodeProtection }) // passcode protection if settings enabled
         .fullScreenCover(isPresented: $locked, content: {
             PasscodeScreen(locked: $locked)
                 .environmentObject(UserSettings())

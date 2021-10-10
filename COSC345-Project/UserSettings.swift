@@ -30,18 +30,6 @@ class UserSettings: ObservableObject {
             UserDefaults.standard.set(accentColor, forKey: "accentColor")
         }
     }
-    ///``thinFolders`` is a Boolean that controls whether the folders in HomeView are the original thinner version (true), or the newer bigger version (false).
-    @Published var thinFolders: Bool {
-        didSet {
-            UserDefaults.standard.set(thinFolders, forKey: "thinFolders")
-        }
-    }
-    ///``shadows`` is a Boolean that controls whether the shadows appear on folders and receipt objects in HomeView. True for shadows enabled, False for shadows disabled.
-    @Published var shadows: Bool {
-        didSet {
-            UserDefaults.standard.set(shadows, forKey: "shadows")
-        }
-    }
     
     ///``autocomplete`` is a Boolean that controls whether the scanner will ask for confirmation of a correct scan. True will disable confirmation, False will enable comfirmation.
     @Published var autocomplete: Bool {
@@ -89,12 +77,8 @@ class UserSettings: ObservableObject {
     init() {
         /// Dark mode defaults to false. Light mode Enabled by default.
         self.darkMode = UserDefaults.standard.object(forKey: "darkMode") as? Bool ?? false
-        /// Shadows defaults to true. Shadows Enabled by default.
-        self.shadows = UserDefaults.standard.object(forKey: "shadows") as? Bool ?? true
         /// Accent color defaults to "UI2". Color is Receipted Fluro Green by default.
         self.accentColor = UserDefaults.standard.object(forKey: "accentColor") as? String ?? "UI2"
-        /// Thin folders defaults to true. Thin folders Enabled by default.
-        self.thinFolders = UserDefaults.standard.object(forKey: "thinFolders") as? Bool ?? true
         /// Auto Complete defaults to false. Confirmation by user required by default.
         self.autocomplete = UserDefaults.standard.object(forKey: "autocomplete") as? Bool ?? false
         /// Dev Mode defaults to false. Regular mode enabled by default.

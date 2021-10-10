@@ -26,41 +26,19 @@ struct FolderView: View {
                 selectedFolder = selectedFolder == folder.title ?? "" ? "" : folder.title ?? "Default"
             }
         }){
-            if settings.thinFolders {
-                // Original Thin Folders
-                ZStack {
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Color(Folder.getColor(title: folder.title ?? "default")))
-                        .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.3 : 0.06, radius: 6)
-                    
-                    HStack {
-                        Image(systemName: folder.icon ?? "folder")
-                        Text("\(folder.receiptCount) \(folder.title ?? " Default").")
-                        Spacer()
-                    }.font(.system(size: 16, weight: .bold))
-                    .foregroundColor(Color("background"))
-                    .padding(10)
-                    .padding(.vertical, 4)
-                }.fixedSize()
-            } else {
-                // New Bigger Folders
-                ZStack {
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Color(Folder.getColor(title: folder.title ?? "default")))
-                        .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.3 : 0.06, radius: 6)
-                    
-                    VStack {
-                        HStack {
-                            Image(systemName: folder.icon ?? "folder")
-                            Spacer()
-                            Text("\(folder.receiptCount)")
-                        }.padding(.trailing, 8)
-                        Text("\(folder.title ?? " Default")")
-                    }.padding(10)
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundColor(Color("background"))
-                }.fixedSize()
-            }
+            ZStack {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(Folder.getColor(title: folder.title ?? "default")))
+                
+                HStack {
+                    Image(systemName: folder.icon ?? "folder")
+                    Text("\(folder.receiptCount) \(folder.title ?? " Default").")
+                    Spacer()
+                }.font(.system(size: 16, weight: .bold))
+                .foregroundColor(Color("background"))
+                .padding(10)
+                .padding(.vertical, 4)
+            }.fixedSize()
         }.buttonStyle(ShrinkingButtonSpring())
     }
 }

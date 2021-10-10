@@ -26,7 +26,8 @@ class COSC345_ProjectTests: XCTestCase {
         let bundle = Bundle(for: COSC345_ProjectTests.self)
         var generatedString = ""
         var testString = ""
-        var recepit = Receipt();
+        let viewContext = PersistenceController.shared.getContext()
+        let receipt = Receipt(context: viewContext)
         //var documentView = DocumentScannerView()
         
             // Fetch Image Data

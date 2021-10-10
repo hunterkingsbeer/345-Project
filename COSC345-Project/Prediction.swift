@@ -70,7 +70,6 @@ struct Prediction {
         return count
     }
     
-    // rework these into overshadowing categories and then into subcategories
     ///``categoryKeywords`` is an array of tuples that are used as the basis for the folder prediction process.
     /// It is made up of a title of the category, along with its keywords associated with the category.
     /// - Tuple format

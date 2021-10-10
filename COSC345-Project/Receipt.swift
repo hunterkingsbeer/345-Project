@@ -18,8 +18,6 @@ enum DetailState {
     case image
     ///``deleting``: When this is active it will present the user with a delete confirmation button, allowing them to delete a receipt.
     case deleting
-    ///``editing``: When this is active it will allow the user to edit the receipt they are viewing. NOT IMPLEMENTED YET.
-    case editing
 }
 
 /// ``ReceiptView``
@@ -36,9 +34,9 @@ struct ReceiptView: View {
     @EnvironmentObject var settings: UserSettings
     
     var body: some View {
-        RoundedRectangle(cornerRadius: 12)
-            .fill(Color(settings.shadows ? "shadowObject" : "object"))
-            .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.06, radius: 5)
+        Blur(effect: UIBlurEffect(style: .systemThinMaterial))
+            .opacity(0.9)
+            .cornerRadius(12)
             .overlay(
                 // the title and body
                 HStack (alignment: .center){
@@ -65,9 +63,8 @@ struct ReceiptView: View {
                                 Image(systemName: Folder.getIcon(title: receipt.folder ?? "doc.plaintext"))
                                     .font(.system(size: 20))
                             }
-                        }.frame(width: UIScreen.screenWidth * 0.08)
-                        .transition(AnyTransition.scale(scale: 0.0).combined(with: .opacity))
-                    }
+                        }.transition(AnyTransition.scale(scale: 0.0).combined(with: .opacity))
+                    }.frame(width: UIScreen.screenWidth * 0.08)
                 }.padding(.horizontal)
                 .padding(.vertical, 10)
             ).animation(.spring())
@@ -98,15 +95,12 @@ struct ReceiptView: View {
 struct ReceiptDetailView: View  {
     ///``receipt``: is a Receipt variable that is passed to the view which holds the information about the receipt this view will represent.
     @State var receipt: Receipt
-    ///``detailState``: allows the view to update based on how the user desired to interact with the receipt. Allows the user to delete, edit, view the image, and view the receipt.
+    ///``detailState``: allows the view to update based on how the user desired to interact with the receipt. Allows the user to delete, view the image, and view the receipt.
     @State var detailState: DetailState = .none
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
-    ///``editedReceipt`` is
-    @State var editedReceipt = (title: "", folder: "", body: "", date: Date())
     
     var body: some View {
-        let editing = detailState == .editing
         ZStack {
             VStack {
                 ZStack {
@@ -121,13 +115,10 @@ struct ReceiptDetailView: View  {
                             Text("\(getDate(date: receipt.date))")
                                 .font(.caption)
                             
-                            EditableReceiptText(placeholder: receipt.title ?? "Title",
-                                                editedItem: $editedReceipt.title,
-                                                editing: editing, font: .title) // title
+                            Text(receipt.title ?? "Title") // title
+                                .font(.title)
                             
-                            EditableReceiptText(placeholder: receipt.folder ?? "Folder",
-                                                editedItem: $editedReceipt.folder,
-                                                editing: false) // folder
+                            Text(receipt.folder ?? "Folder")// folder
                         }
                         Spacer()
                         Image(systemName: Folder.getIcon(title: receipt.folder))
@@ -143,9 +134,14 @@ struct ReceiptDetailView: View  {
             
             ScrollView(showsIndicators: false) {
                 HStack {
-                    VStack {
-                        Text(editedReceipt.body)
-                        //TextEditor(text: $editedReceipt.body) doesnt work :(
+                    VStack(alignment: .leading) {
+                        if Image(data: receipt.image) != nil {
+                            (Image(data: receipt.image) ?? Image(""))
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .padding(.top)
+                        }
+                        Text(receipt.body ?? "")
                         Spacer()
                     }
                     Spacer()
@@ -153,7 +149,7 @@ struct ReceiptDetailView: View  {
                 .padding(.vertical, UIScreen.screenHeight * 0.14)
             }.zIndex(0)
 
-            ReceiptViewButtons(detailState: $detailState, receipt: receipt, editedReceipt: $editedReceipt)
+            ReceiptViewButtons(detailState: $detailState, receipt: receipt)
                 .zIndex(2)
         }.padding(.bottom)
         .background(Color("object"))
@@ -163,12 +159,6 @@ struct ReceiptDetailView: View  {
     func getColor() -> Color {
         return Color(Folder.getColor(title: receipt.folder))
     }
-}
-
-enum EditingState {
-    case confirming
-    case discarding
-    case none
 }
 
 /// ``ReceiptViewButtons``
@@ -183,66 +173,39 @@ struct ReceiptViewButtons: View {
     @State var receipt: Receipt
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
-    ///``editedReceipt`` is
-    @Binding var editedReceipt: (title: String, folder: String, body: String,
-                                 date: Date)
-    ///``editingState`` is
-    @State var editingState: EditingState = .none
     
     var body: some View {
         let buttonSize = UIScreen.screenHeight * 0.06
         VStack {
             Spacer()
-            if detailState == .editing {
-                HStack {
-                    Spacer()
-                    Text("Currently Editing.")
-                        .padding(10)
-                    Spacer()
-                }.background(Blur(effect: UIBlurEffect(style: .systemMaterial)))
-                .cornerRadius(12)
-                .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.06, radius: 12)
-                .transition(AnyTransition.move(edge: .bottom))
-            }
             
             HStack {
                 // Deleting Button
                 if detailState != .image {
                     Button(action: {
-                        if detailState == .editing {
-                            // discard
-                            if editingState == .discarding {
-                                // discard edit
-                                detailState = .none
-                                editingState = .none
-                                updateEditedReceipt()
-                            } else {
-                                editingState = .discarding
-                            }
+                        if detailState == .deleting {
+                            Receipt.delete(receipt: receipt)
+                            hapticFeedback(type: .rigid)
                         } else {
-                            if detailState == .deleting {
-                                Receipt.delete(receipt: receipt)
-                                hapticFeedback(type: .rigid)
-                            } else {
-                                detailState = .deleting
-                                hapticFeedback(type: .rigid)
-                            }
+                            detailState = .deleting
+                            hapticFeedback(type: .rigid)
                         }
                     }){
                         ZStack {
                             Blur(effect: UIBlurEffect(style: .systemMaterial))
-                                .background(editingState == .discarding || detailState == .deleting ? Color("red") : Color.clear)
-                                .cornerRadius(12)
-                                .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.06, radius: 12)
-                                .animation(.easeInOut)
+                                .overlay(
+                                    (detailState == .deleting ? Color("red"): Color.clear)
+                                        .blendMode(settings.darkMode ? .color : .plusDarker)
+                                        .opacity(settings.darkMode ? 0.4 : 0.3)
+                                ).cornerRadius(12)
+                                .animation(.spring())
                             
-                            if detailState == .editing {
-                                Image(systemName: "xmark").scaleEffect(editingState == .discarding ? 1.25 : 1)
-                            } else {
-                                Image(systemName: "trash").scaleEffect(detailState == .deleting ? 1.25 : 1)
-                            }
-                        }
-                        .frame(height: buttonSize)
+                            Image(systemName: "trash")
+                                .scaleEffect(detailState == .deleting ? 1.25 : 1)
+                                .foregroundColor(detailState == .deleting ? Color("red") : Color("text"))
+                                .animation(.spring())
+                            
+                        }.frame(height: buttonSize)
                     }.buttonStyle(ShrinkingButtonSpring())
                     .transition(.offset(x: -150))
                     .onChange(of: detailState, perform: { _ in
@@ -255,19 +218,10 @@ struct ReceiptViewButtons: View {
                                 }
                             }
                         }
-                    }).onChange(of: editingState, perform: { state in
-                        withAnimation(.spring()){
-                            if state == .discarding {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                                    if state == .discarding { // if still discarding (user may have selected another option)
-                                        editingState = .none // turns off delete button after 3 secs
-                                    }
-                                }
-                            }
-                        }
                     })
                 }
                 
+                /*
                 // Image Button
                 Button(action: {
                     detailState = detailState == .image ? .none : .image
@@ -276,7 +230,6 @@ struct ReceiptViewButtons: View {
                     ZStack {
                         Blur(effect: UIBlurEffect(style: .systemMaterial))
                             .cornerRadius(12)
-                            .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.06, radius: 12)
                         VStack {
                             if detailState == .image && receipt.image != nil && !UIDevice.current.inSimulator {
                                 (Image(data: receipt.image) ?? Image(""))
@@ -290,53 +243,9 @@ struct ReceiptViewButtons: View {
                         .cornerRadius(12)
                     }
                     .frame(height: detailState == .image ? UIScreen.screenHeight * 0.6 : buttonSize)
-                }.buttonStyle(ShrinkingButtonSpring())
+                }.buttonStyle(ShrinkingButtonSpring())*/
                 
-                // Editing Button
-                if detailState != .image {
-                    Button(action: {
-                        if detailState == .editing {
-                            // confirming
-                            if editingState == .confirming {
-                                // save edit
-                                detailState = .none
-                                editingState = .none
-                                Receipt.updateReceipt(receipt: receipt, editedReceipt: editedReceipt)
-                            } else {
-                                editingState = .confirming
-                            }
-                        } else {
-                            detailState = detailState == .editing ? .none : .editing
-                        }
-                        hapticFeedback(type: .rigid)
-                    }){
-                        ZStack {
-                            Blur(effect: UIBlurEffect(style: .systemMaterial))
-                                .background(editingState == .confirming ? Color("UI2") : Color.clear)
-                                .cornerRadius(12)
-                                .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.06, radius: 10)
-                            if detailState == .editing {
-                                Image(systemName: "checkmark").scaleEffect(editingState == .confirming ? 1.25 : 1)
-                            } else {
-                                Image(systemName: "pencil").padding()
-                            }
-                        }.frame(height: buttonSize)
-                    }.buttonStyle(ShrinkingButtonSpring())
-                    .transition(.offset(x: 150))
-                    .onChange(of: editingState, perform: { state in
-                        withAnimation(.spring()){
-                            if state == .confirming {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                                    if state == .confirming {
-                                        editingState = .none // turns off delete button after 3 secs
-                                    }
-                                }
-                            }
-                        }
-                    })
-                }
-                /*
-                // temporary dismiss button, replace with functioning edit button
+                // Dismiss Button
                 if detailState != .image {
                     Button(action: {
                         detailState = .none
@@ -344,33 +253,16 @@ struct ReceiptViewButtons: View {
                         presentationMode.wrappedValue.dismiss()
                     }){
                         ZStack {
-                            RoundedRectangle(cornerRadius: 15)
-                                .fill(Color(settings.darkMode ? "shadowObject" : "background"))
-                                .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.1, radius: 12)
+                            Blur(effect: UIBlurEffect(style: .systemMaterial))
+                                .cornerRadius(12)
                             Image(systemName: "chevron.down").padding()
                         }.padding(.vertical)
                         .frame(height: UIScreen.screenHeight * 0.1)
                     }.buttonStyle(ShrinkingButtonSpring())
                     .transition(.offset(x: 150))
-                }*/
+                }
             }
         }.padding(.horizontal).padding(.bottom)
-        .onAppear(perform: updateEditedReceipt)
-    }
-    
-    func updateEditedReceipt(){
-        editedReceipt.title = receipt.title ?? ""
-        editedReceipt.folder = receipt.folder ?? ""
-        editedReceipt.body = receipt.body ?? ""
-        editedReceipt.date = receipt.date ?? Date()
-    }
-    
-    func saveReceipt(){
-        receipt.title = editedReceipt.title
-        receipt.folder = editedReceipt.folder
-        receipt.body = editedReceipt.body
-        receipt.date = editedReceipt.date
-        Receipt.save()
     }
 }
 
@@ -382,10 +274,8 @@ extension Receipt {
     /// - Parameter image: The image of the receipt that was scanned.
     static func saveScan(recognizedText: String, image: UIImage = UIImage()){
         print("\n----------------------------")
-        let viewContext = PersistenceController.shared.getContext()
-        
-        let newReceipt = Receipt(context: viewContext)
-        let title = String(recognizedText.components(separatedBy: CharacterSet.newlines).first!).capitalized
+        let newReceipt = getEmptyReceipt()
+        let title = getTitle(text: recognizedText)
     
         newReceipt.id = UUID()
         newReceipt.title = title
@@ -400,7 +290,33 @@ extension Receipt {
         print("Receipt saved!")
     }
     
-    static func updateReceipt(receipt: Receipt, editedReceipt: (title: String, folder: String, body: String, date: Date)) {
+    ///``returnScan``
+    /// takes in an image and recognized text and applies it to a Receipt variable to be returned.
+    /// - Parameter recognizedText: The text from the scanned image, to be placed into a receipt variable.
+    /// - Parameter image: The image of the receipt that was scanned.
+    static func returnScan(recognizedText: String, image: UIImage = UIImage()) -> Receipt {
+        print("\n----------------------------")
+        let newReceipt = getEmptyReceipt()
+        let title = getTitle(text: recognizedText)
+        newReceipt.id = UUID()
+        newReceipt.title = title
+        print("New Receipt Saving: \(title)")
+        newReceipt.body = String(recognizedText.dropFirst((newReceipt.title ?? "").count)).capitalized
+        newReceipt.image = imageToData(image: image)
+        // image cant be compared to nil, but it can be compared to an empty UIImage
+        newReceipt.date = Date()
+        newReceipt.folder = Prediction.pointPrediction(text: (title + (newReceipt.body ?? "")))
+        Folder.verifyFolder(title: newReceipt.folder ?? "Default")
+        print("Receipt created!")
+        save()
+        return newReceipt
+    }
+    
+    static func getEmptyReceipt() -> Receipt {
+        return Receipt(context: PersistenceController.shared.getContext())
+    }
+    
+    /*static func updateReceipt(receipt: Receipt, editedReceipt: (title: String, folder: String, body: String, date: Date)) {
         let receiptFinal = Receipt.getReceipt(title: receipt.title ?? "")
         
         receiptFinal.title = editedReceipt.title
@@ -409,7 +325,7 @@ extension Receipt {
         receiptFinal.date = editedReceipt.date
         
         Receipt.save()
-    }
+    } NOT IN USE FOR FULL RELEASE */
     
     ///``getReceipts``
     /// Gets an array of receipts from the database.
@@ -458,7 +374,7 @@ extension Receipt {
     /// Performs this by doing a for loop, checking each receipt until the matching receipt title (and receipt) is found, where it returns the Receipt.
     /// - Parameter title: The title of the receipt you want to retrieve.
     /// - Returns A Receipt with the matching title as the parameter.
-    static func getReceipt(title: String) -> Receipt{
+    static func getReceipt(title: String) -> Receipt {
         for receipt in getReceipts() where receipt.title == title {
             return receipt
         }
@@ -493,9 +409,9 @@ extension Receipt {
                      
                      "JB Hifi\nPS5 - $500.00,\nPlaystation Game - $120.00", // games
                      
-                     "Nike\nSoccer Shoes - $150.00,\n Mouthguard - $15.00", // sports
+                     "Nike\nSneakers - $150.00,\nFootball - $25.00", // sports
                      
-                     "SuperCheap Auto\nSteering Wheel - $320.00,\n Battery - $450.00,\nRims - $75.00" // vehicles
+                     "SuperCheap Auto\nOil - $120.00,\nBattery - $350.00,\nRims - $75.00" // vehicles
         ]
         for _ in 0..<10 {
             Receipt.saveScan(recognizedText: scans.randomElement() ?? "")

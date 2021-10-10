@@ -55,28 +55,40 @@ struct HomeView: View {
                 
                 // RECEIPTS
                 ScrollView(showsIndicators: false) {
-                    VStack {
-                        if receipts.count > 0 {
-                        
-                            // If selectedFolder contains something, use it to show receipts in the folder.
-                            // Else If userSearch contains something, use it to check for receipts.
-                                // Else show receipts that have any body text (all receipts).
-                            ForEach(receipts.filter({ !selectedFolder.isEmpty ?
-                                                        $0.folder!.localizedCaseInsensitiveContains("\(selectedFolder)") :
-                                                      !userSearch.isEmpty ?
-                                                        $0.body!.localizedCaseInsensitiveContains("\(userSearch)") ||
-                                                        $0.folder!.localizedCaseInsensitiveContains("\(userSearch)")  ||
-                                                        $0.title!.localizedCaseInsensitiveContains("\(userSearch)") :
-                                                        $0.body!.count > 0 })){ receipt in
-                                ReceiptView(receipt: receipt)
-                                    .transition(.opacity)
-                                    .padding(.horizontal)
-                                    .padding(.bottom, 8)
+                    ScrollViewReader { value in
+                        VStack {
+                            if receipts.count > 0 {
+                            
+                                // If selectedFolder contains something, use it to show receipts in the folder.
+                                // Else If userSearch contains something, use it to check for receipts.
+                                    // Else show receipts that have any body text (all receipts).
+                                ForEach(receipts.filter({ !selectedFolder.isEmpty ?
+                                                            $0.folder!.localizedCaseInsensitiveContains("\(selectedFolder)") :
+                                                          !userSearch.isEmpty ?
+                                                            $0.body!.localizedCaseInsensitiveContains("\(userSearch)") ||
+                                                            $0.folder!.localizedCaseInsensitiveContains("\(userSearch)")  ||
+                                                            $0.title!.localizedCaseInsensitiveContains("\(userSearch)") :
+                                                            $0.body!.count > 0 })){ receipt in
+                                    ReceiptView(receipt: receipt)
+                                        .transition(.opacity)
+                                        .padding(.horizontal)
+                                        .padding(.bottom, 8)
+                                }
+                                if receipts.count > 8 {
+                                    Button(action: {
+                                        withAnimation(.spring()){
+                                            value.scrollTo(0, anchor: .top)
+                                        }
+                                    }){
+                                        Image(systemName: "arrow.up.to.line")
+                                            .opacity(0.5)
+                                    }.buttonStyle(ShrinkingButton())
+                                }
+                            } else {
+                                NoReceiptsView()
                             }
-                        } else {
-                            NoReceiptsView()
-                        }
-                    }.padding(.top, 10).padding(.bottom)
+                        }.padding(.top, 10).padding(.bottom).id(0)
+                    }
                 }.cornerRadius(0)
             }
         }
@@ -96,13 +108,11 @@ struct NoReceiptsView: View {
         Button(action: {
             selectedTab.changeTab(tabPage: .scan)
         }){
-            RoundedRectangle(cornerRadius: 18)
-                .fill(Color(settings.shadows ? "shadowObject" : "accent"))
-                .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.45 : 0.15, radius: 4)
+            Blur(effect: UIBlurEffect(style: .systemThinMaterial))
+                .cornerRadius(18)
                 .overlay(
                     // the title and body
                     HStack (alignment: .center){
-                        Image(systemName: "doc.plaintext")
                         VStack(alignment: .leading) {
                             Text("Add a receipt!")
                                 .font(.system(size: 16, weight: .bold, design: .rounded))
@@ -110,7 +120,8 @@ struct NoReceiptsView: View {
                                 .font(.system(size: 14, weight: .regular, design: .rounded))
                         }
                         Spacer()
-                    }.padding(10)
+                        Image(systemName: "doc.plaintext")
+                    }.padding()
                 ).frame(height: UIScreen.screenHeight * 0.08)
                 .padding(.horizontal)
         }.buttonStyle(ShrinkingButton())
@@ -153,7 +164,7 @@ struct HomeTitleBar: View {
                             .font(.system(size: 30, weight: .semibold))
                         Text("\(selectedFolder).")
                             .font(.system(size: 40, weight: .semibold))
-                            .lineLimit(2).minimumScaleFactor(0.85)
+                            .lineLimit(2).minimumScaleFactor(0.8)
                     }
                     .foregroundColor(Color("background"))
                     .transition(AnyTransition.opacity.combined(with: .offset(y: -100)))

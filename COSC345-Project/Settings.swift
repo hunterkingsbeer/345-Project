@@ -15,8 +15,6 @@ import SwiftUI
 struct SettingsView: View  {
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
-    ///``shadowProperties``: Used to uniformly control shadows applied to all the settings buttons/selectors.
-    let shadowProperties = (lightOpacity: 0.06, darkOpacity: 0.3, radius: CGFloat(5))
    
     var body: some View {
         ZStack {
@@ -30,29 +28,25 @@ struct SettingsView: View  {
                     VStack {
                         HStack {
                             //dark mode
-                            DarkModeButton(shadowProperties: shadowProperties)
-                                .frame(height: UIScreen.screenHeight * 0.2)
-                            
-                            // shadows
-                            ShadowModeButton(shadowProperties: shadowProperties)
+                            DarkModeButton()
                                 .frame(height: UIScreen.screenHeight * 0.2)
                         }
                         
                         // scan selector
-                        ScanDefaultSelector(shadowProperties: shadowProperties)
+                        ScanDefaultSelector()
                             .frame(height: UIScreen.screenHeight * 0.2)
                         
                         // passcode selector
-                        PasscodeSelector(shadowProperties: shadowProperties)
+                        PasscodeSelector()
                             .frame(height: UIScreen.screenHeight * 0.2)
                         
                         // color
-                        AccentColorSelector(shadowProperties: shadowProperties)
+                        AccentColorSelector()
                             .frame(height: UIScreen.screenHeight * 0.2)
                     }.padding(.horizontal).padding(.bottom)
                     
                     if settings.devMode {
-                        DeveloperSettings(shadowProperties: shadowProperties)
+                        DeveloperSettings()
                     }
                 }.animation(.easeInOut)
             }
@@ -69,17 +63,15 @@ enum PassSuccess {
 struct PasscodeSelector: View {
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
-    let shadowProperties : (lightOpacity: Double, darkOpacity: Double, radius: CGFloat)
     @State var passState : PassEditingState = .none
     @State var passEditScreen = (editing: false, expectedCode: "0000")
     @State var passcodeSuccess = (success: false, code: "")
     
     var body: some View {
-        Color(settings.shadows ? "shadowObject" : "object")
+        
+        Blur(effect: UIBlurEffect(style: .systemThinMaterial))
+            .opacity(0.9)
             .cornerRadius(12)
-            .dropShadow(isOn: settings.shadows,
-                         opacity: settings.darkMode ? shadowProperties.darkOpacity : shadowProperties.lightOpacity,
-                         radius: shadowProperties.radius)
             .overlay(
                 VStack {
                     HStack {
@@ -158,8 +150,6 @@ struct PasscodeSelector: View {
 struct DarkModeButton: View {
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
-    ///``shadowProperties``: Used to uniformly control shadows applied to all the settings buttons/selectors.
-    let shadowProperties : (lightOpacity: Double, darkOpacity: Double, radius: CGFloat)
     
     var body: some View {
         Button(action: {
@@ -168,11 +158,9 @@ struct DarkModeButton: View {
             }
             hapticFeedback(type: .rigid)
         }){
-            Color(settings.shadows ? "shadowObject" : "object")
+            Blur(effect: UIBlurEffect(style: .systemThinMaterial))
+                .opacity(0.9)
                 .cornerRadius(12)
-                .dropShadow(isOn: settings.shadows,
-                            opacity: settings.darkMode ? shadowProperties.darkOpacity : shadowProperties.lightOpacity,
-                             radius: shadowProperties.radius)
                 .overlay(
                     VStack {
                         Spacer()
@@ -199,60 +187,14 @@ struct DarkModeButton: View {
     }
 }
 
-struct ShadowModeButton: View {
-    ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
-    @EnvironmentObject var settings: UserSettings
-    ///``shadowProperties``: Used to uniformly control shadows applied to all the settings buttons/selectors.
-    let shadowProperties : (lightOpacity: Double, darkOpacity: Double, radius: CGFloat)
-    
-    var body: some View {
-        Button(action: {
-            withAnimation(.easeInOut){
-                settings.shadows.toggle()
-            }
-            hapticFeedback(type: .rigid)
-        }){
-            Color(settings.shadows ? "shadowObject" : "object")
-                .cornerRadius(12)
-                .dropShadow(isOn: settings.shadows,
-                             opacity: settings.darkMode ? shadowProperties.darkOpacity : shadowProperties.lightOpacity,
-                             radius: shadowProperties.radius)
-                .overlay(
-                    VStack {
-                        Spacer()
-                        if settings.shadows {
-                            Image(systemName: "smoke.fill")
-                                .font(.largeTitle)
-                                .foregroundColor(Color(settings.accentColor))
-                                .transition(AnyTransition.opacity)
-                        } else {
-                            Image(systemName: "smoke")
-                                .font(.largeTitle)
-                                .transition(AnyTransition.opacity)
-                        }
-                        Spacer()
-                        Text("SHADOWS \(settings.shadows ? "ON" : "OFF")")
-                            .bold()
-                            .font(.system(.body, design: .rounded))
-                        Spacer()
-                    }.padding()
-                )
-        }.buttonStyle(ShrinkingButton()).padding(.vertical).padding(.leading, 5)
-    }
-}
-
 struct ScanDefaultSelector: View {
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
-    ///``shadowProperties``: Used to uniformly control shadows applied to all the settings buttons/selectors.
-    let shadowProperties : (lightOpacity: Double, darkOpacity: Double, radius: CGFloat)
     
     var body: some View {
-        Color(settings.shadows ? "shadowObject" : "object")
+        Blur(effect: UIBlurEffect(style: .systemThinMaterial))
+            .opacity(0.9)
             .cornerRadius(12)
-            .dropShadow(isOn: settings.shadows,
-                         opacity: settings.darkMode ? shadowProperties.darkOpacity : shadowProperties.lightOpacity,
-                         radius: shadowProperties.radius)
             .overlay(
                 VStack {
                     Spacer()
@@ -328,15 +270,11 @@ struct AccentColorSelector: View {
     @State var colors = Color.colors
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
-    ///``shadowProperties``: Used to uniformly control shadows applied to all the settings buttons/selectors.
-    let shadowProperties : (lightOpacity: Double, darkOpacity: Double, radius: CGFloat)
     
     var body: some View {
-        Color(settings.shadows ? "shadowObject" : "object")
+        Blur(effect: UIBlurEffect(style: .systemThinMaterial))
+            .opacity(0.9)
             .cornerRadius(12)
-            .dropShadow(isOn: settings.shadows,
-                         opacity: settings.darkMode ? shadowProperties.darkOpacity : shadowProperties.lightOpacity,
-                         radius: shadowProperties.radius)
             .overlay(
                 VStack {
                     Spacer()
@@ -375,7 +313,7 @@ struct AccentColorSelector: View {
                                                         if settings.accentColor == colors[color]{
                                                             Image(systemName: "circle.fill")
                                                                 .font(.system(size: 18, weight: .bold))
-                                                                .foregroundColor(Color(settings.shadows ? "shadowObject" : "object"))
+                                                                .foregroundColor(Color("object"))
                                                                 .transition(AnyTransition.scale(scale: 0.9).combined(with: .opacity))
                                                         }
                                                     }
@@ -407,8 +345,6 @@ struct DeveloperSettings: View {
     var receipts: FetchedResults<Receipt>
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
-    ///``shadowProperties``: Used to uniformly control shadows applied to all the settings buttons/selectors.
-    let shadowProperties : (lightOpacity: Double, darkOpacity: Double, radius: CGFloat)
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -434,11 +370,9 @@ struct DeveloperSettings: View {
                     }
                     hapticFeedback(type: .rigid)
                 }){
-                    Color(settings.shadows ? "shadowObject" : "object")
+                    Blur(effect: UIBlurEffect(style: .systemThinMaterial))
+                        .opacity(0.9)
                         .cornerRadius(12)
-                        .dropShadow(isOn: settings.shadows,
-                                    opacity: settings.darkMode ? shadowProperties.darkOpacity : shadowProperties.lightOpacity,
-                                    radius: shadowProperties.radius)
                         .overlay(
                             VStack {
                                 Spacer()
@@ -459,11 +393,9 @@ struct DeveloperSettings: View {
                     Folder.deleteAll()
                     hapticFeedback(type: .rigid)
                 }){
-                    Color(settings.shadows ? "shadowObject" : "object")
+                    Blur(effect: UIBlurEffect(style: .systemThinMaterial))
+                        .opacity(0.9)
                         .cornerRadius(12)
-                        .dropShadow(isOn: settings.shadows,
-                                    opacity: settings.darkMode ? shadowProperties.darkOpacity : shadowProperties.lightOpacity,
-                                    radius: shadowProperties.radius)
                         .overlay(
                             VStack {
                                 Spacer()

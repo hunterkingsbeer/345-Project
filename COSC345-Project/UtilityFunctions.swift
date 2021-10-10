@@ -46,6 +46,10 @@ func imageToData(image: UIImage) -> Data {
     return image.jpegData(compressionQuality: 0.5) ?? Data()
 }
 
+func getTitle(text: String) -> String {
+    return String(text.components(separatedBy: CharacterSet.newlines).first!).capitalized
+}
+
 func hapticFeedback(type: UIImpactFeedbackGenerator.FeedbackStyle){
     UIImpactFeedbackGenerator(style: type).impactOccurred()
 }
@@ -108,19 +112,6 @@ extension View {
                         .padding(.top, 45))
             .padding(10)
     }
-    
-    /// ``dropShadow``
-    /// is a property than can be applied to any View object to provide a desired shadow on it. This is a quality of life function, and only serves to make the calling parameters more straight forward while using an already set shadow color.
-    ///
-    /// - Parameter on: True if you want the shadow on. False if you want to turn it off. Handy for hooking into UserSettings.
-    /// - Parameter opacity: Adjusts the opacity of the shadow.
-    /// - Parameter radius: Adjusts the radius of the shadow.
-    /// - Returns
-    ///     - A shadow as specified in the params.
-    func dropShadow(isOn: Bool, opacity: Double, radius: CGFloat) -> some View {
-        self
-            .shadow(color: Color("shadow").opacity(isOn ? opacity : 0.0), radius: radius)
-    }
 }
 
 extension Image {
@@ -162,7 +153,7 @@ struct ShrinkingButton: ButtonStyle {
 struct ShrinkingButtonSpring: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.95 : 1)
+            .scaleEffect(configuration.isPressed ? 0.975 : 1)
             .animation(.spring())
     }
 }
@@ -174,7 +165,7 @@ struct ShrinkingOpacityButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .scaleEffect(configuration.isPressed ? 0.98 : 1)
-            .opacity(configuration.isPressed ? 0.5 : 1)
+            .opacity(configuration.isPressed ? 0.4 : 1)
             .animation(.spring())
     }
 }

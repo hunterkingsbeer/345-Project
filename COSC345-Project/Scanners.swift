@@ -39,6 +39,19 @@ enum ScanSelection: Int {
     case gallery = 2
 }
 
+/// ``SaveState``
+/// is an enum with three cases that relate to the states a receipt may be in while being saved to the database.
+enum SaveState {
+    ///``none``: When none is active, the receipt doesn't need saving. This is its default state.
+    case none
+    ///``recognizing``: When confirming is active, the receipt is being confirmed by the user.
+    case recognizing
+    
+    case saving
+    
+    case confirming
+}
+
 /// ``ScanView``
 /// is a Parent View struct that holds the scanner views (GalleryScannerView, DocumentScannerView, and ScannerSelectView).
 /// This manages the visibility of the scanners based on the ScanSelection variable. A Loading screen is displayed when translating a scanned image.
@@ -54,10 +67,8 @@ struct ScanView: View {
     let inSimulator: Bool = UIDevice.current.inSimulator
     ///``scanSelection`` is used to manage the screens active view, based on the values presented in the ScanView's documentation.
     @State var scanSelection: ScanSelection = .none
-    ///``isRecognizing`` is used to provide a loading screen when the scanner is recognizing text (via ScanTranslation).
-    @State var isRecognizing: Bool = false
-    ///``invalidAlert`` is used to handle invalid scans (which have too few words). It displays an alert, explaining an invalid scan and then returns the user to scan again.
-    @State var invalidAlert: Bool = false
+    ///``SaveState`` is used to manage the receipts save states while its being saved and processed. (via ScanTranslation).
+    @State var saveState: SaveState = .none
     @State var unusedBool = false
     
     var body: some View {
@@ -68,34 +79,18 @@ struct ScanView: View {
                 TitleText(buttonBool: $unusedBool, title: "scan", icon: getIcon())
                     .padding(.horizontal)
                 
-                if !isRecognizing {
-                    if scanSelection == .gallery { // scan via gallery
-                        GalleryScannerView(invalidAlert: $invalidAlert,
-                                           scanSelection: $scanSelection,
-                                           isRecognizing: $isRecognizing)
-                        
-                    } else if scanSelection == .camera { // scan via camera
-                        DocumentScannerView(invalidAlert: $invalidAlert,
-                                            scanSelection: $scanSelection,
-                                            isRecognizing: $isRecognizing)
-                    } else { // default "gallery or camera" screen
-                        ScannerSelectView(scanSelection: $scanSelection)
-                            .transition(AnyTransition.scale(scale: 0.8).combined(with: .opacity).combined(with: .move(edge: .bottom)))
-                    }
-                } else {
-                    Spacer()
-                    Text("Saving...")
-                        .font(.system(.title, design: .rounded))
-                    Loading()
-                    Spacer()
+                if scanSelection == .gallery { // scan via gallery
+                    GalleryScannerView(scanSelection: $scanSelection,
+                                       saveState: $saveState)
+                    
+                } else if scanSelection == .camera { // scan via camera
+                    DocumentScannerView(scanSelection: $scanSelection,
+                                        saveState: $saveState)
+                } else { // default "gallery or camera" screen
+                    ScannerSelectView(scanSelection: $scanSelection)
+                        .transition(AnyTransition.scale(scale: 0.8).combined(with: .opacity).combined(with: .move(edge: .bottom)))
                 }
             }
-        }.alert(isPresented: $invalidAlert) {
-            Alert(
-                title: Text("Receipt Not Saved!"),
-                message: Text("This image is not valid. Try again."),
-                dismissButton: .default(Text("Okay"))
-            )
         }.onAppear(perform: {
             scanSelection = ScanSelection(rawValue: settings.scanDefault) ?? .none
         })
@@ -123,36 +118,267 @@ struct ScannerSelectView: View {
         VStack {
             Spacer()
             Button(action: {
+                scanSelection = scanSelection == .camera ? .none : .camera
+            }){
+                Blur(effect: UIBlurEffect(style: .systemThinMaterial))
+                    .opacity(0.9)
+                    .cornerRadius(12)
+                    .overlay(
+                        // the title and body
+                        VStack (alignment: .center){
+                            Spacer()
+                            Image(systemName: "camera")
+                                .font(.system(size: 50))
+                            VStack(alignment: .center) {
+                                Text("Camera")
+                                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                                Text("Use the camera to scan a physical item.")
+                                    .font(.system(size: 14, weight: .regular, design: .rounded))
+                                    .frame(width: UIScreen.screenWidth * 0.35)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.top, 10)
+                            }
+                            Spacer()
+                        }.padding()
+                    ).frame(width: UIScreen.screenWidth * 0.65, height: UIScreen.screenHeight * 0.25)
+                    .padding(.bottom)
+            }.buttonStyle(ShrinkingButtonSpring())
+            .accessibility(identifier: "Add from Camera")
+            
+            Spacer()
+        
+            Button(action: {
                 scanSelection = scanSelection == .gallery ? .none : .gallery
             }){
-                VStack {
-                    if scanSelection == .none {
-                        Image(systemName: "photo.fill")
-                            .font(.system(size: 60, design: .rounded))
-                            .padding()
-                    }
-                }.contentShape(Rectangle())
-            }.buttonStyle(ShrinkingButton())
+                Blur(effect: UIBlurEffect(style: .systemThinMaterial))
+                    .opacity(0.9)
+                    .cornerRadius(12)
+                    .overlay(
+                        // the title and body
+                        VStack (alignment: .center){
+                            Spacer()
+                            Image(systemName: "photo")
+                                .font(.system(size: 50))
+                            VStack(alignment: .center) {
+                                Text("Gallery")
+                                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                                Text("Use the gallery to import an image.")
+                                    .font(.system(size: 14, weight: .regular, design: .rounded))
+                                    .multilineTextAlignment(.center)
+                                    .frame(width: UIScreen.screenWidth * 0.3)
+                                    .padding(.top, 10)
+                            }
+                            Spacer()
+                        }.padding()
+                    ).frame(width: UIScreen.screenWidth * 0.65, height: UIScreen.screenHeight * 0.25)
+                    .padding(.top)
+            }.buttonStyle(ShrinkingButtonSpring())
             .accessibility(identifier: "Add from Gallery")
             
             Spacer()
-            Divider()
-            Spacer()
-            
-            Button(action: {
-                scanSelection = scanSelection == .camera ? .none : .camera
-            }){
+        }.padding()
+    }
+}
+
+
+/// ``ConfirmationView``
+/// is a View struct that shows the user its scanned receipt(s) and then provides them with an option of editing, discarding, or confirming the scan.
+/// - Called by DocumentScannerView and GalleryScannerView.
+struct ConfirmationView: View {
+    ///``selectedTab`` Controls the TabView's active tab it is viewing. Imports the TabSelection EnvironmentObject, allowing for application wide changing of the selected tab.
+    @EnvironmentObject var selectedTab: TabSelection
+    
+    @State var receipt: Receipt
+    ///``scanSelection`` is used to manage the screens active view. This is @Binding as it controls the parent views value, allowing it to change the screen as desired.
+    @Binding var scanSelection: ScanSelection
+    ///``SaveState`` is used to manage the receipts save states while its being saved and processed. (via ScanTranslation).
+    @Binding var saveState: SaveState
+    ///``isConfirming`` is a bool used to control the confirmation screens sheet.
+    @Binding var isConfirming: Bool
+    ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
+    @EnvironmentObject var settings: UserSettings
+    
+    var body: some View {
+        VStack {
+            Text("Does this look correct?")
+                .font(.system(.title, design: .rounded)).bold()
+            ZStack { // receipt
                 VStack {
-                    if scanSelection == .none {
-                        Image(systemName: "camera.fill")
-                            .font(.system(size: 60, design: .rounded))
-                            .padding()
-                    }
-                }.contentShape(Rectangle())
-            }.buttonStyle(ShrinkingButtonSpring())
-            .accessibility(identifier: "Add from Camera")
-            Spacer()
+                    ZStack (alignment: .top) {
+                        Blur(effect: UIBlurEffect(style: .systemThinMaterial))
+                            .ignoresSafeArea()
+                            .overlay(Color(Folder.getColor(title: "software"))
+                                        .blendMode(.color)
+                                        .opacity(settings.darkMode ? 0.2 : 1.0))
+                        
+                        HStack(alignment: .center) {
+                            VStack(alignment: .leading) {
+                                Text("\(getDate(date: receipt.date))")
+                                    .font(.caption)
+                                
+                                Text(receipt.title ?? "")
+                                    .font(.title)
+                                
+                                Text(receipt.folder ?? "")
+                            }
+                            Spacer()
+                            Image(systemName: Folder.getIcon(title: receipt.folder))
+                                .font(.system(size: 30, weight: .semibold))
+                                .padding(10)
+                                .foregroundColor(Color(Folder.getColor(title: receipt.folder)))
+                                .cornerRadius(12)
+                        }.foregroundColor(Color("text"))
+                        .padding()
+                    }.frame(height: UIScreen.screenHeight * 0.14)
+                    Spacer()
+                }.zIndex(1)
+                
+                ScrollView(showsIndicators: false) {
+                    HStack(alignment: .top) {
+                        VStack {
+                            if Image(data: receipt.image) != nil {
+                                (Image(data: receipt.image) ?? Image(""))
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .padding(.top)
+                            }
+                            Text(receipt.body ?? "")
+                            Spacer()
+                        }
+                        Spacer()
+                    }.padding(.horizontal)
+                    .padding(.top, UIScreen.screenHeight * 0.14)
+                    .fixedSize(horizontal: false, vertical: true)
+                }.background(Color("object"))
+                .frame(height: UIScreen.screenHeight * 0.675)
+                .zIndex(0)
+            }.cornerRadius(12)
+            
+            VStack { // buttons
+                HStack (alignment: .center){
+                    Button(action:{ // cancel
+                        exit(success: false)
+                    }){
+                        Blur(effect: UIBlurEffect(style: .systemMaterial))
+                            .cornerRadius(12)
+                            .overlay(Image(systemName: "xmark"))
+                    }.buttonStyle(ShrinkingButton())
+                    
+                    Button(action:{ // view image of scan
+                        
+                    }){
+                        Blur(effect: UIBlurEffect(style: .systemMaterial))
+                            .cornerRadius(12)
+                            .overlay(Image(systemName: "photo"))
+                    }.buttonStyle(ShrinkingButton())
+                    
+                    Button(action:{ // edit scan
+                        
+                    }){
+                        Blur(effect: UIBlurEffect(style: .systemMaterial))
+                            .cornerRadius(12)
+                            .overlay(Image(systemName: "pencil"))
+                    }.buttonStyle(ShrinkingButton())
+                    
+                    Button(action:{ // confirmation
+                        exit(success: true)
+                    }){
+                        Blur(effect: UIBlurEffect(style: .systemMaterial))
+                            .cornerRadius(12)
+                            .overlay(Image(systemName: "checkmark"))
+                    }.buttonStyle(ShrinkingButton())
+                }
+            }
+        }.padding()
+    }
+    
+    func exit(success: Bool){
+        if success {
+            Receipt.save()
+            saveState = .none
+            isConfirming = false
+            selectedTab.changeTab(tabPage: .home)
+        } else {
+            Receipt.delete(receipt: receipt)
+            saveState = .none
+            isConfirming = false
         }
+    }
+}
+
+/// ``GalleryScannerView``
+/// is a View struct that manages the ImagePicker and its outputs and surrounding processes.
+/// - Called by ScanView.
+/// - The ImagePicker outputs a result, which is either a success or a failure.
+///     - A success holds scanned images, which are passed to ScanTranslation which extracts the information from the images and applies it into the recognizedContent variable. ScanTranslation holds the saveReceipt function which saves the receipt to the database.
+///     - A failure prints an error to the debug console and places the user back on the image picker.
+struct GalleryScannerView: View {
+    ///``selectedTab`` Controls the TabView's active tab it is viewing. Imports the TabSelection EnvironmentObject, allowing for application wide changing of the selected tab.
+    @EnvironmentObject var selectedTab: TabSelection
+    ///``scanSelection`` is used to manage the screens active view. This is @Binding as it controls the parent views value, allowing it to change the screen as desired.
+    @Binding var scanSelection: ScanSelection
+    ///``SaveState`` is used to manage the receipts save states while its being saved and processed. (via ScanTranslation).
+    @Binding var saveState: SaveState
+    
+    @State var receipt: Receipt = Receipt()
+    ///``invalidAlert`` is used to set whether the scan is valid or not. This links with the parent ScanView which actually displays the error.
+    @State var invalidAlert: Bool = false
+    ///``isConfirming`` is a bool used to control the confirmation screens sheet.
+    @State var isConfirming: Bool = false
+    ///``recognizedContent`` is an object that holds an array of ReceiptItems, holding the information about the scan performed by the user.
+    @ObservedObject var recognizedContent: RecognizedContent  = RecognizedContent()
+    
+    var body: some View {
+        ImagePicker { result in
+            switch result {
+            case .success(let scannedImages):
+                ScanTranslation(scannedImages: scannedImages, recognizedContent: recognizedContent) {
+                    if saveReceipt() { // if save receipt returns true (valid scan), exit the scanner
+                        saveState = .saving // set the state to saving
+                    } else { // else stay in the scanner and alert them to scan again
+                        invalidAlert = true
+                    }
+                }.recognizeText()
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        } didCancelScanning: {
+            // Dismiss the scanner
+            scanSelection = .none
+        }.sheet(isPresented: $isConfirming, content: {
+            ConfirmationView(receipt: Receipt.getReceipt(title: getTitle(text: recognizedContent.items[recognizedContent.items.count-1].text)),
+                             scanSelection: $scanSelection, saveState: $saveState, isConfirming: $isConfirming)
+        }).alert(isPresented: $invalidAlert) {
+            Alert(
+                title: Text("Receipt Not Saved!"),
+                message: Text("This image is not valid. Try again."),
+                dismissButton: .default(Text("Okay"))
+            )
+        }.onChange(of: receipt, perform: { _ in
+            if (receipt.body ?? "").count > 10 {
+                isConfirming = true
+            }
+        })
+    }
+    
+    /// ``saveReceipt``
+    /// is a function that is used to save a RecognizedContent objects receipts. It is used in an if statement to determine whether there is actually translated text, and if its at an acceptable number.
+    /// - Returns
+    ///     - True if the scan is being saved, and passed the validity tests, False if the scan isn't able to be saved, and didn't pass the validity tests.
+    func saveReceipt() -> Bool {
+        if recognizedContent.items.count > 0 {
+            for receiptIn in recognizedContent.items {
+                if receiptIn.text.count > 2 { // if the text in receipt is a suitable size
+                    receipt = Receipt.returnScan(recognizedText: receiptIn.text)
+                    return true
+                } else {
+                   
+                    return false
+                }
+            }
+            scanSelection = .none
+        }
+        return false
     }
 }
 
@@ -164,14 +390,14 @@ struct ScannerSelectView: View {
 ///     - A success holds scanned images, which are passed to ScanTranslation which extracts the information from the images and applies it into the recognizedContent variable. ScanTranslation holds the saveReceipt function which saves the receipt to the database.
 ///     - A failure prints an error to the debug console and places the user back on the document scanner.
 struct DocumentScannerView: View {
-    ///``selectedTab`` Controls the TabView's active tab it is viewing. Imports the TabSelection EnvironmentObject, allowing for application wide changing of the selected tab.
-    @EnvironmentObject var selectedTab: TabSelection
-    ///``invalidAlert`` is used to set whether the scan is valid or not. This links with the parent ScanView which actually displays the error.
-    @Binding var invalidAlert: Bool
     ///``scanSelection`` is used to manage the screens active view. This is @Binding as it controls the parent views value, allowing it to change the screen as desired.
     @Binding var scanSelection: ScanSelection
-    ///``isRecognizing`` binds to the parent views boolean and allows the display of a loading screen while the scan's image is being translated to text.
-    @Binding var isRecognizing: Bool
+    ///``SaveState`` is used to manage the receipts save states while its being saved and processed. (via ScanTranslation).
+    @Binding var saveState: SaveState
+    ///``isConfirming`` is a bool used to control the confirmation screens sheet.
+    @State var isConfirming: Bool = false
+    ///``invalidAlert`` is used to set whether the scan is valid or not. This links with the parent ScanView which actually displays the error.
+    @State var invalidAlert: Bool = false
     ///``recognizedContent`` is an object that holds an array of ReceiptItems, holding the information about the scan performed by the user.
     @ObservedObject var recognizedContent: RecognizedContent  = RecognizedContent()
     
@@ -180,31 +406,44 @@ struct DocumentScannerView: View {
             DocumentScanner { result in
                 switch result {
                 case .success(let scannedImages):
-                    isRecognizing = true
+                    saveState = .confirming
                     print(recognizedContent.items.count)
-                    ScanTranslation(scannedImages: scannedImages,
-                                    recognizedContent: recognizedContent) {
-                        if saveReceipt(){ // if save receipt returns true (valid scan), exit the scanner
-                            scanSelection = .none
-                            selectedTab.changeTab(tabPage: .home)
-                        } else { // else stay in the scanner and alert them to scan again
-                            invalidAlert = true
-                        }
-                        isRecognizing = false // Text recognition is finished, hide the progress indicator.
-                    }.recognizeText()
+                    if saveState == .recognizing {
+                        ScanTranslation(scannedImages: scannedImages, recognizedContent: recognizedContent) {
+                            if saveReceipt() { // if save receipt returns true (valid scan), exit the scanner
+                                saveState = .saving // set the state to saving
+                            } else { // else stay in the scanner and alert them to scan again
+                                invalidAlert = true
+                            }
+                        }.recognizeText()
+                    }
+                    if saveState == .saving { // is the receipt was able to save then make the user confirm it. (receipt needs to be saved first, to make sure there is a database entry to edit.)
+                        saveState = .confirming
+                    }
                 case .failure(let error):
                     print(error.localizedDescription)
                 }
             } didCancelScanning: {
                 // Dismiss the scanner
                 scanSelection = .none
-            }.alert(isPresented: $invalidAlert) {
+            }.onChange(of: saveState, perform: { _ in
+                if saveState == .confirming {
+                    isConfirming = true
+                } else {
+                    isConfirming = false
+                }
+            })
+            .sheet(isPresented: $isConfirming, content: {
+                ConfirmationView(receipt: Receipt.getReceipt(title: getTitle(text: recognizedContent.items[0].text)),
+                                 scanSelection: $scanSelection, saveState: $saveState, isConfirming: $isConfirming)
+            }).alert(isPresented: $invalidAlert) {
                 Alert(
                     title: Text("Receipt Not Saved!"),
                     message: Text("This image is not valid. Try again."),
                     dismissButton: .default(Text("Okay"))
                 )
             }
+            
         } else { // else if its in the simulator (no camera)
             Text("Camera not supported in the simulator!\n\nPlease use a physical device.")
                 .font(.system(.title, design: .rounded))
@@ -220,69 +459,6 @@ struct DocumentScannerView: View {
             }.buttonStyle(ShrinkingButton())
             .accessibility(identifier: "BackButtonCamera")
             Spacer()
-        }
-    }
-    
-    /// ``saveReceipt``
-    /// is a function that is used to save a RecognizedContent objects receipts. It is used in an if statement to determine whether there is actually translated text, and if its at an acceptable number.
-    /// - Returns
-    ///     - True if the scan is being saved, and passed the validity tests, False if the scan isn't able to be saved, and didn't pass the validity tests.
-    func saveReceipt() -> Bool {
-        if recognizedContent.items.count > 0 {
-            for receipt in recognizedContent.items {
-                if receipt.text.count < 2 {
-                    return false
-                } else {
-                    Receipt.saveScan(recognizedText: receipt.text, image: receipt.image)
-                    return true
-                }
-            }
-            scanSelection = .none
-        }
-        return false
-    }
-}
-
-/// ``GalleryScannerView``
-/// is a View struct that manages the ImagePicker and its outputs and surrounding processes.
-/// - Called by ScanView.
-/// - The ImagePicker outputs a result, which is either a success or a failure.
-///     - A success holds scanned images, which are passed to ScanTranslation which extracts the information from the images and applies it into the recognizedContent variable. ScanTranslation holds the saveReceipt function which saves the receipt to the database.
-///     - A failure prints an error to the debug console and places the user back on the image picker.
-struct GalleryScannerView: View {
-    ///``selectedTab`` Controls the TabView's active tab it is viewing. Imports the TabSelection EnvironmentObject, allowing for application wide changing of the selected tab.
-    @EnvironmentObject var selectedTab: TabSelection
-    ///``invalidAlert`` is used to set whether the scan is valid or not. This links with the parent ScanView which actually displays the error.
-    @Binding var invalidAlert: Bool
-    ///``scanSelection`` is used to manage the screens active view. This is @Binding as it controls the parent views value, allowing it to change the screen as desired.
-    @Binding var scanSelection: ScanSelection
-    ///``isRecognizing`` binds to the parent views boolean and allows the display of a loading screen while the scan's image is being translated to text.
-    @Binding var isRecognizing: Bool
-    ///``recognizedContent`` is an object that holds an array of ReceiptItems, holding the information about the scan performed by the user.
-    @ObservedObject var recognizedContent: RecognizedContent  = RecognizedContent()
-    
-    var body: some View {
-        ImagePicker { result in
-            switch result {
-            case .success(let scannedImages):
-                isRecognizing = true
-                print(recognizedContent.items.count)
-                ScanTranslation(scannedImages: scannedImages,
-                                recognizedContent: recognizedContent) {
-                    if saveReceipt() { // if save receipt returns true (valid scan), exit the scanner
-                        scanSelection = .none
-                        selectedTab.changeTab(tabPage: .home)
-                    } else { // else stay in the scanner and alert them to scan again
-                        invalidAlert = true
-                    }
-                    isRecognizing = false // Text recognition is finished, hide the progress indicator.
-                }.recognizeText()
-            case .failure(let error):
-                print(error.localizedDescription)
-            }
-        } didCancelScanning: {
-            // Dismiss the scanner
-            scanSelection = .none
         }
     }
     
@@ -391,122 +567,5 @@ struct DocumentScanner: UIViewControllerRepresentable {
         func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFailWithError error: Error) {
             scannerView.didFinishScanning(.failure(error))
         }
-    }
-}
-
-
-/// ``ConfirmationView``
-/// is a View struct that shows the user its scanned receipt(s) and then provides them with an option of editing, discarding, or confirming the scan.
-/// - Called by DocumentScannerView and GalleryScannerView.
-struct ConfirmationView: View {
-    ///``receipt``: is a Receipt variable that is passed to the view which allows this view to delete and update it as needed.
-    @State var receipt: Receipt
-    ///``isConfirming`` is used to display a confirmation/edit screen when confirming the users scans as correct. (CURRENTLY NOT IN USE, IMPLEMENTATION IS PLANNED).
-    @State var isConfirming: Bool = false
-    ///``recognizedContent`` is an object that holds an array of ReceiptItems that hold the information about the scan performed by the user.
-    @ObservedObject var recognizedContent: RecognizedContent = RecognizedContent()
-    ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
-    @EnvironmentObject var settings: UserSettings
-    
-    //@State var unusedBool = false
-    
-    var body: some View {
-        VStack {
-            Text("Is this correct?")
-                .font(.system(.title, design: .rounded)).bold()
-            ZStack { // receipt
-                VStack {
-                    ZStack (alignment: .top) {
-                        Blur(effect: UIBlurEffect(style: .systemThinMaterial))
-                            .ignoresSafeArea()
-                            .overlay(Color(Folder.getColor(title: "software"))
-                                        .blendMode(.color)
-                                        .opacity(settings.darkMode ? 0.2 : 1.0))
-                        
-                        HStack(alignment: .center) {
-                            VStack(alignment: .leading) {
-                                Text("\(getDate(date: receipt.date))")
-                                    .font(.caption)
-                                
-                                Text(receipt.title ?? "")
-                                    .font(.title)
-                                
-                                Text(receipt.folder ?? "")
-                            }
-                            Spacer()
-                            Image(systemName: Folder.getIcon(title: receipt.folder))
-                                .font(.system(size: 30, weight: .semibold))
-                                .padding(10)
-                                .foregroundColor(Color(Folder.getColor(title: receipt.folder)))
-                                .cornerRadius(12)
-                        }.foregroundColor(Color("text"))
-                        .padding()
-                    }.frame(height: UIScreen.screenHeight * 0.14)
-                    Spacer()
-                }
-                .zIndex(1)
-                
-                ScrollView(showsIndicators: false) {
-                    HStack(alignment: .top) {
-                        VStack {
-                            Text(receipt.body ?? "")
-                        }
-                        Spacer()
-                    }.padding(.horizontal)
-                    .padding(.top, UIScreen.screenHeight * 0.14)
-                    .fixedSize(horizontal: false, vertical: true)
-                }.background(Color("object"))
-                .frame(height: UIScreen.screenHeight * 0.675)
-                .zIndex(0)
-            }.cornerRadius(12)
-            
-            VStack { // buttons
-                HStack (alignment: .center){
-                    Button(action:{
-                        // cancel scan
-                    }){
-                        Blur(effect: UIBlurEffect(style: .systemMaterial))
-                            .cornerRadius(12)
-                            .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.06, radius: 10)
-                            .overlay(Image(systemName: "xmark"))
-                    }.buttonStyle(ShrinkingButton())
-                    
-                    Button(action:{
-                        // view image of scan
-                    }){
-                        Blur(effect: UIBlurEffect(style: .systemMaterial))
-                            .cornerRadius(12)
-                            .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.06, radius: 10)
-                            .overlay(Image(systemName: "photo"))
-                    }.buttonStyle(ShrinkingButton())
-                    
-                    Button(action:{
-                        // edit scan
-                    }){
-                        Blur(effect: UIBlurEffect(style: .systemMaterial))
-                            .cornerRadius(12)
-                            .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.06, radius: 10)
-                            .overlay(Image(systemName: "pencil"))
-                    }.buttonStyle(ShrinkingButton())
-                    
-                    Button(action:{
-                        // confirm scan
-                    }){
-                        Blur(effect: UIBlurEffect(style: .systemMaterial))
-                            .cornerRadius(12)
-                            .dropShadow(isOn: settings.shadows, opacity: settings.darkMode ? 0.25 : 0.06, radius: 10)
-                            .overlay(Image(systemName: "checkmark"))
-                    }.buttonStyle(ShrinkingButton())
-                }
-            }
-        }.padding()
-    }
-    
-    func discard(){
-        // send cancel signal to parent view
-    }
-    
-    func save(){
-        // send save signal to parent view
     }
 }
