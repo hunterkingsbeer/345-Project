@@ -48,7 +48,7 @@ extension Folder {
     
     /// ``folders``
     /// Defines the title of folders, with their respective icons and colours. NEEDS UPDATING TO HAVE NEW FOLDERS WE HAVE CREATED.
-    static let folders = [(title: "Default", icon: "doc.plaintext", color: "text"),
+    static let folders = [(title: "Document", icon: "doc.plaintext", color: "text"),
                               //(title: "Retail", icon: "tag", color: "lightYellow"), too vague
                               (title: "Groceries", icon: "cart", color: "UI2"),
                               (title: "Technology", icon: "desktopcomputer", color: "UI3"),

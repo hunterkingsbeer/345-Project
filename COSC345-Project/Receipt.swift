@@ -95,6 +95,8 @@ struct ReceiptView: View {
 struct ReceiptDetailView: View  {
     ///``receipt``: is a Receipt variable that is passed to the view which holds the information about the receipt this view will represent.
     @State var receipt: Receipt
+    
+    @State var showingDismiss = false
     ///``detailState``: allows the view to update based on how the user desired to interact with the receipt. Allows the user to delete, view the image, and view the receipt.
     @State var detailState: DetailState = .none
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
@@ -136,11 +138,11 @@ struct ReceiptDetailView: View  {
                 HStack {
                     VStack(alignment: .leading) {
                         if Image(data: receipt.image) != nil {
-                            (Image(data: receipt.image) ?? Image(""))
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .cornerRadius(12)
-                                .padding(.top)
+                            HStack {
+                                Spacer()
+                                ImageView(image: (Image(data: receipt.image) ?? Image("")))
+                                Spacer()
+                            }
                         }
                         HStack {
                             Text(receipt.body ?? "")
@@ -164,6 +166,7 @@ struct ReceiptDetailView: View  {
         return Color(Folder.getColor(title: receipt.folder))
     }
 }
+
 
 /// ``ReceiptViewButtons``
 /// is a View struct that displays the buttons at the bottom of the ReceiptDetailView, allowing the receipt to be modified as needed.
@@ -467,3 +470,53 @@ struct EditableReceiptText: View {
 }
 
 
+
+struct ImageView: View {
+    var image: Image
+    @State var viewingImage: Bool = false
+    @State var showingDismiss: Bool = false
+    var body: some View {
+        image
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .cornerRadius(12)
+            .padding(.top)
+            .onTapGesture {
+                withAnimation(.spring()){
+                    viewingImage = true
+                }
+            }.fullScreenCover(isPresented: $viewingImage, content: {
+                ZStack {
+                    ZoomableScrollView {
+                        image
+                            .resizable()
+                            .scaledToFit()
+                            .cornerRadius(12)
+                            .padding()
+                            .onTapGesture {
+                                showingDismiss.toggle()
+                            }
+                        
+                    }.ignoresSafeArea()
+                    
+                    if showingDismiss {
+                        VStack {
+                            Spacer()
+                            
+                            Button(action: {
+                                viewingImage = false
+                            }){
+                                ZStack {
+                                    Blur(effect: UIBlurEffect(style: .systemMaterial))
+                                    Text("Dismiss")
+                                }.animation(.spring())
+                                .frame(width: UIScreen.screenWidth * 0.3, height: UIScreen.screenHeight * 0.065)
+                                .cornerRadius(12)
+                            }.buttonStyle(ShrinkingButton())
+                            .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.5)))
+                        }
+                    }
+                }
+            })
+    }
+}

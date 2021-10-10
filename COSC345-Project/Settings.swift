@@ -94,10 +94,17 @@ struct PasscodeSelector: View {
                                 passEditScreen.editing = true
                             }
                         }){
-                            Image(systemName: settings.passcodeProtection ? "lock.fill" : "lock.slash")
-                                .foregroundColor(Color(settings.passcodeProtection ? settings.accentColor : "text"))
-                                .font(.system(size: 45))
+                            ZStack {
+                                if settings.passcodeProtection {
+                                    Image(systemName: "shield.fill")
+                                        .foregroundColor(Color(settings.accentColor == "UIContrast" ? "accentAlt" : settings.accentColor))
+                                        .font(.system(size: 55))
+                                }
+                                Image(systemName: settings.passcodeProtection ? "lock.fill" : "shield.slash.fill")
+                                    .foregroundColor(Color("text"))
+                                    .font(.system(size: settings.passcodeProtection ? 30 : 45))
                                 .animation(.easeInOut)
+                            }
                         }.buttonStyle(ShrinkingButton())
                         
                         if settings.passcodeProtection {

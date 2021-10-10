@@ -49,7 +49,7 @@ struct ContentView: View {
             SettingsView()
                 .tabItem { Label("Settings", systemImage: "hammer.fill").foregroundColor(Color("text")) }
                 .tag(2)
-        }//.onAppear(perform: { locked = settings.passcodeProtection }) // passcode protection if settings enabled
+        }.onAppear(perform: { locked = settings.passcodeProtection }) // passcode protection if settings enabled
         .fullScreenCover(isPresented: $locked, content: {
             PasscodeScreen(locked: $locked)
                 .environmentObject(UserSettings())

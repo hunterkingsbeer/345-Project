@@ -132,6 +132,7 @@ struct ScannerSelectView: View {
                             VStack(alignment: .center) {
                                 Text("Camera")
                                     .font(.system(size: 22, weight: .bold, design: .rounded))
+                                    .padding(.bottom, 5)
                                 Text("Use the camera to scan a physical item.")
                                     .font(.system(size: 14, weight: .regular, design: .rounded))
                                     .frame(width: UIScreen.screenWidth * 0.35)
@@ -161,6 +162,7 @@ struct ScannerSelectView: View {
                             VStack(alignment: .center) {
                                 Text("Gallery")
                                     .font(.system(size: 22, weight: .bold, design: .rounded))
+                                    .padding(.bottom, 5)
                                 Text("Use the gallery to import an image.")
                                     .font(.system(size: 14, weight: .regular, design: .rounded))
                                     .multilineTextAlignment(.center)
@@ -185,8 +187,12 @@ struct ScannerSelectView: View {
 struct ConfirmationView: View {
     ///``selectedTab`` Controls the TabView's active tab it is viewing. Imports the TabSelection EnvironmentObject, allowing for application wide changing of the selected tab.
     @EnvironmentObject var selectedTab: TabSelection
-    
-    @State var receipt: Receipt
+    ///``isEditing`` is
+    @State var isEditing = false
+    ///``editedReceipt`` is
+    @State var editedReceipt = (title: "", folder: "", body: "", date: Date())
+    ///``receipt``: is a Receipt variable that is passed to the view which holds the information about the receipt this view will represent.
+    @ObservedObject var receipt: Receipt
     ///``scanSelection`` is used to manage the screens active view. This is @Binding as it controls the parent views value, allowing it to change the screen as desired.
     @Binding var scanSelection: ScanSelection
     ///``SaveState`` is used to manage the receipts save states while its being saved and processed. (via ScanTranslation).
@@ -197,94 +203,120 @@ struct ConfirmationView: View {
     @EnvironmentObject var settings: UserSettings
     
     var body: some View {
-        VStack {
-            Text("Does this look correct?")
-                .font(.system(.title, design: .rounded)).bold()
-            ZStack { // receipt
-                VStack {
-                    ZStack (alignment: .top) {
-                        Blur(effect: UIBlurEffect(style: .systemThinMaterial))
-                            .ignoresSafeArea()
-                            .overlay(Color(Folder.getColor(title: "software"))
-                                        .blendMode(.color)
-                                        .opacity(settings.darkMode ? 0.2 : 1.0))
-                        
-                        HStack(alignment: .center) {
-                            VStack(alignment: .leading) {
-                                Text("\(getDate(date: receipt.date))")
-                                    .font(.caption)
-                                
-                                Text(receipt.title ?? "")
-                                    .font(.title)
-                                
-                                Text(receipt.folder ?? "")
-                            }
-                            Spacer()
-                            Image(systemName: Folder.getIcon(title: receipt.folder))
-                                .font(.system(size: 30, weight: .semibold))
-                                .padding(10)
-                                .foregroundColor(Color(Folder.getColor(title: receipt.folder)))
-                                .cornerRadius(12)
-                        }.foregroundColor(Color("text"))
-                        .padding()
-                    }.frame(height: UIScreen.screenHeight * 0.14)
-                    Spacer()
-                }.zIndex(1)
-                
-                ScrollView(showsIndicators: false) {
-                    HStack(alignment: .top) {
-                        VStack {
-                            if Image(data: receipt.image) != nil {
-                                (Image(data: receipt.image) ?? Image(""))
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
+        ZStack {
+            Color("background")
+                .ignoresSafeArea()
+            VStack {
+                Text("Does this look correct?")
+                    .font(.system(.title, design: .rounded)).bold()
+                    .foregroundColor(Color(settings.accentColor))
+                Text("Please confirm the info below.")
+                ZStack { // receipt
+                    VStack {
+                        ZStack (alignment: .top) {
+                            Blur(effect: UIBlurEffect(style: .systemThinMaterial))
+                                .ignoresSafeArea()
+                                .overlay(Color(Folder.getColor(title: "software"))
+                                            .blendMode(.color)
+                                            .opacity(settings.darkMode ? 0.2 : 1.0))
+                            
+                            HStack(alignment: .center) {
+                                VStack(alignment: .leading) {
+                                    Text("\(getDate(date: receipt.date))")
+                                        .font(.caption)
+                                    EditableReceiptText(placeholder: receipt.title ?? "Title",
+                                                        editedItem: $editedReceipt.title,
+                                                        editing: isEditing, font: .title)// title
+                                    
+                                    Text(receipt.folder ?? "")
+                                }
+                                Spacer()
+                                Image(systemName: Folder.getIcon(title: receipt.folder))
+                                    .font(.system(size: 30, weight: .semibold))
+                                    .padding(10)
+                                    .foregroundColor(Color(Folder.getColor(title: receipt.folder)))
                                     .cornerRadius(12)
-                                    .padding(.top)
-                            }
-                            HStack {
-                                Text(receipt.body ?? "")
+                            }.foregroundColor(Color("text"))
+                            .padding()
+                        }.frame(height: UIScreen.screenHeight * 0.14)
+                        Spacer()
+                    }.zIndex(1)
+                    
+                    ScrollView(showsIndicators: false) {
+                        HStack(alignment: .top) {
+                            VStack {
+                                if Image(data: receipt.image) != nil {
+                                    HStack {
+                                        Spacer()
+                                        ImageView(image: (Image(data: receipt.image) ?? Image("")))
+                                        Spacer()
+                                    }
+                                }
+                                HStack {
+                                    Text(receipt.body ?? "")
+                                    Spacer()
+                                }
                                 Spacer()
                             }
                             Spacer()
-                        }
-                        Spacer()
-                    }.padding(.horizontal)
-                    .padding(.top, UIScreen.screenHeight * 0.14)
-                    .fixedSize(horizontal: false, vertical: true)
+                        }.padding(.horizontal)
+                        .padding(.top, UIScreen.screenHeight * 0.14)
+                        .fixedSize(horizontal: false, vertical: true)
+                    }.background(Color("object"))
+                    .frame(height: UIScreen.screenHeight * 0.7)
+                    .zIndex(0)
                 }.background(Color("object"))
-                .frame(height: UIScreen.screenHeight * 0.7)
-                .zIndex(0)
-            }.background(Color("background"))
-            .cornerRadius(12)
-            
-            VStack { // buttons
-                HStack (alignment: .center){
-                    Button(action:{ // cancel
-                        exit(success: false)
-                    }){
-                        Blur(effect: UIBlurEffect(style: .systemMaterial))
-                            .cornerRadius(12)
-                            .overlay(Image(systemName: "xmark"))
-                    }.buttonStyle(ShrinkingButton())
-                    
-                    Button(action:{ // edit scan
+                .cornerRadius(12)
+                
+                VStack { // buttons
+                    HStack (alignment: .center){
+                        Button(action:{ // cancel
+                            if isEditing {
+                                updateEditedReceipt()
+                                isEditing = false
+                            } else {
+                                exit(success: false)
+                            }
+                        }){
+                            Blur(effect: UIBlurEffect(style: .systemMaterial))
+                                .cornerRadius(12)
+                                .overlay(
+                                    Image(systemName: isEditing ? "xmark" : "trash")
+                                        .animation(.spring()))
+                        }.buttonStyle(ShrinkingButton())
                         
-                    }){
-                        Blur(effect: UIBlurEffect(style: .systemMaterial))
-                            .cornerRadius(12)
-                            .overlay(Image(systemName: "pencil"))
-                    }.buttonStyle(ShrinkingButton())
-                    
-                    Button(action:{ // confirmation
-                        exit(success: true)
-                    }){
-                        Blur(effect: UIBlurEffect(style: .systemMaterial))
-                            .cornerRadius(12)
-                            .overlay(Image(systemName: "checkmark"))
-                    }.buttonStyle(ShrinkingButton())
+                        Button(action:{ // edit scan
+                            isEditing.toggle()
+                            if isEditing {
+                                updateEditedReceipt()
+                            }
+                        }){
+                            Blur(effect: UIBlurEffect(style: .systemMaterial))
+                                .cornerRadius(12)
+                                .overlay(
+                                    ZStack{
+                                        if isEditing { Text("Editing") } else { Image(systemName: "pencil") }
+                                    })
+                        }.buttonStyle(ShrinkingButton())
+                        
+                        Button(action:{ // confirmation
+                            if isEditing {
+                                saveReceipt()
+                                isEditing = false
+                            }else {
+                                exit(success: true)
+                            }
+                        }){
+                            Blur(effect: UIBlurEffect(style: .systemMaterial))
+                                .cornerRadius(12)
+                                .overlay(
+                                    Image(systemName: isEditing ? "arrow.forward" : "checkmark")
+                                        .animation(.spring()))
+                        }.buttonStyle(ShrinkingButton())
+                    }
                 }
-            }
-        }.padding()
+            }.padding().onAppear(perform: updateEditedReceipt)
+        }
     }
     
     func exit(success: Bool){
@@ -298,6 +330,21 @@ struct ConfirmationView: View {
             saveState = .none
             isConfirming = false
         }
+    }
+    
+    func updateEditedReceipt(){
+        editedReceipt.title = receipt.title ?? ""
+        editedReceipt.folder = receipt.folder ?? ""
+        editedReceipt.body = receipt.body ?? ""
+        editedReceipt.date = receipt.date ?? Date()
+    }
+    
+    func saveReceipt(){
+        receipt.title = editedReceipt.title
+        receipt.folder = editedReceipt.folder
+        receipt.body = editedReceipt.body
+        receipt.date = editedReceipt.date
+        Receipt.save()
     }
 }
 
@@ -314,7 +361,7 @@ struct GalleryScannerView: View {
     @Binding var scanSelection: ScanSelection
     ///``SaveState`` is used to manage the receipts save states while its being saved and processed. (via ScanTranslation).
     @Binding var saveState: SaveState
-    
+    ///``receipt``: is a Receipt variable that is passed to the view which holds the information about the receipt this view will represent.
     @State var receipt: Receipt = Receipt()
     ///``invalidAlert`` is used to set whether the scan is valid or not. This links with the parent ScanView which actually displays the error.
     @State var invalidAlert: Bool = false
@@ -338,10 +385,11 @@ struct GalleryScannerView: View {
         } didCancelScanning: {
             // Dismiss the scanner
             scanSelection = .none
-        }.sheet(isPresented: $isConfirming, onDismiss: { Receipt.delete(receipt: receipt) }){
+        }.fullScreenCover(isPresented: $isConfirming, content: {
             ConfirmationView(receipt: Receipt.getReceipt(title: getTitle(text: recognizedContent.items[recognizedContent.items.count-1].text)),
                              scanSelection: $scanSelection, saveState: $saveState, isConfirming: $isConfirming)
-        }.alert(isPresented: $invalidAlert) {
+                .environmentObject(UserSettings())
+        }).alert(isPresented: $invalidAlert) {
             Alert(
                 title: Text("Receipt Not Saved!"),
                 message: Text("This image is not valid. Try again."),
@@ -384,7 +432,7 @@ struct DocumentScannerView: View {
     @Binding var scanSelection: ScanSelection
     ///``SaveState`` is used to manage the receipts save states while its being saved and processed. (via ScanTranslation).
     @Binding var saveState: SaveState
-    
+    ///``receipt``: is a Receipt variable that is passed to the view which holds the information about the receipt this view will represent.
     @State var receipt: Receipt = Receipt()
     ///``invalidAlert`` is used to set whether the scan is valid or not. This links with the parent ScanView which actually displays the error.
     @State var invalidAlert: Bool = false
@@ -409,10 +457,11 @@ struct DocumentScannerView: View {
             } didCancelScanning: {
                 // Dismiss the scanner
                 scanSelection = .none
-            }.sheet(isPresented: $isConfirming, onDismiss: { Receipt.delete(receipt: receipt) }){
+            }.fullScreenCover(isPresented: $isConfirming, content: {
                 ConfirmationView(receipt: Receipt.getReceipt(title: getTitle(text: recognizedContent.items[recognizedContent.items.count-1].text)),
                                  scanSelection: $scanSelection, saveState: $saveState, isConfirming: $isConfirming)
-            }.alert(isPresented: $invalidAlert) {
+                    .environmentObject(UserSettings())
+            }).alert(isPresented: $invalidAlert) {
                 Alert(
                     title: Text("Receipt Not Saved!"),
                     message: Text("This image is not valid. Try again."),
