@@ -285,7 +285,7 @@ struct ConfirmationView: View {
                                         .animation(.spring()))
                         }.buttonStyle(ShrinkingButton())
                         
-                        Button(action:{ // edit scan
+                        /*Button(action:{ // edit scan
                             isEditing.toggle()
                             if isEditing {
                                 updateEditedReceipt()
@@ -297,7 +297,7 @@ struct ConfirmationView: View {
                                     ZStack{
                                         if isEditing { Text("Editing") } else { Image(systemName: "pencil") }
                                     })
-                        }.buttonStyle(ShrinkingButton())
+                        }.buttonStyle(ShrinkingButton())*/
                         
                         Button(action:{ // confirmation
                             if isEditing {
