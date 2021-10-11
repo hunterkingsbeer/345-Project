@@ -28,7 +28,7 @@ class COSC345_ProjectTests: XCTestCase {
         var generatedString = ""
         var testString = ""
         let viewContext = PersistenceController.shared.getContext()
-        let receipt = Receipt(context: viewContext)
+        var receipt = Receipt(context: viewContext)
         //var documentView = DocumentScannerView()
         
             // Fetch Image Data
@@ -64,39 +64,39 @@ class COSC345_ProjectTests: XCTestCase {
             let testGen = testString.components(separatedBy:  CharacterSet.newlines).first
             XCTAssert(genString == testGen )
         
-        Receipt.saveScan(recognizedText: generatedString, image: image2)
-        recepit = Receipt.getReceipt(title: "Blond")
-        let splitString = generatedString.components(separatedBy: CharacterSet.newlines).first!
-        print(splitString)
-        XCTAssert(splitString == recepit.title?.lowercased())
-            
-             let preview: PersistenceController = {
-                let result = PersistenceController(inMemory: true)
-                let viewContext = result.container.viewContext
-                
-                for folder in Folder.folders {
-                    let newFolder = Folder(context: viewContext)
-                    newFolder.title = folder.title.capitalized
-                    newFolder.color = folder.color
-                    newFolder.icon = folder.icon
-                    newFolder.id = UUID()
-                }
-                
-                 PersistenceController.save(viewContext: viewContext)
-                
-                for index in 0..<10 {
-                    let newReceipt = Receipt(context: viewContext)
-                    newReceipt.body = "BODY TEXT EXAMPLE"
-                    newReceipt.date = Date()
-                    newReceipt.id = UUID()
-                    newReceipt.title = "Example Store"
-                    newReceipt.folder = Prediction.pointPrediction(text: ((newReceipt.title ?? "") + (newReceipt.body ?? "")))
-                }
-                        
-                 PersistenceController.save(viewContext: viewContext)
-                return result
-            }()
-            XCTAssert(PersistenceController.preview.getContext() != preview.getContext() )
+        //Receipt.saveScan(recognizedText: generatedString, image: image2)
+        //receipt = Receipt.getReceipt(title: "Blond")
+//        let splitString = generatedString.components(separatedBy: CharacterSet.newlines).first!
+//        print(splitString)
+//        XCTAssert(splitString == testGen)
+//            
+//             let preview: PersistenceController = {
+//                let result = PersistenceController(inMemory: true)
+//                let viewContext = result.container.viewContext
+//                
+//                for folder in Folder.folders {
+//                    let newFolder = Folder(context: viewContext)
+//                    newFolder.title = folder.title.capitalized
+//                    newFolder.color = folder.color
+//                    newFolder.icon = folder.icon
+//                    newFolder.id = UUID()
+//                }
+//                
+//                 //PersistenceController.save(viewContext: viewContext)
+//                
+//                for index in 0..<10 {
+//                    let newReceipt = Receipt(context: viewContext)
+//                    newReceipt.body = "BODY TEXT EXAMPLE"
+//                    newReceipt.date = Date()
+//                    newReceipt.id = UUID()
+//                    newReceipt.title = "Example Store"
+//                    newReceipt.folder = Prediction.pointPrediction(text: ((newReceipt.title ?? "") + (newReceipt.body ?? "")))
+//                }
+//                        
+//                 //PersistenceController.save(viewContext: viewContext)
+//                return result
+//            }()
+//            XCTAssert(PersistenceController.preview.getContext() != preview.getContext() )
         
         }
         
@@ -179,20 +179,6 @@ class COSC345_ProjectTests: XCTestCase {
         userSet.accentColor = "0001"
         testString = UserDefaults.standard.string(forKey: "accentColor")!
         XCTAssert(testString == userSet.accentColor)
-
-        userSet.thinFolders = true
-        testVar = UserDefaults.standard.bool(forKey: "thinFolders")
-        XCTAssert(testVar == userSet.thinFolders)
-        userSet.thinFolders = false
-        testVar = UserDefaults.standard.bool(forKey: "thinFolders")
-        XCTAssert(testVar == userSet.thinFolders)
-
-        userSet.shadows = true
-        testVar = UserDefaults.standard.bool(forKey: "shadows")
-        XCTAssert(testVar == userSet.shadows)
-        userSet.shadows = false
-        testVar = UserDefaults.standard.bool(forKey: "shadows")
-        XCTAssert(testVar == userSet.shadows)
 
         userSet.autocomplete = true
         testVar = UserDefaults.standard.bool(forKey: "autocomplete")
