@@ -120,7 +120,7 @@ class COSC345_ProjectUITests: XCTestCase {
         
         let elementsQuery = app.scrollViews.otherElements
         
-        elementsQuery.buttons["lock.slash"].forceTap()
+        elementsQuery.buttons["shield.slash.fill"].forceTap()
 
         
         let button = app.buttons["1"]
@@ -225,7 +225,7 @@ class COSC345_ProjectUITests: XCTestCase {
         XCUIDevice.shared.press(XCUIDevice.Button.home)
         let app2 = XCUIApplication(bundleIdentifier: "com.apple.mobilesafari")
         app2.launch()
-        app2/*@START_MENU_TOKEN@*/.otherElements["URL"]/*[[".otherElements[\"SafariWindow?View=Narrow&BarsKeptMinimized=false&UUID=DE97B6C6-8E1F-4A40-804D-780FB54E9C0D&SupportsTabBar=false\"]",".otherElements[\"TopBrowserBar\"]",".buttons[\"Address\"]",".otherElements[\"Address\"]",".otherElements[\"URL\"]",".buttons[\"URL\"]"],[[[-1,4],[-1,3],[-1,5,3],[-1,2,3],[-1,1,2],[-1,0,1]],[[-1,4],[-1,3],[-1,5,3],[-1,2,3],[-1,1,2]],[[-1,4],[-1,3],[-1,5,3],[-1,2,3]],[[-1,4],[-1,3]]],[0]]@END_MENU_TOKEN@*/.tap()
+        app2.otherElements["URL"].tap()
         app2.textFields["URL"].typeText("https://i.ibb.co/Xp2C5k6/testRec.jpg")
         app2.buttons["Go"].tap()
         app2.tapCoordinate(at: CGPoint(x: 200, y: 200) )

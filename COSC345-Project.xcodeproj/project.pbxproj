@@ -548,7 +548,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 532Z8N5QBN;
+				DEVELOPMENT_TEAM = TJ3X96WH43;
 				INFOPLIST_FILE = "COSC345-ProjectTests/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -567,6 +567,7 @@
 		5AEDB8AA264DD6AB003A3CDD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = TJ3X96WH43;
 				INFOPLIST_FILE = "COSC345-ProjectUITests/Info.plist";
