@@ -27,8 +27,7 @@ class COSC345_ProjectTests: XCTestCase {
         let bundle = Bundle(for: COSC345_ProjectTests.self)
         var generatedString = ""
         var testString = ""
-        let viewContext = PersistenceController.shared.getContext()
-        var receipt = Receipt(context: viewContext)
+        var receipt: Receipt
         //var documentView = DocumentScannerView()
         
             // Fetch Image Data
@@ -65,38 +64,37 @@ class COSC345_ProjectTests: XCTestCase {
             XCTAssert(genString == testGen )
         
         //Receipt.saveScan(recognizedText: generatedString, image: image2)
-        //receipt = Receipt.getReceipt(title: "Blond")
-//        let splitString = generatedString.components(separatedBy: CharacterSet.newlines).first!
-//        print(splitString)
-//        XCTAssert(splitString == testGen)
-//            
-//             let preview: PersistenceController = {
-//                let result = PersistenceController(inMemory: true)
-//                let viewContext = result.container.viewContext
-//                
-//                for folder in Folder.folders {
-//                    let newFolder = Folder(context: viewContext)
-//                    newFolder.title = folder.title.capitalized
-//                    newFolder.color = folder.color
-//                    newFolder.icon = folder.icon
-//                    newFolder.id = UUID()
-//                }
-//                
-//                 //PersistenceController.save(viewContext: viewContext)
-//                
-//                for index in 0..<10 {
-//                    let newReceipt = Receipt(context: viewContext)
-//                    newReceipt.body = "BODY TEXT EXAMPLE"
-//                    newReceipt.date = Date()
-//                    newReceipt.id = UUID()
-//                    newReceipt.title = "Example Store"
-//                    newReceipt.folder = Prediction.pointPrediction(text: ((newReceipt.title ?? "") + (newReceipt.body ?? "")))
-//                }
-//                        
-//                 //PersistenceController.save(viewContext: viewContext)
-//                return result
-//            }()
-//            XCTAssert(PersistenceController.preview.getContext() != preview.getContext() )
+        receipt = Receipt.getReceipt(title: "Blond")
+        let splitString = generatedString.components(separatedBy: CharacterSet.newlines).first!
+        print(splitString)
+        XCTAssert(splitString == testGen)
+            
+             let preview: PersistenceController = {
+                let result = PersistenceController(inMemory: true)
+                let viewContext = result.container.viewContext
+                for folder in Folder.folders {
+                    let newFolder = Folder(context: viewContext)
+                    newFolder.title = folder.title.capitalized
+                    newFolder.color = folder.color
+                    newFolder.icon = folder.icon
+                    newFolder.id = UUID()
+                }
+                
+                 PersistenceController.save(viewContext: viewContext)
+                
+                for index in 0..<2 {
+                    let newReceipt = Receipt(context: viewContext)
+                    newReceipt.body = "BODY TEXT EXAMPLE"
+                    newReceipt.date = Date()
+                    newReceipt.id = UUID()
+                    newReceipt.title = "Example Store"
+                    newReceipt.folder = "Documents"
+                }
+                        
+                 PersistenceController.save(viewContext: viewContext)
+                return result
+            }()
+            XCTAssert(PersistenceController.preview.getContext() != preview.getContext() )
         
         }
         
