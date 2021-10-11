@@ -10,46 +10,34 @@ import SwiftUI
 import CoreData
 import Swift
 
-extension Color {
-
-    var rgb: (red: Double, green: Double, blue: Double, o: Double)? {
-        let uiColor: UIColor
-        
-        var r: CGFloat = 0
-        var g: CGFloat = 0
-        var b: CGFloat = 0
-        var o: CGFloat = 0
-        
-        if self.description.contains("NamedColor") {
-            let lowerBound = self.description.range(of: "name: \"")!.upperBound
-            let upperBound = self.description.range(of: "\", bundle")!.lowerBound
-            let assetsName = String(self.description[lowerBound..<upperBound])
-            
-            uiColor = UIColor(named: assetsName)!
-        } else {
-            uiColor = UIColor(self)
-        }
-
-        guard uiColor.getRed(&r, green: &g, blue: &b, alpha: &o) else { return nil }
-        
-        return (Double(r), Double(g), Double(b), Double(o))
-    }
-}
-
+/// ``Blur``
+/// is a UIViewRepresentable that is used to create a blur object. This is used all over the app as backgrounds or accents.
+/// - Parameter effect: the type of blur effect you want.
 struct Blur: UIViewRepresentable {
     var effect: UIVisualEffect?
     func makeUIView(context: UIViewRepresentableContext<Self>) -> UIVisualEffectView { UIVisualEffectView() }
     func updateUIView(_ uiView: UIVisualEffectView, context: UIViewRepresentableContext<Self>) { uiView.effect = effect }
 }
 
+/// ``imageToData``
+/// is used to return the data of an input image.
+/// - Parameter image: the image you want to convert to data.
+/// - Returns the data from the image.
 func imageToData(image: UIImage) -> Data {
     return image.jpegData(compressionQuality: 0.5) ?? Data()
 }
 
+/// ``getTitle``
+/// is used to return the first line (title) of a given text
+/// - Parameter text: Text you want the title of
+/// - Returns the first line of the text.
 func getTitle(text: String) -> String {
     return String(text.components(separatedBy: CharacterSet.newlines).first!).capitalized
 }
 
+// ``hapticFeedback``
+/// is used to trigger a haptic feedback vibration
+/// - Parameter type: the type of haptic feedback you want.
 func hapticFeedback(type: UIImpactFeedbackGenerator.FeedbackStyle){
     UIImpactFeedbackGenerator(style: type).impactOccurred()
 }
@@ -236,8 +224,8 @@ class TabSelection: ObservableObject {
     }
 }
 
-// Found @ https://stackoverflow.com/questions/58341820/isnt-there-an-easy-way-to-pinch-to-zoom-in-an-image-in-swiftui
-// makes a zoomable view for fullscreen images
+/// ``ZoomableScrollView``
+/// is a UIViewRepresentable struct that bridges UIKit to allow for a zoomable/movable image view.
 struct ZoomableScrollView<Content: View>: UIViewRepresentable {
   private var content: Content
 

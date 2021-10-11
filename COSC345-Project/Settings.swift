@@ -54,17 +54,20 @@ struct SettingsView: View  {
     }
 }
 
-enum PassSuccess {
-    case none
-    case success
-    case failure
-}
-
+/// ``PasscodeSelector``
+/// is a View struct that allows a user to manage their passcodes. This includes the option to enable, disable, and update passcodes.
+/// - Called by SettingsView.
 struct PasscodeSelector: View {
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
+    
+    ///``passState``: is used to control the passcode editing state (cereating, updating, removing)
     @State var passState : PassEditingState = .none
+    
+    ///``passEditScreen``: is used to control the fullscreen passcodeEdit view. Editing managed the fullscreen presentation, and expected code controls the edit type to be passed through (cereating, updating, removing)
     @State var passEditScreen = (editing: false, expectedCode: "0000")
+    
+    ///``passcodeSuccess``: is used to hold the result of a passcode edit result.
     @State var passcodeSuccess = (success: false, code: "")
     
     var body: some View {
@@ -144,7 +147,7 @@ struct PasscodeSelector: View {
                 }
             }
             .fullScreenCover(isPresented: $passEditScreen.editing, content: {
-                PasscodeEdit(result: $passcodeSuccess, expectedCode: passEditScreen.expectedCode)
+                PasscodeEdit(result: $passcodeSuccess, editType: passEditScreen.expectedCode)
                     .environmentObject(UserSettings())
                     .preferredColorScheme(settings.darkMode ? .dark : .light)
                     .onDisappear(perform: {
@@ -154,6 +157,9 @@ struct PasscodeSelector: View {
     }
 }
 
+/// ``DarkModeButton``
+/// is a View struct that updates the UI color scheme. Either dark or light.
+/// - Called by SettingsView.
 struct DarkModeButton: View {
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
@@ -193,6 +199,9 @@ struct DarkModeButton: View {
     }
 }
 
+/// ``ScanDefaultSelector``
+/// is a View struct that controls the default scanner option. This is either the camera, gallery or the option of both.
+/// - Called by SettingsView.
 struct ScanDefaultSelector: View {
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
@@ -271,6 +280,9 @@ struct ScanDefaultSelector: View {
     }
 }
 
+/// ``AccentColorSelector``
+/// is a View struct that controls the accent color of the app. This is takes the UI colors and presents them for selection.
+/// - Called by SettingsView.
 struct AccentColorSelector: View {
     ///``colors`` Imports an array of tuples containing various colors that are used to style the UI. This is based on the UserSettings 'style' setting, and is an @State to update the UI.
     @State var colors = Color.colors

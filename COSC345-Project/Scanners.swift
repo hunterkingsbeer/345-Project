@@ -69,6 +69,7 @@ struct ScanView: View {
     @State var scanSelection: ScanSelection = .none
     ///``SaveState`` is used to manage the receipts save states while its being saved and processed. (via ScanTranslation).
     @State var saveState: SaveState = .none
+    
     @State var unusedBool = false
     
     var body: some View {

@@ -31,13 +31,6 @@ class UserSettings: ObservableObject {
         }
     }
     
-    ///``autocomplete`` is a Boolean that controls whether the scanner will ask for confirmation of a correct scan. True will disable confirmation, False will enable comfirmation.
-    @Published var autocomplete: Bool {
-        didSet {
-            UserDefaults.standard.set(autocomplete, forKey: "autocomplete")
-        }
-    }
-    
     ///``devMode`` is a Boolean that controls whether the Settings show the developer options. True for dev mode, false for regular mode.
     @Published var devMode: Bool {
         didSet {
@@ -49,13 +42,6 @@ class UserSettings: ObservableObject {
     @Published var scanDefault: Int {
         didSet {
             UserDefaults.standard.set(scanDefault, forKey: "scanDefault")
-        }
-    }
-    
-    ///``firstUse`` is a Boolean that holds whether a user is using the app for the first time. True if its a first use, false if not.
-    @Published var firstUse: Bool {
-        didSet {
-            UserDefaults.standard.set(firstUse, forKey: "firstUse")
         }
     }
     
@@ -79,14 +65,10 @@ class UserSettings: ObservableObject {
         self.darkMode = UserDefaults.standard.object(forKey: "darkMode") as? Bool ?? false
         /// Accent color defaults to "UI2". Color is Receipted Fluro Green by default.
         self.accentColor = UserDefaults.standard.object(forKey: "accentColor") as? String ?? "UI2"
-        /// Auto Complete defaults to false. Confirmation by user required by default.
-        self.autocomplete = UserDefaults.standard.object(forKey: "autocomplete") as? Bool ?? false
         /// Dev Mode defaults to false. Regular mode enabled by default.
         self.devMode = UserDefaults.standard.object(forKey: "devMode") as? Bool ?? false
         /// Scan Default defaults to choose. Allows user to choose their scan method.
         self.scanDefault = UserDefaults.standard.object(forKey: "scanDefault") as? Int ?? 0
-        /// First Use defaults to true, once the user loads up the app for its first use its set to false.
-        self.firstUse = UserDefaults.standard.object(forKey: "firstUse") as? Bool ?? true
         /// Passcode Protection defaults to false, requiring the user to enable it if desired.
         self.passcodeProtection = UserDefaults.standard.object(forKey: "passcodeProtection") as? Bool ?? false
         /// Passcode defaults to 0000, in a temporary disabled state.
