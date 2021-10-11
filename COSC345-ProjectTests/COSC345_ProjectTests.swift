@@ -178,13 +178,6 @@ class COSC345_ProjectTests: XCTestCase {
         testString = UserDefaults.standard.string(forKey: "accentColor")!
         XCTAssert(testString == userSet.accentColor)
 
-        userSet.autocomplete = true
-        testVar = UserDefaults.standard.bool(forKey: "autocomplete")
-        XCTAssert(testVar == userSet.autocomplete)
-        userSet.autocomplete = false
-        testVar = UserDefaults.standard.bool(forKey: "autocomplete")
-        XCTAssert(testVar == userSet.autocomplete)
-
         userSet.devMode = true
         testVar = UserDefaults.standard.bool(forKey: "devMode")
         XCTAssert(testVar == userSet.devMode)
@@ -198,13 +191,6 @@ class COSC345_ProjectTests: XCTestCase {
         userSet.scanDefault = 2
         testInt = UserDefaults.standard.integer(forKey: "scanDefault")
         XCTAssert(testInt == userSet.scanDefault)
-
-        userSet.firstUse = true
-        testVar = UserDefaults.standard.bool(forKey: "firstUse")
-        XCTAssert(testVar == userSet.firstUse)
-        userSet.firstUse = false
-        testVar = UserDefaults.standard.bool(forKey: "firstUse")
-        XCTAssert(testVar == userSet.firstUse)
         
         userSet.passcodeProtection = true
         testVar = UserDefaults.standard.bool(forKey: "passcodeProtection")
@@ -242,14 +228,5 @@ class COSC345_ProjectTests: XCTestCase {
         XCTAssert(tab.selection == 0)
         tab.changeTab(tabPage: TabPage.scan)
         XCTAssert(tab.selection == 1)
-        
-        var color = Color.white
-        let colorRgb = color.rgb
-        let bound = color.description.range(of: "name: \"")
-        color = Color.red
-        let colorRgb2 = color.rgb
-        let bound2 = color.description.range(of: "name: \"")
-        XCTAssert(colorRgb2?.green != colorRgb?.green && bound == bound2)
-        
     }
 }
