@@ -8,20 +8,51 @@
 import SwiftUI
 import CoreData
 
-/// used to handle the initial lockscreen
+/// ``PassEditingState``
+/// is an enum that is used to control the state of the the edited state of the passcode from the settings menu.
+enum PassEditingState: String {
+    ///``none``: When this is active it will present the view in its default view, with nothing active.
+    case none = "none"
+    
+    ///``updating``: When this is active the user is updating their passcode, requiring entry of the current passcode before confirming a new one.
+    case updating = "updating"
+    
+    ///``creating``: When this is active the user will be asked to enter and confirm a new passcode.
+    case creating = "creating"
+    
+    ///``removing``: When this is active the user is removing passcode protection, requiring entry of the current passcode before passcode protection is removed.
+    case removing = "removing"
+}
+
+/// ``PasscodeScreen``
+/// is a View struct that displays the passcode protection screen when initially booting up the app. It prevents access to the app until the user enters their passcode, or reset it (where it then deletes all stored data)
+/// - Called by ContentView.
+/// - Parameters
+///     - ``locked``: Binding bool that controls whether the screen is locked or unlocked (where it will dismiss the view)
 struct PasscodeScreen: View {
+    ///``presentationMode``: is used to control the presentation of a sheet modal view.
     @Environment(\.presentationMode) var presentationMode
+    
     ///``FetchRequest``: Creates a FetchRequest for the 'Receipt' CoreData entities. Contains a NSSortDescriptor that sorts and orders the receipts as specified by Date.
     @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)], animation: .spring())
+    
     ///``receipts``: Takes and stores the requested Receipt entities in a FetchedResults variable of type Receipt. This variable is essentially an array of Receipt objects that the user has scanned.
     var receipts: FetchedResults<Receipt>
+    
     ///``settings`` Alters the view based on the user's settings. Imports the UserSettings EnvironmentObject allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
+    
+    ///``locked``: controls whether the screen is locked and present.
     @Binding var locked: Bool
+    
+    ///``userInput``: holds the users passcode entry.
     @State var userInput = ""
+    
+    ///``backgroundColor``: controls the background color. Used to update the background based on a success or failure.
     @State var backgroundColor = "background"
+    
+    ///``resetting``: controls whether the passcode reset screen is present.
     @State var resetting = false
-    @State var unusedBool = false
     
     var body: some View {
         ZStack {
@@ -29,7 +60,7 @@ struct PasscodeScreen: View {
                 .animation(.spring())
                 .ignoresSafeArea(.all)
             VStack(alignment: .center) {
-                TitleText(buttonBool: $unusedBool, title: "Receipted", icon: backgroundColor == "UI2" ? "lock.open" : "lock")
+                TitleText(title: "Receipted", icon: backgroundColor == "UI2" ? "lock.open" : "lock")
                 
                 if !resetting {
                     VStack {
@@ -71,7 +102,7 @@ struct PasscodeScreen: View {
                         HStack {
                             Spacer()
                             Button(action: { // clear
-                                userInput = settings.devMode ? settings.passcode : ""
+                                userInput = ""
                                 hapticFeedback(type: .rigid)
                             }){
                                 Blur(effect: UIBlurEffect(style: .systemUltraThinMaterial))
@@ -231,23 +262,31 @@ struct PasscodeScreen: View {
     }
 }
 
-enum PassEditingState: String {
-    case none = "none"
-    case updating = "updating"
-    case creating = "creating"
-    case removing = "removing"
-}
-
-
-/// Used in adding/editing/removing the passcode
+/// ``PasscodeEdit``
+/// is a View struct that is used to edit the users passcode. This includes adding a new passcode, updating a current passcode, or deleting a current passcode.
+/// - Called by SettingsView.
+/// - Parameters
+///     - ``locked``: Binding bool that controls whether the screen is locked or unlocked (where it will dismiss the view)
 struct PasscodeEdit: View {
+    ///``presentationMode``: is used to control the presentation of a sheet modal view.
     @Environment(\.presentationMode) var presentationMode
-    ///``settings`` Alters the view based on the user's settings. Imports the UserSettings EnvironmentObject allowing unified usage and updating of the users settings across all classes.
+    
+    ///``settings``: Alters the view based on the user's settings. Imports the UserSettings EnvironmentObject allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
+    
+    ///``backgroundColor``:  controls the background color. Used to update the background based on a success or failure.
     @State var backgroundColor = "background"
+    
+    ///``result``: holds the final result of the edit, this includes whether the view exits with success (bool) and the final code.
     @Binding var result: (success: Bool, code: String)
-    @State var expectedCode: String
+    
+    ///``editType``: is used for setting the edit type. "creating" for creating a new pass, "updating" for updating a pass, current passcode for deleting.
+    @State var editType: String
+    
+    ///``repeatPass``: is used for comparison when confirming a passcode.
     @State var repeatPass: String = ""
+    
+    ///``confirmedPass``: is used to control the view's features when confirming a passcode.
     @State var confirmedPass: Bool = false
     
     var body: some View {
@@ -301,7 +340,7 @@ struct PasscodeEdit: View {
                 HStack {
                     Spacer()
                     Button(action: { // clear
-                        result.code = settings.devMode ? expectedCode : ""
+                        result.code = ""
                     }){
                         Blur(effect: UIBlurEffect(style: .systemUltraThinMaterial))
                             .frame(width: UIScreen.screenWidth * 0.2,
@@ -351,7 +390,7 @@ struct PasscodeEdit: View {
             .padding(.bottom, 30)
         }.onChange(of: result.code, perform: { _ in
             if result.code.count == 4 {
-                if expectedCode == "creating" { // new pass
+                if editType == "creating" { // new pass
                     if repeatPass.isEmpty { // saves first code so the user can repeat it
                         repeatPass = result.code
                         hapticFeedback(type: .light)
@@ -361,7 +400,7 @@ struct PasscodeEdit: View {
                     } else if result.code != repeatPass{ // otherwise fail, user will redo input
                         incorrect()
                     }
-                } else if expectedCode == "updating" { // updating pass
+                } else if editType == "updating" { // updating pass
                     if confirmedPass == false && result.code == settings.passcode { // entered current pass
                         confirmedPass = true
                         hapticFeedback(type: .light)
@@ -379,7 +418,7 @@ struct PasscodeEdit: View {
                         }
                     }
                 } else { // removing pass
-                    if result.code == expectedCode {
+                    if result.code == editType {
                         // unlock
                         success()
                     } else {
@@ -391,38 +430,50 @@ struct PasscodeEdit: View {
         })
     }
     
+    ///``getTitle``
+    /// Gets the title required based on the editType variable.
+    /// - Returns A string with the appropriate title.
     func getTitle() -> String {
-        if expectedCode == "creating" {
+        if editType == "creating" {
             return "Create a new passcode."
-        } else if expectedCode == "updating" {
+        } else if editType == "updating" {
             return "Update your passcode."
         } else {
             return "Disable Passcode Protection."
         }
     }
     
+    ///``getSubtext``
+    /// Gets the subtext required based on the editType variable.
+    /// - Returns A string with the appropriate subtext.
     func getSubtext() -> String {
-        if expectedCode == "creating" {
+        if editType == "creating" {
             return repeatPass.isEmpty ? "If you forget your passcode, your data will be lost." : "Confirm your passcode."
-        } else if expectedCode == "updating" {
+        } else if editType == "updating" {
             return confirmedPass == false ? "Enter your current passcode." :
                 repeatPass.isEmpty ? "Set a new passcode." : "Confirm your new passcode."
         }
         return "Enter your current passcode."
     }
     
+    ///``getIcon``
+    /// Gets the icon required based on the editType and update variable.
+    /// - Returns A string with the appropriate icon.
     func getIcon() -> String {
         let update = backgroundColor == "UI2"
-        if expectedCode == "creating" { // new pass
+        if editType == "creating" { // new pass
             return update ? "lock" : "lock.open"
-        } else if expectedCode == "updating" { // update pass
+        } else if editType == "updating" { // update pass
             return update ? "checkmark" : "lock.rotation"
-        } else if expectedCode == settings.passcode { // remove pass
+        } else if editType == settings.passcode { // remove pass
             return update ? "lock.slash.fill" : "lock.slash"
         }
         return "lock"
     }
     
+    ///``success``
+    /// Used to send a successful signal with passcode screen.
+    /// - Parameter dismiss a bool that controls whether the passcode screen dismisses after success.
     func success(dismiss: Bool = true){
         backgroundColor = "UI2"
         hapticFeedback(type: .light)
@@ -435,6 +486,9 @@ struct PasscodeEdit: View {
         }
     }
     
+    ///``incorrect``
+    /// Used to send a failure signal with passcode screen.
+    /// - Parameter dismiss a bool that controls whether the passcode screen dismisses after success.
     func incorrect(dismiss: Bool = false){
         backgroundColor = "red"
         hapticFeedback(type: .heavy)
@@ -452,10 +506,19 @@ struct PasscodeEdit: View {
     }
 }
 
+
+/// ``PasscodeButton``
+/// is a View struct that is used to represent a passcode screen numbered button.
+/// - Called by PasscodeEdit and PasscodeScreen.
+/// - Parameters
+///     - ``number``: an int that represents the desired number of the button.
+///     - ``passcodeIn`` is the current passcode, used to ensure that numbers are added when available input space permits.
 struct PasscodeButton: View {
     ///``settings`` Alters the view based on the user's settings. Imports the UserSettings EnvironmentObject allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
+    ///``number`` is the number that you want the button to implement.
     let number: Int
+    ///``passcodeIn`` is a binding string that holds the current input passcode.
     @Binding var passcodeIn: String
     
     var body: some View {
@@ -474,6 +537,9 @@ struct PasscodeButton: View {
         }.buttonStyle(ShrinkingOpacityButton())
     }
     
+    ///``addNumber``
+    /// Used to add the respective number to the current input passcode.
+    /// - Parameter numIn the number that is to be added.
     func addNumber(numIn: Int){
         if passcodeIn.count < 4 {
             passcodeIn += String(numIn)

@@ -14,20 +14,27 @@ import CoreData
 struct HomeView: View {
     ///``FetchRequest``: Creates a FetchRequest for the 'Receipt' CoreData entities. Contains a NSSortDescriptor that sorts and orders the receipts as specified by Date.
     @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)], animation: .spring())
+    
     ///``receipts``: Takes and stores the requested Receipt entities in a FetchedResults variable of type Receipt. This variable is essentially an array of Receipt objects that the user has scanned.
     var receipts: FetchedResults<Receipt>
+    
     ///``FetchRequest``: Creates a FetchRequest for the 'Folder' CoreData entities. Contains 2 NSSortDescriptor's that sorts and orders the folders as specified by title and receipt count.
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Folder.receiptCount, ascending: false),
                           NSSortDescriptor(keyPath: \Folder.title, ascending: true)], animation: .spring())
+    
     ///``folders``: Takes and stores the requested Folder entities in a FetchedResults variable of type Folder. This variable is essentially an array of Folder objects relating to the receipts predicted folders.
     var folders: FetchedResults<Folder>
+    
     ///``userSearch``: Filters the search results based on the users search input into the titlebar/search bar. This applies to every section of a receipt.
     @State var userSearch: String = ""
+    
     ///``selectedFolder``: Filters the search results based on the users selected Folder, so that only receipts within the selected Folder are displayed.
     @State var selectedFolder: String = ""
+    
     ///``colors``: Imports an array of tuples containing various colors that are used to style the UI. This is based on the UserSettings 'style' setting, and is an @State to update the UI.
     @State var colors = Color.colors
+    
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
 
@@ -101,6 +108,7 @@ struct HomeView: View {
 struct NoReceiptsView: View {
     ///``selectedTab`` Controls the TabView's active tab it is viewing. In this case, it is used to switch the user's view to the scanning page.
     @EnvironmentObject var selectedTab: TabSelection
+    
     /// ``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
     
@@ -134,12 +142,16 @@ struct NoReceiptsView: View {
 struct HomeTitleBar: View {
     /// ``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
+    
     ///``selectedFolder``: Filters the search results based on the users selected Folder, so that only receipts within the selected Folder are displayed.
     @Binding var selectedFolder: String
+    
     ///``userSearch``: Filters the search results based on the users search input into the titlebar/search bar. This applies to every section of a receipt.
     @Binding var userSearch: String
+    
     /// ``colors``: Imports an array of tuples containing various colors that are used to style the UI. This is based on the UserSettings 'style' setting, and is an @State to update the UI.
     @State var colors = Color.colors
+    
     var body: some View {
         HStack {
             HStack {

@@ -26,10 +26,13 @@ enum DetailState {
 struct ReceiptView: View {
     ///``receipt``: is a Receipt variable that is passed to the view which holds the information about the receipt this view will represent.
     @ObservedObject var receipt: Receipt
+    
     ///``selected``: is a Bool that controls the visibility of the ReceiptDetailView sheet, when true the sheet is visible, when false the sheet is not visible.
     @State var selected: Bool = false
+    
     /// ``pendingDelete``: is a Bool that shows the delete button for a user to confirm a deletion of a receipt.
     @State var pendingDelete = false
+    
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
     
@@ -96,9 +99,9 @@ struct ReceiptDetailView: View  {
     ///``receipt``: is a Receipt variable that is passed to the view which holds the information about the receipt this view will represent.
     @State var receipt: Receipt
     
-    @State var showingDismiss = false
     ///``detailState``: allows the view to update based on how the user desired to interact with the receipt. Allows the user to delete, view the image, and view the receipt.
     @State var detailState: DetailState = .none
+    
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
     
@@ -177,10 +180,13 @@ struct ReceiptDetailView: View  {
 struct ReceiptViewButtons: View {
     ///``presentationMode``: Controls the presentation of the sheet the receipt is being displayed on. Specifically used in the dismiss button
     @Environment(\.presentationMode) var presentationMode
+    
     ///``detailState``:  binds to the parent views detailState, to update it based on the users interaction.
     @Binding var detailState: DetailState
+    
     ///``receipt``: is a Receipt variable that is passed to the view which allows this view to delete and update it as needed.
     @State var receipt: Receipt
+    
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
     
@@ -267,6 +273,63 @@ struct ReceiptViewButtons: View {
     }
 }
 
+/// ``ImageView``
+/// is a View struct that displays the receipts image, until its tapped on where it will enter full screen view with the ability to zoom and move the image.
+/// - Called by ConfirmationView and ReceiptDetailView.
+struct ImageView: View {
+    ///``image``: is the image that is passed through to be viewed
+    var image: Image
+    ///``viewingImage``: Controls whether the image is being viewed in fullscreen.
+    @State var viewingImage: Bool = false
+    ///``showingDismiss``: Controls whether the dismiss button is active in the fullscreen view (to dismiss the fullscreen)
+    @State var showingDismiss: Bool = false
+    var body: some View {
+        image
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .cornerRadius(12)
+            .padding(.top)
+            .onTapGesture {
+                withAnimation(.spring()){
+                    viewingImage = true
+                }
+            }.fullScreenCover(isPresented: $viewingImage, content: {
+                ZStack {
+                    ZoomableScrollView {
+                        image
+                            .resizable()
+                            .scaledToFit()
+                            .cornerRadius(12)
+                            .padding()
+                            .onTapGesture {
+                                showingDismiss.toggle()
+                            }
+                        
+                    }.ignoresSafeArea()
+                    
+                    if showingDismiss {
+                        VStack {
+                            Spacer()
+                            
+                            Button(action: {
+                                viewingImage = false
+                            }){
+                                ZStack {
+                                    Blur(effect: UIBlurEffect(style: .systemMaterial))
+                                    Text("Dismiss")
+                                }.animation(.spring())
+                                .frame(width: UIScreen.screenWidth * 0.3, height: UIScreen.screenHeight * 0.065)
+                                .cornerRadius(12)
+                            }.buttonStyle(ShrinkingButton())
+                                .transition(AnyTransition.move(edge: .bottom).combined(with: .opacity))
+                                .animation(.spring())
+                        }
+                    }
+                }.animation(.spring())
+            })
+    }
+}
+
 /// Extension of the Receipt object.
 extension Receipt {
     ///``saveScan``
@@ -315,17 +378,6 @@ extension Receipt {
     static func getEmptyReceipt() -> Receipt {
         return Receipt(context: PersistenceController.shared.getContext())
     }
-    
-    /*static func updateReceipt(receipt: Receipt, editedReceipt: (title: String, folder: String, body: String, date: Date)) {
-        let receiptFinal = Receipt.getReceipt(title: receipt.title ?? "")
-        
-        receiptFinal.title = editedReceipt.title
-        receiptFinal.body = editedReceipt.body
-        receiptFinal.folder = editedReceipt.folder
-        receiptFinal.date = editedReceipt.date
-        
-        Receipt.save()
-    } NOT IN USE FOR FULL RELEASE */
     
     ///``getReceipts``
     /// Gets an array of receipts from the database.
@@ -446,74 +498,5 @@ extension Receipt {
             let nserror = error as NSError
             fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
         }
-    }
-}
-
-struct EditableReceiptText: View {
-    @State var placeholder: String
-    @Binding var editedItem: String
-    var editing: Bool
-    var font: Font = .body
-    
-    var body: some View {
-        TextField(placeholder, text: $editedItem)
-            .disabled(editing ? false : true)
-            .placeholder(when: editedItem == placeholder){
-                Text(placeholder)
-                    .foregroundColor(Color("text"))
-            }.font(font)
-    }
-}
-
-
-
-struct ImageView: View {
-    var image: Image
-    @State var viewingImage: Bool = false
-    @State var showingDismiss: Bool = false
-    var body: some View {
-        image
-            .resizable()
-            .aspectRatio(contentMode: .fit)
-            .cornerRadius(12)
-            .padding(.top)
-            .onTapGesture {
-                withAnimation(.spring()){
-                    viewingImage = true
-                }
-            }.fullScreenCover(isPresented: $viewingImage, content: {
-                ZStack {
-                    ZoomableScrollView {
-                        image
-                            .resizable()
-                            .scaledToFit()
-                            .cornerRadius(12)
-                            .padding()
-                            .onTapGesture {
-                                showingDismiss.toggle()
-                            }
-                        
-                    }.ignoresSafeArea()
-                    
-                    if showingDismiss {
-                        VStack {
-                            Spacer()
-                            
-                            Button(action: {
-                                viewingImage = false
-                            }){
-                                ZStack {
-                                    Blur(effect: UIBlurEffect(style: .systemMaterial))
-                                    Text("Dismiss")
-                                }.animation(.spring())
-                                .frame(width: UIScreen.screenWidth * 0.3, height: UIScreen.screenHeight * 0.065)
-                                .cornerRadius(12)
-                            }.buttonStyle(ShrinkingButton())
-                                .transition(AnyTransition.move(edge: .bottom).combined(with: .opacity))
-                                .animation(.spring())
-                        }
-                    }
-                }.animation(.spring())
-            })
     }
 }

@@ -15,8 +15,10 @@ import SwiftUI
 struct FolderView: View {
     ///``folder``: is a Folder variable that is passed to the view which holds the information about the folder this view will represent.
     @ObservedObject var folder: Folder
+    
     ///``selectedFolder``: is a String that holds the text of the folders title, used in filtering receipt results in HomeView.
     @Binding var selectedFolder: String
+    
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
     
@@ -82,7 +84,7 @@ extension Folder {
     /// Gets the color of the folder you want to check.
     /// Performs this by doing a for loop, checking each folder until the matching folder title (and folder) is found, where it returns the string.
     /// - Parameter title: The title of the folder you want the color of.
-    /// - Returns: A string that can be placed inside a Color(), e.g. Color("green").
+    /// - Returns: A string that can be placed inside a Color(), e.g. Color("UI2").
     static func getColor(title: String?) -> String {
         for match in folders where match.title.lowercased() == title?.lowercased(){
             return match.color != "" ? match.color : "text"

@@ -46,9 +46,9 @@ enum SaveState {
     case none
     ///``recognizing``: When confirming is active, the receipt is being confirmed by the user.
     case recognizing
-    
+    ///``saving``: When saving is active, the receipt is being saved to the database.
     case saving
-    
+    ///``confirming``: When confirming is active, the user is confirming the receipt.
     case confirming
 }
 
@@ -63,20 +63,22 @@ enum SaveState {
 struct ScanView: View {
     ///``settings`` Alters the view based on the user's settings. Imports the UserSettings EnvironmentObject allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
+    
     ///``inSimulator`` provides a bool based on if the application is in a simulator. Allows the view to avoid errors relating to the camera being available or not.
     let inSimulator: Bool = UIDevice.current.inSimulator
+    
     ///``scanSelection`` is used to manage the screens active view, based on the values presented in the ScanView's documentation.
     @State var scanSelection: ScanSelection = .none
+    
     ///``SaveState`` is used to manage the receipts save states while its being saved and processed. (via ScanTranslation).
     @State var saveState: SaveState = .none
-    @State var unusedBool = false
     
     var body: some View {
         ZStack {
             BackgroundView()
             
             VStack {
-                TitleText(buttonBool: $unusedBool, title: "scan", icon: getIcon())
+                TitleText(title: "scan", icon: getIcon())
                     .padding(.horizontal)
                 
                 if scanSelection == .gallery { // scan via gallery
@@ -95,6 +97,10 @@ struct ScanView: View {
             scanSelection = ScanSelection(rawValue: settings.scanDefault) ?? .none
         })
     }
+    
+    ///``getIcon``
+    /// Gets the icon you want to retrieve.
+    /// - Returns A string with the appropriate icon name.
     func getIcon() -> String {
         if scanSelection == .camera {
             return "camera"
@@ -111,6 +117,7 @@ struct ScanView: View {
 struct ScannerSelectView: View {
     ///``scanSelection`` is used to manage the screens active view. This is @Binding as it controls the parent views value, allowing it to change the screen as desired.
     @Binding var scanSelection: ScanSelection
+    
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
     
@@ -187,20 +194,24 @@ struct ScannerSelectView: View {
 struct ConfirmationView: View {
     ///``selectedTab`` Controls the TabView's active tab it is viewing. Imports the TabSelection EnvironmentObject, allowing for application wide changing of the selected tab.
     @EnvironmentObject var selectedTab: TabSelection
-    ///``isEditing`` is
-    @State var isEditing = false
-    ///``editedReceipt`` is
-    @State var editedReceipt = (title: "", folder: "", body: "", date: Date())
+    
     ///``receipt``: is a Receipt variable that is passed to the view which holds the information about the receipt this view will represent.
     @ObservedObject var receipt: Receipt
+    
     ///``scanSelection`` is used to manage the screens active view. This is @Binding as it controls the parent views value, allowing it to change the screen as desired.
     @Binding var scanSelection: ScanSelection
+    
     ///``SaveState`` is used to manage the receipts save states while its being saved and processed. (via ScanTranslation).
     @Binding var saveState: SaveState
+    
     ///``isConfirming`` is a bool used to control the confirmation screens sheet.
     @Binding var isConfirming: Bool
+    
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
+    
+    ///``usingCamera``: is specifically used to cancel the camera view when discarding a scan.
+    var usingCamera = false
     
     var body: some View {
         ZStack {
@@ -224,9 +235,8 @@ struct ConfirmationView: View {
                                 VStack(alignment: .leading) {
                                     Text("\(getDate(date: receipt.date))")
                                         .font(.caption)
-                                    EditableReceiptText(placeholder: receipt.title ?? "Title",
-                                                        editedItem: $editedReceipt.title,
-                                                        editing: isEditing, font: .title)// title
+                                    Text(receipt.title ?? "Title")
+                                        .font(.title)
                                     
                                     Text(receipt.folder ?? "")
                                 }
@@ -271,37 +281,27 @@ struct ConfirmationView: View {
                 VStack { // buttons
                     HStack (alignment: .center){
                         Button(action:{ // cancel
-                            if isEditing {
-                                updateEditedReceipt()
-                                isEditing = false
-                            } else {
-                                exit(success: false)
-                            }
+                            exit(success: false)
                         }){
                             Blur(effect: UIBlurEffect(style: .systemMaterial))
                                 .cornerRadius(12)
                                 .overlay(
-                                    Image(systemName: isEditing ? "xmark" : "trash")
+                                    Image(systemName: "trash")
                                         .animation(.spring()))
                         }.buttonStyle(ShrinkingButton())
                         
                         Button(action:{ // confirmation
-                            if isEditing {
-                                saveReceipt()
-                                isEditing = false
-                            }else {
-                                exit(success: true)
-                            }
+                            exit(success: true)
                         }){
                             Blur(effect: UIBlurEffect(style: .systemMaterial))
                                 .cornerRadius(12)
                                 .overlay(
-                                    Image(systemName: isEditing ? "arrow.forward" : "checkmark")
+                                    Image(systemName: "checkmark")
                                         .animation(.spring()))
                         }.buttonStyle(ShrinkingButton())
                     }
                 }
-            }.padding().onAppear(perform: updateEditedReceipt)
+            }.padding()
         }
     }
     
@@ -315,23 +315,12 @@ struct ConfirmationView: View {
         } else {
             Receipt.delete(receipt: receipt)
             saveState = .none
+            if usingCamera {
+                scanSelection = .none
+            }
             isConfirming = false
+            
         }
-    }
-    
-    func updateEditedReceipt(){
-        editedReceipt.title = receipt.title ?? ""
-        editedReceipt.folder = receipt.folder ?? ""
-        editedReceipt.body = receipt.body ?? ""
-        editedReceipt.date = receipt.date ?? Date()
-    }
-    
-    func saveReceipt(){
-        receipt.title = editedReceipt.title
-        receipt.folder = editedReceipt.folder
-        receipt.body = editedReceipt.body
-        receipt.date = editedReceipt.date
-        Receipt.save()
     }
 }
 
@@ -344,16 +333,22 @@ struct ConfirmationView: View {
 struct GalleryScannerView: View {
     ///``selectedTab`` Controls the TabView's active tab it is viewing. Imports the TabSelection EnvironmentObject, allowing for application wide changing of the selected tab.
     @EnvironmentObject var selectedTab: TabSelection
+    
     ///``scanSelection`` is used to manage the screens active view. This is @Binding as it controls the parent views value, allowing it to change the screen as desired.
     @Binding var scanSelection: ScanSelection
+    
     ///``SaveState`` is used to manage the receipts save states while its being saved and processed. (via ScanTranslation).
     @Binding var saveState: SaveState
+    
     ///``receipt``: is a Receipt variable that is passed to the view which holds the information about the receipt this view will represent.
     @State var receipt: Receipt = Receipt()
+    
     ///``invalidAlert`` is used to set whether the scan is valid or not. This links with the parent ScanView which actually displays the error.
     @State var invalidAlert: Bool = false
+    
     ///``isConfirming`` is a bool used to control the confirmation screens sheet.
     @State var isConfirming: Bool = false
+    
     ///``recognizedContent`` is an object that holds an array of ReceiptItems, holding the information about the scan performed by the user.
     @ObservedObject var recognizedContent: RecognizedContent  = RecognizedContent()
     
@@ -415,16 +410,22 @@ struct GalleryScannerView: View {
 struct DocumentScannerView: View {
     ///``selectedTab`` Controls the TabView's active tab it is viewing. Imports the TabSelection EnvironmentObject, allowing for application wide changing of the selected tab.
     @EnvironmentObject var selectedTab: TabSelection
+    
     ///``scanSelection`` is used to manage the screens active view. This is @Binding as it controls the parent views value, allowing it to change the screen as desired.
     @Binding var scanSelection: ScanSelection
+    
     ///``SaveState`` is used to manage the receipts save states while its being saved and processed. (via ScanTranslation).
     @Binding var saveState: SaveState
+    
     ///``receipt``: is a Receipt variable that is passed to the view which holds the information about the receipt this view will represent.
     @State var receipt: Receipt = Receipt()
+    
     ///``invalidAlert`` is used to set whether the scan is valid or not. This links with the parent ScanView which actually displays the error.
     @State var invalidAlert: Bool = false
+    
     ///``isConfirming`` is a bool used to control the confirmation screens sheet.
     @State var isConfirming: Bool = false
+    
     ///``recognizedContent`` is an object that holds an array of ReceiptItems, holding the information about the scan performed by the user.
     @ObservedObject var recognizedContent: RecognizedContent  = RecognizedContent()
     
@@ -446,7 +447,7 @@ struct DocumentScannerView: View {
                 scanSelection = .none
             }.fullScreenCover(isPresented: $isConfirming, content: {
                 ConfirmationView(receipt: Receipt.getReceipt(title: getTitle(text: recognizedContent.items[recognizedContent.items.count-1].text)),
-                                 scanSelection: $scanSelection, saveState: $saveState, isConfirming: $isConfirming)
+                                 scanSelection: $scanSelection, saveState: $saveState, isConfirming: $isConfirming, usingCamera: true)
                     .environmentObject(UserSettings())
             }).alert(isPresented: $invalidAlert) {
                 Alert(

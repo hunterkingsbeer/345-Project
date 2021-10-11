@@ -25,6 +25,7 @@ struct Prediction {
     static func pointPrediction(text: String) -> String {
         ///``predictionTypes`` gets an array of the possible predicted folders that may apply to the text being predicted.
         let predictedTypes: [(title: String, matches: Int)] = predictedCategories(text: text)
+        
         ///``bestPrediction`` holds the title and number of matches of the best predicted folder.
         var bestPrediction = (title: "Default", matches: 0)
         

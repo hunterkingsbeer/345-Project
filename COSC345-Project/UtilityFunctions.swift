@@ -10,32 +10,6 @@ import SwiftUI
 import CoreData
 import Swift
 
-extension Color {
-
-    var rgb: (red: Double, green: Double, blue: Double, o: Double)? {
-        let uiColor: UIColor
-        
-        var r: CGFloat = 0
-        var g: CGFloat = 0
-        var b: CGFloat = 0
-        var o: CGFloat = 0
-        
-        if self.description.contains("NamedColor") {
-            let lowerBound = self.description.range(of: "name: \"")!.upperBound
-            let upperBound = self.description.range(of: "\", bundle")!.lowerBound
-            let assetsName = String(self.description[lowerBound..<upperBound])
-            
-            uiColor = UIColor(named: assetsName)!
-        } else {
-            uiColor = UIColor(self)
-        }
-
-        guard uiColor.getRed(&r, green: &g, blue: &b, alpha: &o) else { return nil }
-        
-        return (Double(r), Double(g), Double(b), Double(o))
-    }
-}
-
 struct Blur: UIViewRepresentable {
     var effect: UIVisualEffect?
     func makeUIView(context: UIViewRepresentableContext<Self>) -> UIVisualEffectView { UIVisualEffectView() }
@@ -46,10 +20,17 @@ func imageToData(image: UIImage) -> Data {
     return image.jpegData(compressionQuality: 0.5) ?? Data()
 }
 
+/// ``getTitle``
+/// is used to return the first line (title) of a given text
+/// - Parameter text: Text you want the title of
+/// - Returns the first line of the text.
 func getTitle(text: String) -> String {
     return String(text.components(separatedBy: CharacterSet.newlines).first!).capitalized
 }
 
+// ``hapticFeedback``
+/// is used to trigger a haptic feedback vibration
+/// - Parameter type: the type of haptic feedback you want.
 func hapticFeedback(type: UIImpactFeedbackGenerator.FeedbackStyle){
     UIImpactFeedbackGenerator(style: type).impactOccurred()
 }
@@ -58,8 +39,7 @@ func hapticFeedback(type: UIImpactFeedbackGenerator.FeedbackStyle){
 /// is used to convert an optional Date value into a formatted date in a String type.
 /// - Format: EEEE, d MMM yyyy. (E.g. : Wednesday, 11 Aug 2021.)
 /// - Parameter date: The Date variable that will be converted into a formatted String.
-/// - Returns
-///     - The formatted date in a String type.
+/// - Returns The formatted date in a String type.
 func getDate(date: Date?) -> String {
     let formatter = DateFormatter()
     formatter.dateFormat = "EEEE, d MMM yyyy."
@@ -97,7 +77,6 @@ extension View {
             self
         }
     }
-    
     
     /// ``underlineTextField``
     /// is a property than can be applied to any View object to provide a predetermined underline to it. However, this is specifically designed to be applied to text.
@@ -236,8 +215,9 @@ class TabSelection: ObservableObject {
     }
 }
 
-// Found @ https://stackoverflow.com/questions/58341820/isnt-there-an-easy-way-to-pinch-to-zoom-in-an-image-in-swiftui
-// makes a zoomable view for fullscreen images
+
+/// ``ZoomableScrollView``
+/// is a UIViewRepresentable struct that bridges UIKit to allow for a zoomable/movable image view.
 struct ZoomableScrollView<Content: View>: UIViewRepresentable {
   private var content: Content
 

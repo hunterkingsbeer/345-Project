@@ -79,8 +79,6 @@ struct BackgroundView: View {
 ///     - ``title``: String
 ///     - ``icon``: String
 struct TitleText: View {
-    @Binding var buttonBool: Bool
-    /// ``settings`` Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
     /// ``colors`` Imports an array of tuples containing various colors that are used to style the UI. This is based on the UserSettings 'style' setting, and is an @State to update the UI.
     @State var colors = Color.colors
@@ -115,17 +113,11 @@ struct TitleText: View {
                     .transition(AnyTransition.opacity.combined(with: .move(edge: .bottom)))
                 })
             Spacer()
-            Button(action: {
-                withAnimation(.spring()){
-                    buttonBool.toggle()
-                }
-            }){
-                Image(systemName: icon)
+            Image(systemName: icon)
                     .font(.system(size: 19, weight: .bold, design: .rounded))
                     .foregroundColor(Color(settings.accentColor))
                     .padding(.horizontal)
-            }.buttonStyle(ShrinkingButton())
-            .frame(width: UIScreen.screenWidth * 0.16)
+                    .frame(width: UIScreen.screenWidth * 0.16)
         }
     }
 }

@@ -21,50 +21,46 @@ struct SettingsView: View  {
             BackgroundView()
             
             VStack {
-                TitleText(buttonBool: $settings.devMode, title: "settings", icon: "hammer.fill")
+                TitleText(title: "settings", icon: "hammer.fill")
                     .padding(.horizontal)
                 
                 ScrollView(showsIndicators: false){
                     VStack {
-                        HStack {
+                        Group {
                             //dark mode
                             DarkModeButton()
-                                .frame(height: UIScreen.screenHeight * 0.2)
-                        }
-                        
-                        // passcode selector
-                        PasscodeSelector()
-                            .frame(height: UIScreen.screenHeight * 0.2)
-                        
-                        // scan selector
-                        ScanDefaultSelector()
-                            .frame(height: UIScreen.screenHeight * 0.2)
-                        
-                        // color
-                        AccentColorSelector()
-                            .frame(height: UIScreen.screenHeight * 0.2)
+                                
+                            // passcode selector
+                            PasscodeSelector()
+                            
+                            // color selector
+                            AccentColorSelector()
+                            
+                            // scan selector
+                            ScanDefaultSelector()
+
+                        }.frame(height: UIScreen.screenHeight * 0.2)
                     }.padding(.horizontal).padding(.bottom)
-                    
-                    if settings.devMode {
-                        DeveloperSettings()
-                    }
                 }.animation(.easeInOut)
             }
         }
     }
 }
 
-enum PassSuccess {
-    case none
-    case success
-    case failure
-}
-
+/// ``PasscodeSelector``
+/// is a View struct that allows a user to manage their passcodes. This includes the option to enable, disable, and update passcodes.
+/// - Called by SettingsView.
 struct PasscodeSelector: View {
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
+    
+    ///``passState``: is used to control the passcode editing state (cereating, updating, removing)
     @State var passState : PassEditingState = .none
+    
+    ///``passEditScreen``: is used to control the fullscreen passcodeEdit view. Editing managed the fullscreen presentation, and expected code controls the edit type to be passed through (cereating, updating, removing)
     @State var passEditScreen = (editing: false, expectedCode: "0000")
+    
+    ///``passcodeSuccess``: is used to hold the result of a passcode edit result.
     @State var passcodeSuccess = (success: false, code: "")
     
     var body: some View {
@@ -125,7 +121,7 @@ struct PasscodeSelector: View {
                             Spacer()
                         }
                     }.padding(.bottom).animation(.spring())
-                    Text("PASSCODE \(settings.passcodeProtection ? "ENABLED" : "DISABLED") \(settings.devMode ? "[\(settings.passcode)]" : "")")
+                    Text("PASSCODE \(settings.passcodeProtection ? "ENABLED" : "DISABLED")")
                         .bold()
                         .font(.system(.body, design: .rounded))
                 }.padding()
@@ -144,7 +140,7 @@ struct PasscodeSelector: View {
                 }
             }
             .fullScreenCover(isPresented: $passEditScreen.editing, content: {
-                PasscodeEdit(result: $passcodeSuccess, expectedCode: passEditScreen.expectedCode)
+                PasscodeEdit(result: $passcodeSuccess, editType: passEditScreen.expectedCode)
                     .environmentObject(UserSettings())
                     .preferredColorScheme(settings.darkMode ? .dark : .light)
                     .onDisappear(perform: {
@@ -154,6 +150,9 @@ struct PasscodeSelector: View {
     }
 }
 
+/// ``DarkModeButton``
+/// is a View struct that updates the UI color scheme. Either dark or light.
+/// - Called by SettingsView.
 struct DarkModeButton: View {
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
@@ -193,6 +192,9 @@ struct DarkModeButton: View {
     }
 }
 
+/// ``ScanDefaultSelector``
+/// is a View struct that controls the default scanner option. This is either the camera, gallery or the option of both.
+/// - Called by SettingsView.
 struct ScanDefaultSelector: View {
     ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
@@ -271,6 +273,9 @@ struct ScanDefaultSelector: View {
     }
 }
 
+/// ``AccentColorSelector``
+/// is a View struct that controls the accent color of the app. This is takes the UI colors and presents them for selection.
+/// - Called by SettingsView.
 struct AccentColorSelector: View {
     ///``colors`` Imports an array of tuples containing various colors that are used to style the UI. This is based on the UserSettings 'style' setting, and is an @State to update the UI.
     @State var colors = Color.colors
@@ -341,83 +346,5 @@ struct AccentColorSelector: View {
                     Spacer()
                 }.padding(.vertical)
             ).padding(.bottom)
-    }
-}
-
-struct DeveloperSettings: View {
-    ///``FetchRequest``: Creates a FetchRequest for the 'Receipt' CoreData entities. Contains a NSSortDescriptor that sorts and orders the receipts as specified by Date.
-    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)], animation: .spring())
-    ///``receipts``: Takes and stores the requested Receipt entities in a FetchedResults variable of type Receipt. This variable is essentially an array of Receipt objects that the user has scanned.
-    var receipts: FetchedResults<Receipt>
-    ///``settings``: Imports the UserSettings environment object allowing unified usage and updating of the users settings across all classes.
-    @EnvironmentObject var settings: UserSettings
-    
-    var body: some View {
-        VStack(alignment: .leading) {
-            HStack {
-                Spacer()
-                Image(systemName: "aqi.medium")
-                Image(systemName: "hammer.fill")
-                //Image(systemName: "gyroscope")
-                Image(systemName: "cloud.moon.bolt")
-                Image(systemName: "lightbulb")
-                //Image(systemName: "move.3d")
-                //Image(systemName: "perspective")
-                Spacer()
-            }.padding()
-            Text("\(receipts.count) receipts.")
-                .font(.body)
-            HStack {
-                Button(action: {
-                    if isTesting(){
-                        Receipt.generateKnownReceipts()
-                    } else {
-                        Receipt.generateRandomReceipts()
-                    }
-                    hapticFeedback(type: .rigid)
-                }){
-                    Blur(effect: UIBlurEffect(style: .systemThinMaterial))
-                        .opacity(0.9)
-                        .cornerRadius(12)
-                        .overlay(
-                            VStack {
-                                Spacer()
-                                Image(systemName: "doc.badge.plus")
-                                    .font(.largeTitle)
-                                    .padding(2)
-                                Text("+10 RECEIPTS")
-                                    .bold()
-                                    .font(.system(.body, design: .rounded))
-                                Spacer()
-                            }.padding()
-                        )
-                }.buttonStyle(ShrinkingButton())
-                .padding(.trailing, 5)
-                
-                Button(action: {
-                    Receipt.deleteAll(receipts: receipts)
-                    Folder.deleteAll()
-                    hapticFeedback(type: .rigid)
-                }){
-                    Blur(effect: UIBlurEffect(style: .systemThinMaterial))
-                        .opacity(0.9)
-                        .cornerRadius(12)
-                        .overlay(
-                            VStack {
-                                Spacer()
-                                Image(systemName: "trash")
-                                    .font(.largeTitle)
-                                    .padding(2)
-                                Text("DELETE ALL")
-                                    .bold()
-                                    .font(.system(.body, design: .rounded))
-                                Spacer()
-                            }.padding()
-                        )
-                }.buttonStyle(ShrinkingButton())
-                .padding(.leading, 5)
-            }.frame(height: UIScreen.screenHeight * 0.15)
-        }.animation(.spring()).transition(AnyTransition.move(edge: .bottom))
-        .padding(.horizontal).padding(.bottom, 20)
     }
 }
