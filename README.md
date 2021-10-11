@@ -11,7 +11,7 @@ This app has been developed using an iPhone 11 Pro, however it should run on any
 To use the camera or gallery, you **MUST** have a physical phone. This app is designed to be run on a physical device, without one you should not expect to experience the apps full functionality. 
 
 Start the app using the Xcode simulator running an iOS phone.
-To generate random receipts, navigate to the settings tab and select "Generate receipts". This will generate 10 random receipts to preview.
+To generate random receipts, navigate to the settings tab and tap the hammer icon in the top left to enable developer settings. Then scroll down until you find the dev settings, and tap "+10 RECEIPTS". This will generate 10 random receipts to preview.
 
 ### Our Team:
 -   Hunter Kingsbeer: Engineering and Team Lead.
