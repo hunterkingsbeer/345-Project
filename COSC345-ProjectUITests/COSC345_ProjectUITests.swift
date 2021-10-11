@@ -92,13 +92,6 @@ class COSC345_ProjectUITests: XCTestCase {
         
         elementsQuery2.staticTexts["Invoice"].tap()
         sleep(2)
-        app.buttons["photo"].tap()
-        
-        XCTAssert(!app.buttons["trash"].firstMatch.isHittable)
-       // this should be passing just fine
-        
-        app.buttons["photo"].tap()
-        XCTAssert(XCUIApplication().buttons["photo"].firstMatch.exists)
         
         app.buttons["trash"].tap()
         app.buttons["trash"].tap()
@@ -238,9 +231,10 @@ class COSC345_ProjectUITests: XCTestCase {
         app/*@START_MENU_TOKEN@*/.buttons["Add from Gallery"]/*[[".buttons[\"photo.fill\"]",".buttons[\"Add from Gallery\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
         sleep(5)
         app.scrollViews.otherElements.images.element(boundBy: 0).tap()
-        sleep(1)
-        XCTAssert(app.staticTexts["Saving..."].exists)
-        while app.staticTexts["Saving..."].exists{ continue }
+        sleep(5)
+        
+        app.buttons["checkmark"].tap()
+        
         let tabBar = XCUIApplication().tabBars["Tab Bar"]
         tabBar.buttons["Home"].tap()
         sleep(2)
