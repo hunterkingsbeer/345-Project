@@ -14,8 +14,8 @@ import SwiftUI
 enum DetailState {
     ///``none``: When this is active it will present the view in its default view, with nothing active.
     case none
-    ///``image``: When this is active it will present the image of the receipt.
-    case image
+    ///``text``: When this is active it will present the text of the receipt.
+    case text
     ///``deleting``: When this is active it will present the user with a delete confirmation button, allowing them to delete a receipt.
     case deleting
 }
@@ -114,13 +114,14 @@ struct ReceiptDetailView: View  {
                     
                     HStack(alignment: .center) {
                         VStack(alignment: .leading) {
+                            Spacer()
                             Text("\(getDate(date: receipt.date))")
                                 .font(.caption)
                             
                             Text(receipt.title ?? "Title") // title
                                 .font(.title)
-                            
                             Text(receipt.folder ?? "Folder")// folder
+                            Spacer()
                         }
                         Spacer()
                         Image(systemName: Folder.getIcon(title: receipt.folder))
@@ -130,7 +131,7 @@ struct ReceiptDetailView: View  {
                             .cornerRadius(12)
                     }.foregroundColor(Color("text"))
                     .padding()
-                }.frame(height: UIScreen.screenHeight * 0.14)
+                }.frame(height: UIScreen.screenHeight * 0.12)
                 Spacer()
             }.zIndex(1)
             
@@ -144,9 +145,11 @@ struct ReceiptDetailView: View  {
                                 Spacer()
                             }
                         }
-                        HStack {
-                            Text(receipt.body ?? "")
-                            Spacer()
+                        if detailState == .text {
+                            HStack {
+                                Text(receipt.body ?? "")
+                                Spacer()
+                            }.transition(AnyTransition.move(edge: .bottom).combined(with: .opacity)).animation(.spring())
                         }
                         Spacer()
                     }
@@ -188,86 +191,77 @@ struct ReceiptViewButtons: View {
             
             HStack {
                 // Deleting Button
-                if detailState != .image {
-                    Button(action: {
+                Button(action: {
+                    if detailState == .deleting {
+                        Receipt.delete(receipt: receipt)
+                        hapticFeedback(type: .rigid)
+                    } else {
+                        detailState = .deleting
+                        hapticFeedback(type: .rigid)
+                    }
+                }){
+                    ZStack {
+                        Blur(effect: UIBlurEffect(style: .systemMaterial))
+                            .overlay(
+                                (detailState == .deleting ? Color("red"): Color.clear)
+                                    .blendMode(settings.darkMode ? .color : .plusDarker)
+                                    .opacity(settings.darkMode ? 0.4 : 0.3)
+                            ).cornerRadius(12)
+                            .animation(.spring())
+                        
+                        Image(systemName: "trash")
+                            .scaleEffect(detailState == .deleting ? 1.25 : 1)
+                            .foregroundColor(detailState == .deleting ? Color("red") : Color("text"))
+                            .animation(.spring())
+                        
+                    }.frame(height: buttonSize)
+                }.buttonStyle(ShrinkingButtonSpring())
+                .transition(.offset(x: -150))
+                .onChange(of: detailState, perform: { _ in
+                    withAnimation(.spring()){
                         if detailState == .deleting {
-                            Receipt.delete(receipt: receipt)
-                            hapticFeedback(type: .rigid)
-                        } else {
-                            detailState = .deleting
-                            hapticFeedback(type: .rigid)
-                        }
-                    }){
-                        ZStack {
-                            Blur(effect: UIBlurEffect(style: .systemMaterial))
-                                .overlay(
-                                    (detailState == .deleting ? Color("red"): Color.clear)
-                                        .blendMode(settings.darkMode ? .color : .plusDarker)
-                                        .opacity(settings.darkMode ? 0.4 : 0.3)
-                                ).cornerRadius(12)
-                                .animation(.spring())
-                            
-                            Image(systemName: "trash")
-                                .scaleEffect(detailState == .deleting ? 1.25 : 1)
-                                .foregroundColor(detailState == .deleting ? Color("red") : Color("text"))
-                                .animation(.spring())
-                            
-                        }.frame(height: buttonSize)
-                    }.buttonStyle(ShrinkingButtonSpring())
-                    .transition(.offset(x: -150))
-                    .onChange(of: detailState, perform: { _ in
-                        withAnimation(.spring()){
-                            if detailState == .deleting {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                                    if detailState == .deleting {
-                                        detailState = .none // turns off delete button after 3 secs
-                                    }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                                if detailState == .deleting {
+                                    detailState = .none // turns off delete button after 3 secs
                                 }
                             }
                         }
-                    })
-                }
+                    }
+                })
                 
-                /*
-                // Image Button
+                
+                
+                // View Text button
+                
                 Button(action: {
-                    detailState = detailState == .image ? .none : .image
+                    detailState = detailState == .text ? .none : .text
                     hapticFeedback(type: .rigid)
                 }){
                     ZStack {
                         Blur(effect: UIBlurEffect(style: .systemMaterial))
                             .cornerRadius(12)
-                        VStack {
-                            if detailState == .image && receipt.image != nil && !UIDevice.current.inSimulator {
-                                (Image(data: receipt.image) ?? Image(""))
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                            } else {
-                                Image(systemName: "photo")
-                                    .padding()
-                            }
-                        }.transition(AnyTransition.scale(scale: 0.1).combined(with: .opacity))
-                        .cornerRadius(12)
-                    }
-                    .frame(height: detailState == .image ? UIScreen.screenHeight * 0.6 : buttonSize)
-                }.buttonStyle(ShrinkingButtonSpring())*/
+                        Image(systemName: "textformat").padding()
+                    }.padding(.vertical)
+                    .frame(height: UIScreen.screenHeight * 0.1)
+                }.buttonStyle(ShrinkingButtonSpring())
+                .transition(.offset(x: 150))
+                
                 
                 // Dismiss Button
-                if detailState != .image {
-                    Button(action: {
-                        detailState = .none
-                        hapticFeedback(type: .rigid)
-                        presentationMode.wrappedValue.dismiss()
-                    }){
-                        ZStack {
-                            Blur(effect: UIBlurEffect(style: .systemMaterial))
-                                .cornerRadius(12)
-                            Image(systemName: "chevron.down").padding()
-                        }.padding(.vertical)
-                        .frame(height: UIScreen.screenHeight * 0.1)
-                    }.buttonStyle(ShrinkingButtonSpring())
-                    .transition(.offset(x: 150))
-                }
+                Button(action: {
+                    detailState = .none
+                    hapticFeedback(type: .rigid)
+                    presentationMode.wrappedValue.dismiss()
+                }){
+                    ZStack {
+                        Blur(effect: UIBlurEffect(style: .systemMaterial))
+                            .cornerRadius(12)
+                        Image(systemName: "chevron.down").padding()
+                    }.padding(.vertical)
+                    .frame(height: UIScreen.screenHeight * 0.1)
+                }.buttonStyle(ShrinkingButtonSpring())
+                .transition(.offset(x: 150))
+                
             }
         }.padding(.horizontal).padding(.bottom)
     }
@@ -390,7 +384,7 @@ extension Receipt {
     ///``generateRandomReceipts``
     /// Uses a pre-determined array of strings to create receipts. This function generates the receipts at random varying ratios.
     /// Each receipt is saved to the database.
-    static func generateRandomReceipts() -> String {
+    static func generateRandomReceipts(){
         let scans = ["Countdown\nLettuce - $2.00,\nDoritos - $2.99,\nMilk - $3", // groceries
                      
                      "JB Hifi\nKeyboard - $120.00,\nTablet - $2300.99,\nEar buds - $119.99", // tech
@@ -424,7 +418,6 @@ extension Receipt {
                 Receipt.saveScan(recognizedText: scans.randomElement() ?? "")
             }
         }
-        return scans.randomElement()!
     }
     
     ///``generateKnownReceipts``
@@ -516,10 +509,11 @@ struct ImageView: View {
                                 .frame(width: UIScreen.screenWidth * 0.3, height: UIScreen.screenHeight * 0.065)
                                 .cornerRadius(12)
                             }.buttonStyle(ShrinkingButton())
-                            .transition(AnyTransition.opacity.combined(with: .scale(scale: 0.5)))
+                                .transition(AnyTransition.move(edge: .bottom).combined(with: .opacity))
+                                .animation(.spring())
                         }
                     }
-                }
+                }.animation(.spring())
             })
     }
 }

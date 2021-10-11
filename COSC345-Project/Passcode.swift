@@ -11,11 +11,17 @@ import CoreData
 /// used to handle the initial lockscreen
 struct PasscodeScreen: View {
     @Environment(\.presentationMode) var presentationMode
+    ///``FetchRequest``: Creates a FetchRequest for the 'Receipt' CoreData entities. Contains a NSSortDescriptor that sorts and orders the receipts as specified by Date.
+    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Receipt.date, ascending: false)], animation: .spring())
+    ///``receipts``: Takes and stores the requested Receipt entities in a FetchedResults variable of type Receipt. This variable is essentially an array of Receipt objects that the user has scanned.
+    var receipts: FetchedResults<Receipt>
     ///``settings`` Alters the view based on the user's settings. Imports the UserSettings EnvironmentObject allowing unified usage and updating of the users settings across all classes.
     @EnvironmentObject var settings: UserSettings
     @Binding var locked: Bool
     @State var userInput = ""
     @State var backgroundColor = "background"
+    @State var resetting = false
+    @State var unusedBool = false
     
     var body: some View {
         ZStack {
@@ -23,88 +29,189 @@ struct PasscodeScreen: View {
                 .animation(.spring())
                 .ignoresSafeArea(.all)
             VStack(alignment: .center) {
-                TitleText(buttonBool: $settings.devMode, title: "Receipted", icon: backgroundColor == "UI2" ? "lock.open" : "lock")
-                Text("Enter your passcode\(settings.devMode ? " [\(settings.passcode)]" : "").")
-                    .font(.system(.body, design: .rounded))
-                    .animation(.spring())
-                    .multilineTextAlignment(.center).lineLimit(1)
-                    .minimumScaleFactor(0.8)
-                HStack {
-                    Circle()
-                        .padding(userInput.count >= 1 ? 5 : 15)
-                    Circle()
-                        .padding(userInput.count >= 2 ? 5 : 15)
-                    Circle()
-                        .padding(userInput.count >= 3 ? 5 : 15)
-                    Circle()
-                        .padding(userInput.count >= 4 ? 5 : 15)
-                }.padding(.horizontal, 80).animation(.spring())
+                TitleText(buttonBool: $unusedBool, title: "Receipted", icon: backgroundColor == "UI2" ? "lock.open" : "lock")
                 
-                HStack {
-                    PasscodeButton(number: 1, passcodeIn: $userInput)
-                    PasscodeButton(number: 2, passcodeIn: $userInput)
-                    PasscodeButton(number: 3, passcodeIn: $userInput)
-                }
-                
-                HStack {
-                    PasscodeButton(number: 4, passcodeIn: $userInput)
-                    PasscodeButton(number: 5, passcodeIn: $userInput)
-                    PasscodeButton(number: 6, passcodeIn: $userInput)
-                }
-                
-                HStack {
-                    PasscodeButton(number: 7, passcodeIn: $userInput)
-                    PasscodeButton(number: 8, passcodeIn: $userInput)
-                    PasscodeButton(number: 9, passcodeIn: $userInput)
-                }
-                
-                HStack {
-                    Spacer()
-                    Button(action: { // clear
-                        userInput = settings.devMode ? settings.passcode : ""
-                        hapticFeedback(type: .rigid)
-                    }){
-                        Blur(effect: UIBlurEffect(style: .systemUltraThinMaterial))
-                            .frame(width: UIScreen.screenWidth * 0.2,
-                                    height: UIScreen.screenWidth * 0.2)
-                            .cornerRadius(100)
-                            .overlay(
-                                Text("CLEAR")
-                                    .foregroundColor(Color("text"))
-                                    .font(.system(size: 16, weight: .bold, design: .rounded))
-                            )
-                    }.buttonStyle(ShrinkingOpacityButton())
-                    
-                    Spacer()
-                    PasscodeButton(number: 0, passcodeIn: $userInput)
-                    Spacer()
-                    
-                    Button(action: { // delete
-                        if userInput.count > 0 {
-                            userInput.removeLast()
-                            hapticFeedback(type: .rigid)
+                if !resetting {
+                    VStack {
+                        Text("Enter your current passcode.")
+                            .font(.system(.title, design: .rounded)).bold()
+                            .foregroundColor(Color(settings.accentColor))
+                            .animation(.spring())
+                            .multilineTextAlignment(.center).lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                        HStack {
+                            Circle()
+                                .padding(userInput.count >= 1 ? 5 : 15)
+                            Circle()
+                                .padding(userInput.count >= 2 ? 5 : 15)
+                            Circle()
+                                .padding(userInput.count >= 3 ? 5 : 15)
+                            Circle()
+                                .padding(userInput.count >= 4 ? 5 : 15)
+                        }.padding(.horizontal, 80).animation(.spring())
+                        
+                        HStack {
+                            PasscodeButton(number: 1, passcodeIn: $userInput)
+                            PasscodeButton(number: 2, passcodeIn: $userInput)
+                            PasscodeButton(number: 3, passcodeIn: $userInput)
                         }
-                    }){
-                        Blur(effect: UIBlurEffect(style: .systemUltraThinMaterial))
-                            .frame(width: UIScreen.screenWidth * 0.2,
-                                    height: UIScreen.screenWidth * 0.2)
-                            .cornerRadius(100)
-                            .overlay(
-                                Image(systemName: "delete.left")
-                                    .foregroundColor(Color("text"))
-                                    .font(.system(size: 16, weight: .bold, design: .rounded))
-                            )
-                    }.buttonStyle(ShrinkingOpacityButton())
-                    Spacer()
-                }.padding(.bottom, 50).padding(.horizontal, 12)
-            }.padding(.horizontal)
+                        
+                        HStack {
+                            PasscodeButton(number: 4, passcodeIn: $userInput)
+                            PasscodeButton(number: 5, passcodeIn: $userInput)
+                            PasscodeButton(number: 6, passcodeIn: $userInput)
+                        }
+                        
+                        HStack {
+                            PasscodeButton(number: 7, passcodeIn: $userInput)
+                            PasscodeButton(number: 8, passcodeIn: $userInput)
+                            PasscodeButton(number: 9, passcodeIn: $userInput)
+                        }
+                        
+                        HStack {
+                            Spacer()
+                            Button(action: { // clear
+                                userInput = settings.devMode ? settings.passcode : ""
+                                hapticFeedback(type: .rigid)
+                            }){
+                                Blur(effect: UIBlurEffect(style: .systemUltraThinMaterial))
+                                    .frame(width: UIScreen.screenWidth * 0.2,
+                                            height: UIScreen.screenWidth * 0.2)
+                                    .cornerRadius(100)
+                                    .overlay(
+                                        Text("CLEAR")
+                                            .foregroundColor(Color("text"))
+                                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                                    )
+                            }.buttonStyle(ShrinkingOpacityButton())
+                            
+                            Spacer()
+                            PasscodeButton(number: 0, passcodeIn: $userInput)
+                            Spacer()
+                            
+                            Button(action: { // delete
+                                if userInput.count > 0 {
+                                    userInput.removeLast()
+                                    hapticFeedback(type: .rigid)
+                                }
+                            }){
+                                Blur(effect: UIBlurEffect(style: .systemUltraThinMaterial))
+                                    .frame(width: UIScreen.screenWidth * 0.2,
+                                            height: UIScreen.screenWidth * 0.2)
+                                    .cornerRadius(100)
+                                    .overlay(
+                                        Image(systemName: "delete.left")
+                                            .foregroundColor(Color("text"))
+                                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                                    )
+                            }.buttonStyle(ShrinkingOpacityButton())
+                            Spacer()
+                        }.padding(.horizontal, 12).padding(.bottom, 5)
+                        
+                        Button(action: {
+                            resetting = true
+                            hapticFeedback(type: .rigid)
+                        }){
+                            Blur(effect: UIBlurEffect(style: .systemUltraThinMaterial))
+                                .cornerRadius(18)
+                                .frame(width: UIScreen.screenWidth * 0.25, height: UIScreen.screenWidth * 0.16)
+                                .overlay(
+                                    Text("FORGOT")
+                                        .foregroundColor(Color("text"))
+                                        .font(.system(size: 16, weight: .bold, design: .rounded))
+                                )
+                        }.buttonStyle(ShrinkingOpacityButton())
+                    }.transition(AnyTransition.opacity.combined(with: .scale(scale: 0.5))).animation(.spring())
+                } else {
+                    VStack {
+                        Text("Delete current passcode.")
+                            .font(.system(.title, design: .rounded)).bold()
+                            .foregroundColor(Color(settings.accentColor))
+                            .animation(.spring())
+                            .multilineTextAlignment(.center).lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                        
+                        Text("Please confirm your choice.")
+                            .font(.system(.body, design: .rounded))
+                            .animation(.spring())
+                            .multilineTextAlignment(.center).lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                        Spacer()
+                        Button(action: {
+                            Receipt.deleteAll(receipts: receipts)
+                            // unlock
+                            backgroundColor = "yellow"
+                            hapticFeedback(type: .light)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { hapticFeedback(type: .light) }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                locked = false
+                                settings.passcode = ""
+                                settings.passcodeProtection = false
+                            }
+                                
+                        }){
+                            Blur(effect: UIBlurEffect(style: .systemThinMaterial))
+                                .opacity(0.9)
+                                .cornerRadius(12)
+                                .overlay(
+                                    // the title and body
+                                    VStack (alignment: .center){
+                                        Spacer()
+                                        Image(systemName: "exclamationmark.triangle.fill")
+                                            .font(.system(size: 50))
+                                        VStack(alignment: .center) {
+                                            Text("Confirm deletion")
+                                                .font(.system(size: 22, weight: .bold, design: .rounded))
+                                                .padding(.bottom, 5)
+                                            Text("This will delete all stored data, and remove the current passcode.")
+                                                .font(.system(size: 14, weight: .regular, design: .rounded))
+                                                .frame(width: UIScreen.screenWidth * 0.45)
+                                                .multilineTextAlignment(.center)
+                                        }
+                                        Spacer()
+                                    }.padding()
+                                ).frame(width: UIScreen.screenWidth * 0.65, height: UIScreen.screenHeight * 0.25)
+                                .padding(.bottom)
+                        }.buttonStyle(ShrinkingOpacityButton())
+                        
+                        Button(action: {
+                            resetting = false
+                            hapticFeedback(type: .light)
+                        }){
+                            Blur(effect: UIBlurEffect(style: .systemThinMaterial))
+                                .opacity(0.9)
+                                .cornerRadius(12)
+                                .overlay(
+                                    // the title and body
+                                    VStack (alignment: .center){
+                                        Spacer()
+                                        Image(systemName: "arrow.backward")
+                                            .font(.system(size: 50))
+                                        VStack(alignment: .center) {
+                                            Text("Cancel deletion")
+                                                .font(.system(size: 22, weight: .bold, design: .rounded))
+                                                .padding(.bottom, 5)
+                                            Text("This will return you to the passcode screen to enter your passcode.")
+                                                .font(.system(size: 14, weight: .regular, design: .rounded))
+                                                .frame(width: UIScreen.screenWidth * 0.4)
+                                                .multilineTextAlignment(.center)
+                                        }
+                                        Spacer()
+                                    }.padding()
+                                ).frame(width: UIScreen.screenWidth * 0.65, height: UIScreen.screenHeight * 0.25)
+                                .padding(.bottom)
+                        }.buttonStyle(ShrinkingOpacityButton())
+                        Spacer()
+                    }.transition(AnyTransition.opacity.combined(with: .move(edge: .bottom))).animation(.spring())
+                }
+            }.padding(.horizontal).padding(.bottom, 50).animation(.spring())
         }.onChange(of: userInput, perform: { _ in
             if userInput.count == 4 {
                 if userInput == settings.passcode {
                     // unlock
                     backgroundColor = "UI2"
                     hapticFeedback(type: .light)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { hapticFeedback(type: .light) }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { hapticFeedback(type: .medium) }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                         locked = false
                     }
@@ -354,7 +461,7 @@ struct PasscodeButton: View {
     var body: some View {
         Button(action: { // 1
             addNumber(numIn: number)
-            //hapticFeedback(type: .light)
+            hapticFeedback(type: .light)
         }){
             Blur(effect: UIBlurEffect(style: .systemUltraThinMaterial))
                     .cornerRadius(100)

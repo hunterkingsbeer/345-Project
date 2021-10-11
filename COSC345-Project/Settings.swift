@@ -32,12 +32,12 @@ struct SettingsView: View  {
                                 .frame(height: UIScreen.screenHeight * 0.2)
                         }
                         
-                        // scan selector
-                        ScanDefaultSelector()
-                            .frame(height: UIScreen.screenHeight * 0.2)
-                        
                         // passcode selector
                         PasscodeSelector()
+                            .frame(height: UIScreen.screenHeight * 0.2)
+                        
+                        // scan selector
+                        ScanDefaultSelector()
                             .frame(height: UIScreen.screenHeight * 0.2)
                         
                         // color
@@ -101,7 +101,7 @@ struct PasscodeSelector: View {
                                         .font(.system(size: 55))
                                 }
                                 Image(systemName: settings.passcodeProtection ? "lock.fill" : "shield.slash.fill")
-                                    .foregroundColor(Color("text"))
+                                    .foregroundColor(Color(settings.passcodeProtection ? "text" : "accentAlt"))
                                     .font(.system(size: settings.passcodeProtection ? 30 : 45))
                                 .animation(.easeInOut)
                             }
@@ -175,13 +175,12 @@ struct DarkModeButton: View {
                             Image(systemName: "moon.fill")
                                 .font(.largeTitle)
                                 .foregroundColor(Color(settings.accentColor))
-                                .transition(AnyTransition.scale(scale: 0.25)
-                                                .combined(with: .opacity))
+                                .transition(AnyTransition.scale(scale: 0.5).combined(with: .opacity))
                         } else {
                             Image(systemName: "sun.max.fill")
                                 .font(.largeTitle)
-                                .transition(AnyTransition.scale(scale: 0.25)
-                                                .combined(with: .opacity))
+                                .transition(AnyTransition.scale(scale: 0.5).combined(with: .opacity))
+                                
                         }
                         Spacer()
                         Text("\(settings.darkMode ? "DARK" : "LIGHT") MODE")
@@ -212,7 +211,7 @@ struct ScanDefaultSelector: View {
                                 withAnimation(.easeInOut){
                                     settings.scanDefault = ScanDefault.camera.rawValue
                                 }
-                                hapticFeedback(type: .soft)
+                                hapticFeedback(type: .rigid)
                             }){
                                 Image(systemName: "camera")
                                     .font(.largeTitle)
@@ -230,7 +229,7 @@ struct ScanDefaultSelector: View {
                                 withAnimation(.easeInOut){
                                     settings.scanDefault = ScanDefault.choose.rawValue
                                 }
-                                hapticFeedback(type: .soft)
+                                hapticFeedback(type: .rigid)
                             }){
                                 Image(systemName: "plus")
                                     .font(.largeTitle)
@@ -248,7 +247,7 @@ struct ScanDefaultSelector: View {
                                 withAnimation(.easeInOut){
                                     settings.scanDefault = ScanDefault.gallery.rawValue
                                 }
-                                hapticFeedback(type: .soft)
+                                hapticFeedback(type: .rigid)
                             }){
                                 VStack {
                                     Image(systemName: "photo")
@@ -263,7 +262,7 @@ struct ScanDefaultSelector: View {
                         }
                         Spacer()
                     }
-                    Text("SCAN SCREEN OPTION")
+                    Text("DEFAULT SCANNER: \(settings.scanDefault == ScanDefault.camera.rawValue ? "CAMERA" : settings.scanDefault == ScanDefault.gallery.rawValue ? "GALLERY" : "EITHER")")
                         .bold()
                         .font(.system(.body, design: .rounded))
                     Spacer()
@@ -304,8 +303,8 @@ struct AccentColorSelector: View {
                                                         if settings.accentColor == colors[color]{
                                                             Image(systemName: "circle.fill")
                                                                 .font(.system(size: 18, weight: .bold))
-                                                                .foregroundColor(Color("object"))
-                                                                .transition(AnyTransition.scale(scale: 0)/*.combined(with: .opacity)*/)
+                                                                .foregroundColor(Color("accent"))
+                                                                .transition(AnyTransition.scale(scale: 0.25).combined(with: .opacity))
                                                         }
                                                     }
                                                 )
@@ -320,8 +319,8 @@ struct AccentColorSelector: View {
                                                         if settings.accentColor == colors[color]{
                                                             Image(systemName: "circle.fill")
                                                                 .font(.system(size: 18, weight: .bold))
-                                                                .foregroundColor(Color("object"))
-                                                                .transition(AnyTransition.scale(scale: 0.9).combined(with: .opacity))
+                                                                .foregroundColor(Color("accent"))
+                                                                .transition(AnyTransition.scale(scale: 0.25).combined(with: .opacity))
                                                         }
                                                     }
                                                 ).frame(width: UIScreen.screenWidth*0.1, height: UIScreen.screenWidth*0.1)

@@ -82,7 +82,7 @@ struct HomeView: View {
                                     }){
                                         Image(systemName: "arrow.up.to.line")
                                             .opacity(0.5)
-                                    }.buttonStyle(ShrinkingButton())
+                                    }.buttonStyle(ShrinkingButton()).padding(.bottom)
                                 }
                             } else {
                                 NoReceiptsView()
