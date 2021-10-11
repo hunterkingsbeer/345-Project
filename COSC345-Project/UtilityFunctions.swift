@@ -86,7 +86,6 @@ extension View {
         }
     }
     
-    
     /// ``underlineTextField``
     /// is a property than can be applied to any View object to provide a predetermined underline to it. However, this is specifically designed to be applied to text.
     /// - Returns

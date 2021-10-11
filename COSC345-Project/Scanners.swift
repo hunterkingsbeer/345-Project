@@ -181,7 +181,6 @@ struct ScannerSelectView: View {
     }
 }
 
-
 /// ``ConfirmationView``
 /// is a View struct that shows the user its scanned receipt(s) and then provides them with an option of editing, discarding, or confirming the scan.
 /// - Called by DocumentScannerView and GalleryScannerView.
@@ -271,7 +270,7 @@ struct ConfirmationView: View {
                 
                 VStack { // buttons
                     HStack (alignment: .center){
-                        Button(action:{ // cancel
+                        Button(action: { // cancel
                             if isEditing {
                                 updateEditedReceipt()
                                 isEditing = false
@@ -286,7 +285,7 @@ struct ConfirmationView: View {
                                         .animation(.spring()))
                         }.buttonStyle(ShrinkingButton())
                         
-                        Button(action:{ // confirmation
+                        Button(action: { // confirmation
                             if isEditing {
                                 saveReceipt()
                                 isEditing = false
@@ -519,21 +518,13 @@ struct ImagePicker: UIViewControllerRepresentable {
     final class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
         var galleryView: ImagePicker
         
-        init(with gallery: ImagePicker) {
-            self.galleryView = gallery
-        }
+        init(with gallery: ImagePicker) { self.galleryView = gallery }
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
             
-            if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-                galleryView.didFinishScanning(.success([image]))
-            }
+            if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage { galleryView.didFinishScanning(.success([image])) }
         }
-        func imagePickerControllerDidCancel(_ controller: UIImagePickerController) {
-            galleryView.didCancelScanning()
-        }
-        func imagePickerViewController(_ controller: UIImagePickerController, didFailWithError error: Error) {
-            galleryView.didFinishScanning(.failure(error))
-        }
+        func imagePickerControllerDidCancel(_ controller: UIImagePickerController) { galleryView.didCancelScanning() }
+        func imagePickerViewController(_ controller: UIImagePickerController, didFailWithError error: Error) { galleryView.didFinishScanning(.failure(error)) }
     }
 }
 

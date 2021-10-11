@@ -170,7 +170,6 @@ struct ReceiptDetailView: View  {
     }
 }
 
-
 /// ``ReceiptViewButtons``
 /// is a View struct that displays the buttons at the bottom of the ReceiptDetailView, allowing the receipt to be modified as needed.
 /// - Called by ReceiptDetailView.
@@ -229,10 +228,7 @@ struct ReceiptViewButtons: View {
                     }
                 })
                 
-                
-                
                 // View Text button
-                
                 Button(action: {
                     detailState = detailState == .text ? .none : .text
                     hapticFeedback(type: .rigid)
@@ -315,17 +311,6 @@ extension Receipt {
     static func getEmptyReceipt() -> Receipt {
         return Receipt(context: PersistenceController.shared.getContext())
     }
-    
-    /*static func updateReceipt(receipt: Receipt, editedReceipt: (title: String, folder: String, body: String, date: Date)) {
-        let receiptFinal = Receipt.getReceipt(title: receipt.title ?? "")
-        
-        receiptFinal.title = editedReceipt.title
-        receiptFinal.body = editedReceipt.body
-        receiptFinal.folder = editedReceipt.folder
-        receiptFinal.date = editedReceipt.date
-        
-        Receipt.save()
-    } NOT IN USE FOR FULL RELEASE */
     
     ///``getReceipts``
     /// Gets an array of receipts from the database.
@@ -464,8 +449,6 @@ struct EditableReceiptText: View {
             }.font(font)
     }
 }
-
-
 
 struct ImageView: View {
     var image: Image

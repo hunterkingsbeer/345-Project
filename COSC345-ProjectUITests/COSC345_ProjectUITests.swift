@@ -60,7 +60,7 @@ class COSC345_ProjectUITests: XCTestCase {
         
         let scrollViewsQuery = app.scrollViews
         elementsQuery = scrollViewsQuery.otherElements
-        if(app.scrollViews.otherElements.staticTexts["PASSCODE DISABLED "].exists || app.scrollViews.otherElements.staticTexts["PASSCODE ENABLED "].exists){
+        if app.scrollViews.otherElements.staticTexts["PASSCODE DISABLED "].exists || app.scrollViews.otherElements.staticTexts["PASSCODE ENABLED "].exists {
             app.buttons["hammer.fill"].tap()
         }
         
@@ -157,7 +157,7 @@ class COSC345_ProjectUITests: XCTestCase {
         let app = XCUIApplication()
         let settingsButton = app.tabBars["Tab Bar"].buttons["Settings"]
         settingsButton.tap()
-        if(app.scrollViews.otherElements.staticTexts["PASSCODE DISABLED"].exists){
+        if app.scrollViews.otherElements.staticTexts["PASSCODE DISABLED"].exists {
             app.buttons["hammer.fill"].tap()
         }
         
@@ -240,7 +240,7 @@ class COSC345_ProjectUITests: XCTestCase {
         sleep(2)
         
         let scrollViewsQuery = app.scrollViews
-        let blondStaticText = scrollViewsQuery.otherElements.containing(.staticText, identifier:"Blond").children(matching: .staticText).matching(identifier: "Blond").element(boundBy: 0)
+        let blondStaticText = scrollViewsQuery.otherElements.containing(.staticText, identifier: "Blond").children(matching: .staticText).matching(identifier: "Blond").element(boundBy: 0)
         XCTAssert(blondStaticText.exists)
  
         
@@ -256,7 +256,7 @@ class COSC345_ProjectUITests: XCTestCase {
     func passcodeCheck(){
         sleep(2)
         let app = XCUIApplication()
-        if( XCUIApplication().buttons["lock"].exists){
+        if XCUIApplication().buttons["lock"].exists {
             app.buttons["1"].tap()
             app.buttons["2"].tap()
             app.buttons["3"].tap()
@@ -268,7 +268,7 @@ class COSC345_ProjectUITests: XCTestCase {
 
 extension XCUIElement {
     func forceTap() {
-        coordinate(withNormalizedOffset:CGVector(dx:0.5, dy:0.5)).tap()
+        coordinate(withNormalizedOffset: CGVector(dx:0.5, dy:0.5)).tap()
     }
 }
 
