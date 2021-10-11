@@ -171,7 +171,7 @@ struct PasscodeScreen: View {
                         Button(action: {
                             Receipt.deleteAll(receipts: receipts)
                             // unlock
-                            backgroundColor = "yellow"
+                            backgroundColor = "caution"
                             hapticFeedback(type: .light)
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { hapticFeedback(type: .light) }
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
