@@ -38,6 +38,7 @@ struct ContentView: View {
     ///``locked`` locks the screen if the user has passcode protection enabled
     @State var locked = false
     
+    /// The View consists of a tabview that holds our three tabs. A fullscreen cover holds the passcode screen, enabled when settings permit.
     var body: some View {
         TabView(selection: $selectedTab.selection){
             HomeView()
@@ -65,6 +66,7 @@ struct ContentView: View {
 /// Consists of a Color with value "background", which automatically updates to be white when in light mode, and almost black in dark mode.
 /// - Called by HomeView, ScanView, and SettingsView.
 struct BackgroundView: View {
+    /// A simple color, which allows for the background of the app to be changed app wide.
     var body: some View {
         Color("background")
             .ignoresSafeArea(.all)
@@ -89,6 +91,7 @@ struct TitleText: View {
     ///``icon`` is a String that is used to set the titles icon.
     let icon: String
     
+    /// The title that is seen in all tabs.
     var body: some View {
         HStack {
             HStack {

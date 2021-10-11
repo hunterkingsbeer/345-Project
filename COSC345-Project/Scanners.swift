@@ -289,7 +289,7 @@ struct ConfirmationView: View {
                             if isEditing {
                                 saveReceipt()
                                 isEditing = false
-                            }else {
+                            } else {
                                 exit(success: true)
                             }
                         }){

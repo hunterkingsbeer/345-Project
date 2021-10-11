@@ -62,7 +62,7 @@ struct PasscodeSelector: View {
     @EnvironmentObject var settings: UserSettings
     
     ///``passState``: is used to control the passcode editing state (cereating, updating, removing)
-    @State var passState : PassEditingState = .none
+    @State var passState: PassEditingState = .none
     
     ///``passEditScreen``: is used to control the fullscreen passcodeEdit view. Editing managed the fullscreen presentation, and expected code controls the edit type to be passed through (cereating, updating, removing)
     @State var passEditScreen = (editing: false, expectedCode: "0000")
