@@ -23,6 +23,8 @@ To generate random receipts, navigate to the settings tab and tap the hammer ico
 [Click Here!](https://hunterkingsbeer.github.io/345-Project/index.html)
 
 ### Previews:
-Home Screen | Selected Folder | Searching
-:-------------------------:|:-------------------------:|:-------------------------: 
-<img src="https://i.imgur.com/pauyVax.jpg" width="300"> | <img src="https://i.imgur.com/xD9XTih.jpg" width="300"> | <img src="https://i.imgur.com/YY6VCSL.jpg" width="300">
+Home Screen | Selected Folder
+:-------------------------:|:-------------------------:
+<img src="https://i.imgur.com/Uz49mID.png" width="400"> | <img src="https://i.imgur.com/YELcH92.png" width="400"> 
+Passcode Protection | Scan Confirmation
+<img src="https://i.imgur.com/dDVPSKE.png" width="400"> | <img src="https://i.imgur.com/0rIPMT4.png" width="400"> 
