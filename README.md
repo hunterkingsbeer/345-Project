@@ -4,7 +4,7 @@
 [![codecov](https://codecov.io/gh/hunterkingsbeer/345-Project/branch/main/graph/badge.svg?token=D8BWFYEIIN)](https://codecov.io/gh/hunterkingsbeer/345-Project)
 
 Receipted is a receipt scanning application that intuitively categorizes receipts based on the body text within. 
-Made for COSC345's full year project. Currently on the iOS App Store!
+Made for COSC345's full year project. _**Currently on the iOS App Store!**_
 
 ### Running the application:
 This app has been developed using an iPhone 11 Pro, however it should run on any device running iOS 7 and above.
